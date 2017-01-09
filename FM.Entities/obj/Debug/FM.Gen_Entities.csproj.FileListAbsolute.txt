@@ -1,0 +1,4 @@
+C:\dev\csharp\FM.Entities\bin\Debug\FM.Entities.dll
+C:\dev\csharp\FM.Entities\bin\Debug\FM.Entities.pdb
+C:\dev\csharp\FM.Entities\obj\Debug\FM.Entities.dll
+C:\dev\csharp\FM.Entities\obj\Debug\FM.Entities.pdb
