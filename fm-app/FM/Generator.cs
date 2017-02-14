@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace FM.Generator
 {
-    public class Generator
+    public class WorldGenerator
     {
         internal static Random rnd = new Random();
 
@@ -85,7 +85,11 @@ namespace FM.Generator
             var charisma = rnd.Next(1, Player.MAX_CHARISMA);
             var baseConst = rnd.Next(15, Player.MAX_CONSTITUTION);
             var consti = baseConst - ((age - Player.MIN_AGE) / 2);
-            var xpLevel = (age - Player.MIN_AGE).Times(i => (1-Math.Log(i+1, Player.LEVEL_CAP_LOG_BASE))).Sum();
+            var xpLevel = 0d;
+            for (int i = 0; i < (age- Player.MIN_AGE); i++)
+            {
+                xpLevel += 1 - Math.Log(i + 1, Player.LEVEL_CAP_LOG_BASE);
+            }
             var setplayskill = rnd.Next(1, Player.MAX_SET_PLAY_SKILL);
 
             Player player = new Player()

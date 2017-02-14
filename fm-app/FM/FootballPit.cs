@@ -1,104 +1,163 @@
-﻿using FM.Common;
+﻿using FM;
+using FM.Common;
 using FM.Entities.Generic;
+using FM.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace FootballPit
 {
 
     public class Match
     {
-        public int LengthInActions { get; set; }
+
         public Club HomeClub { get; set; }
         public Club AwayClub { get; set; }
 
+        public static int PENALTY_AREA_BORDER = 2;
+        public static int FIELD_AREAS = 8;
+        public static double ATTK_FACTOR_INIT = 1.25;
+        public static double ATTK_FACTOR_AREA_MULTIPLIER = 0.98;
+        public static double GOALSHOT_FACTOR_INIT = 1d;
+        public static double GOALSHOT_AREA_MULTIPLIER = 0.75;
+        public static double SWEEPER_PICK_FACTOR = 0.3;
+        public static double CENTRALPLAYER_PICK_FACTOR = 0.3;
+        public static double FITNESS_DECAY_OFF = 3d;
+        public static double FITNESS_DECAY_DEF = 6d;
+        public static double FITNESS_DECAY_TACTIC_BONUS = 2d;
+        public static double ATTK_FACTOR_OFFENSIVE = 1.2;
+        public static double ATTK_FACTOR_NORMAL = 1d;
+        public static double DEF_FACTOR_HARD_TACKLING = 1.4;
+        public static double DEF_FACTOR_NORMAL_TACKLING = 1d;
+        public static double DEF_FACTOR_LOW_TACKING = 0.8;
+        public static double GAME_LENGTH = 90;
+        public static double LONGSHOT_P_INIT = 0.4;
+        public static double LONGSHOT_P_INIT_HIGH = 0.5;
+        public static double LONGSHOT_P_INIT_LOW = 0.3;
+        public static double LONGSHOT_P_AREA_MULTIPLIER = 0.5;
+        public static double FREEKICK_P = 0.15;
+        public static double FREEKICK_P_BRUTAL = 0.2;
+        public static double FREEKICK_P_CLEAN = 0.1;
+        public static double PENALTYSHOT_FACTOR = 1.4;
+        public static double FREEKICK_FACTOR_INIT = 0.9;
+        public static double FREEKICK_FACTOR_AREA_MULTIPLIER = 0.25;
 
         public MatchResult Simulate()
         {
-
             var res = new MatchResult();
             res.HomeLineUp = HomeClub.StartingLineUp;
             res.AwayLineUp = AwayClub.StartingLineUp;
             var currentHomeLU = HomeClub.StartingLineUp;
             var currentAwayLU = AwayClub.StartingLineUp;
-            //var currentHomeBench = HomeClub.StartingBench;
-            //var currentAwayBench = AwayClub.StartingBench;
             var offClub = HomeClub;
             var defClub = AwayClub;
             var offLineUp = currentHomeLU;
             var defLineUp = currentAwayLU;
-            for (var i = 0; i < LengthInActions; i++)
+            var area = FIELD_AREAS / 2;
+            var gform = new GameForm(HomeClub, AwayClub, FIELD_AREAS);
+            gform.Show();
+            for (var i = 0; i < GAME_LENGTH; i++)
             {
-                if (FreeKickOrPenaltyGoal(offLineUp, defLineUp))
+
+                gform.UpdateHomeLineup(currentHomeLU);
+                gform.UpdateAwayLineUp(currentAwayLU);
+                gform.SetArea(area, offClub);
+                Thread.Sleep(200);
+                if (IsGoalShotFired(offLineUp, area))
                 {
-                    AddGoal(res, offClub, offLineUp.KickTaker);
+                    gform.Log("Schuss!", i);
+                    Thread.Sleep(50);
+                    if (GoalShot(offLineUp.FieldPlayers, defLineUp.Goalie, area))
+                    {
+                        var p = DistributeGoal(offLineUp);
+                        AddGoal(res, offClub, p);
+                        area = FIELD_AREAS / 2;
+                        gform.Log("Tor von " + p.LastName + " (" + offClub.Name + ")", i);
+                    }
                 }
                 else
                 {
-
-                    if (TryAttack(offLineUp, defLineUp))
+                    if (area > area / 2 && IsFoul(defLineUp))
                     {
-                        var scorer = DistributeGoal(offLineUp, true);
-                        AddGoal(res, offClub, scorer);
-
+                        if (FreeKickOrPenalty(offLineUp, defLineUp, area))
+                        {
+                            AddGoal(res, offClub, DistributeGoal(offLineUp));
+                            area = FIELD_AREAS / 2;
+                        }
+                    }
+                    else
+                    {
+                        if (Battle(offLineUp, defLineUp, area))
+                        {
+                            area++;
+                            continue;
+                        }
                     }
 
 
-                }
-                if (offLineUp.Equals(currentHomeLU))
-                {
-                    offLineUp = currentAwayLU;
-                    offClub = AwayClub;
-                    defLineUp = currentHomeLU;
-                    defClub = HomeClub;
-                }
-                else
-                {
-                    defLineUp = currentAwayLU;
-                    defClub = AwayClub;
-                    offLineUp = currentHomeLU;
-                    offClub = HomeClub;
-                }
-                //Substitute(ref currentHomeLU, ref currentHomeBench, HomeClub, res);
-                //Substitute(ref currentAwayLU, ref currentAwayBench, AwayClub, res);
-            }
+                    area = FIELD_AREAS - area;
+                    if (offLineUp.Equals(currentHomeLU))
+                    {
+                        offLineUp = currentAwayLU;
+                        offClub = AwayClub;
+                        defLineUp = currentHomeLU;
+                        defClub = HomeClub;
+                    }
+                    else
+                    {
+                        defLineUp = currentAwayLU;
+                        defClub = AwayClub;
+                        offLineUp = currentHomeLU;
+                        offClub = HomeClub;
+                    }
 
+                }
+
+            }
+            
             return res;
         }
 
+        public static Random Random = new Random(1860);
 
-        //internal void Substitute(ref LineUp lineUp, ref LineUp bench, Club c, MatchResult mr)
-        //{
-        //    Substitute(ref lineUp.Goalies, ref bench.Goalies, c, mr);
-        //    Substitute(ref lineUp.Defenders, ref bench.Defenders,c, mr);
-        //    Substitute(ref lineUp.Midfielders, ref bench.Midfielders, c, mr);
-        //    Substitute(ref lineUp.Strikers, ref bench.Strikers,c, mr);
-        //}
+        public bool IsGoalShotFired(LineUp lu, int area)
+        {
+            if (area == FIELD_AREAS)
+            {
+                return true;
+            }
+            var init = lu.LongShots == Frequency.High ? LONGSHOT_P_INIT_HIGH : lu.LongShots == Frequency.Normal ? LONGSHOT_P_INIT : LONGSHOT_P_INIT_LOW;
+            var p = init * Math.Pow(LONGSHOT_P_AREA_MULTIPLIER, FIELD_AREAS - area);
 
-        //internal void Substitute(ref List<Player> a, ref List<Player> b, Club c, MatchResult mr)
-        //{
-        //    if (b.Count > 0)
-        //    {
-        //        var playerA = a.OrderBy(x => x.CurrentSKill).First();
-        //        var playerB = b.OrderByDescending(x => x.CurrentSKill).First();
+            return Random.NextDouble() < p;
+        }
 
-        //        if (playerA.CurrentSKill * 1.3 <= playerB.CurrentSKill)
-        //        {
-        //            a.Remove(playerA);
-        //            b.Add(playerA);
-        //            a.Add(playerB);
-        //            b.Remove(playerB);
-        //            mr.Substitutions.Add(new Substitution(c, playerB, playerA));
-        //        }
-        //    }
-        //}
 
-        internal Player DistributeGoal(LineUp lu, bool goalgetterBonus)
+
+
+        internal Player DistributeGoal(LineUp lu)
         {
             var p = new Dictionary<Player, double>();
             lu.Players.ForEach(x => p.Add(x, Util.GetGaussianRandom(x.CurrentSkill, Player.MAX_SKILL / 5)));
             return p.OrderByDescending(x => x.Value).First().Key;
+        }
+
+
+        internal bool IsFoul(LineUp def)
+        {
+            var dice = Random.NextDouble();
+            return (dice < (def.Tackling == Tackling.Brutal ? FREEKICK_P_BRUTAL : def.Tackling == Tackling.Clean ? FREEKICK_P_CLEAN : FREEKICK_P));
+        }
+
+        public bool FreeKickOrPenalty(LineUp off, LineUp def, int area)
+        {
+            var r1 = RollSkill(off.KickTaker.SetPlaySkill, off.KickTaker.SetPlaySkill);
+            var r2 = RollSkill(def.Goalie.Def, def.Goalie.Def);
+            var distance = FIELD_AREAS - area;
+            var offFactor = (distance > 1) ? FREEKICK_FACTOR_INIT * Math.Pow(FREEKICK_FACTOR_AREA_MULTIPLIER, distance) : PENALTYSHOT_FACTOR;
+            return r1 * offFactor > r2;
 
         }
 
@@ -132,21 +191,7 @@ namespace FootballPit
             }
         }
 
-        internal Boolean TryAttack(LineUp off, LineUp def)
-        {
 
-            if (Battle(off, def))
-            {
-                if (GoalShot(off.FieldPlayers, def.Goalie))
-                {
-                    return true;
-                }
-
-            }
-
-            return false;
-
-        }
 
         internal void AddGoal(MatchResult mr, Club c, Player scorer)
         {
@@ -163,19 +208,18 @@ namespace FootballPit
 
         }
 
-        internal Boolean GoalShot(List<Player> off, Player goalie)
+        internal Boolean GoalShot(List<Player> off, Player goalie, int area)
         {
-
+            var offFactor = GOALSHOT_FACTOR_INIT * Math.Pow(GOALSHOT_AREA_MULTIPLIER, FIELD_AREAS - area);
             var offSkillAverage = off.Sum(x => x.Attk) / off.Count;
             var offSingle = off.OrderByDescending(x => x.Attk + Util.GetGaussianRandom(offSkillAverage, offSkillAverage / 5)).First();
-            Console.WriteLine("Oppurtunity " + offSingle.LastName);
             var r1 = RollSkill(offSingle.Attk, offSkillAverage);
             var r2 = RollSkill(goalie.Def, goalie.Def) * 1.4f;
 
             offSingle.DecayFitness(2f);
             goalie.DecayFitness(2f);
 
-            var goal = r1 > r2;
+            var goal = r1 * offFactor > r2;
             if (goal)
             {
                 Console.WriteLine("Goal!");
@@ -187,29 +231,77 @@ namespace FootballPit
             return goal;
         }
 
-        internal Boolean Battle(LineUp off, LineUp def)
-        {
 
-            var offSkillAverage = off.FieldPlayers.Sum(x => x.Attk) / off.FieldPlayers.Count;
-            var defSkillAverage = def.FieldPlayers.Sum(x => x.Def) / def.FieldPlayers.Count;
+
+        internal Boolean Battle(LineUp off, LineUp def, int area)
+        {
+            var offPlayers = new List<Player>();
+            var defPlayers = new List<Player>();
+
+            offPlayers.AddRange(off.Midfielders);
+            defPlayers.AddRange(def.Midfielders);
+            if (area >= FIELD_AREAS / 2)
+            {
+                offPlayers.AddRange(off.Strikers);
+                defPlayers.AddRange(def.Defenders);
+
+            }
+            else
+            {
+                offPlayers.AddRange(off.Defenders);
+                defPlayers.AddRange(def.Strikers);
+            }
+
+            var offSkillAverage = off.FieldPlayers.Sum(x => x.Attk) / Math.Max(offPlayers.Count, defPlayers.Count);
+            var defSkillAverage = def.FieldPlayers.Sum(x => x.Def) / Math.Max(offPlayers.Count, defPlayers.Count);
             var defFitAverage = def.FieldPlayers.Sum(x => x.Fitness) / def.FieldPlayers.Count;
 
 
-            var offSingle = off.FieldPlayers.OrderByDescending(x => (x.Attk + Util.GetGaussianRandom(offSkillAverage, offSkillAverage / 5)) * ((x == off.CentralPlayer || x == def.Sweeper) ? 0.8 : 1)).First();
-            var defSingle = def.FieldPlayers.OrderByDescending(x => (x.Fitness + Util.GetGaussianRandom(defFitAverage, defFitAverage / 5)) * ((x == def.Sweeper || x.Position == Position.Striker) ? 0.8 : 1)).First();
+            var offSingle = off.FieldPlayers.OrderByDescending(x => (x.Attk + Util.GetGaussianRandom(offSkillAverage, offSkillAverage / 5)) * GetPickFactor(off, x, area, true)).First();
+            var defSingle = def.FieldPlayers.OrderByDescending(x => (x.Fitness + Util.GetGaussianRandom(defFitAverage, defFitAverage / 5)) * GetPickFactor(def, x, area, false)).First();
 
-            var offBonus = (off.Tactic == Tactic.Offensive) ? 1.2f : 1f;
-            var r1 = (off.CentralPlayer == null ? RollSkill(offSingle.Attk, offSkillAverage) : RollSkill(offSingle.Attk, off.CentralPlayer.Attk, offSkillAverage)) * offBonus;
-            var defBonus = (def.Tackling == Tackling.Brutal) ? 1.6f : (def.Tackling == Tackling.Normal) ? 1.4f : 1.2f;
-            var r2 = (def.Sweeper == null ? RollSkill(defSingle.Def, defSkillAverage) : RollSkill(defSingle.Def, def.Sweeper.Def, defSkillAverage)) * defBonus;
+            var offBonus = ((off.Tactic == Tactic.Offensive) ? ATTK_FACTOR_OFFENSIVE : ATTK_FACTOR_NORMAL);
+            var offAreaFactor = ATTK_FACTOR_INIT * Math.Pow(ATTK_FACTOR_AREA_MULTIPLIER, area);
+            var r1 = RollSkill(offSingle.Attk, offSkillAverage) * offAreaFactor * offBonus;
+            var defBonus = (def.Tackling == Tackling.Brutal) ? DEF_FACTOR_HARD_TACKLING : (def.Tackling == Tackling.Normal) ? DEF_FACTOR_NORMAL_TACKLING : DEF_FACTOR_LOW_TACKING;
+            var r2 = RollSkill(defSingle.Def, defSkillAverage) * defBonus;
 
-            var decayOff = 6f;
-            var decayDef = (def.Tactic == Tactic.Defensive) ? 4f : 6f;
-            offSingle.DecayFitness(decayOff);
-            defSingle.DecayFitness(decayDef);
+            var decayOff = FITNESS_DECAY_OFF;
+            var decayDef = (def.Tactic == Tactic.Defensive) ? FITNESS_DECAY_DEF - FITNESS_DECAY_TACTIC_BONUS : FITNESS_DECAY_DEF;
+            offSingle.DecayFitness((float)decayOff);
+            defSingle.DecayFitness((float)decayDef);
 
             return r1 > r2;
 
+        }
+
+        private double GetPickFactor(LineUp l, Player p, int area, bool isOffence)
+        {
+            if (p == l.Sweeper)
+            {
+                if (area <= PENALTY_AREA_BORDER)
+                {
+                    return 1 + SWEEPER_PICK_FACTOR;
+                }
+                else
+                {
+                    return 1 - SWEEPER_PICK_FACTOR;
+                }
+            }
+
+            if (p == l.CentralPlayer)
+            {
+                if (isOffence)
+                {
+                    return 1 + CENTRALPLAYER_PICK_FACTOR;
+                }
+                else
+                {
+                    return 1 - CENTRALPLAYER_PICK_FACTOR;
+                }
+            }
+
+            return 1;
         }
 
         internal double RollSkill(double singleSkill, double avgSkill)

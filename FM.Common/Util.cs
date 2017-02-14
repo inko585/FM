@@ -7,6 +7,27 @@ using System.Windows.Forms;
 
 namespace FM.Common
 {
+    public static class RichInt
+    {
+
+        public static IEnumerable<T> Times<T>(this int times, Func<int, T> function)
+        {
+            for (int i = 0; i < times; i++)
+            {
+                yield return function(i);
+            }
+        }
+
+
+        public static void Times(this int times, Action action)
+        {
+            for (int i = 0; i < times; i++)
+            {
+                action();
+            }
+        }
+
+    }
     public class Util 
     {
 

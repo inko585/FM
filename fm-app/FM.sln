@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FM.Entities", "..\FM.Entiti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FM.App", "FM\FM.App.csproj", "{38AF8CEC-5275-42FE-8332-DABA257FA4A3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AE.Graphics", "..\..\vestigo\AE.Graphics\AE.Graphics.csproj", "{E334E390-4E69-4F44-9E36-8BBAEFBA166E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,14 @@ Global
 		{38AF8CEC-5275-42FE-8332-DABA257FA4A3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{38AF8CEC-5275-42FE-8332-DABA257FA4A3}.Release|x86.ActiveCfg = Release|Any CPU
 		{38AF8CEC-5275-42FE-8332-DABA257FA4A3}.Release|x86.Build.0 = Release|Any CPU
+		{E334E390-4E69-4F44-9E36-8BBAEFBA166E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E334E390-4E69-4F44-9E36-8BBAEFBA166E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E334E390-4E69-4F44-9E36-8BBAEFBA166E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E334E390-4E69-4F44-9E36-8BBAEFBA166E}.Debug|x86.Build.0 = Debug|Any CPU
+		{E334E390-4E69-4F44-9E36-8BBAEFBA166E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E334E390-4E69-4F44-9E36-8BBAEFBA166E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E334E390-4E69-4F44-9E36-8BBAEFBA166E}.Release|x86.ActiveCfg = Release|Any CPU
+		{E334E390-4E69-4F44-9E36-8BBAEFBA166E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

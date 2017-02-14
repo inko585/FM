@@ -38,6 +38,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Messaging" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -48,11 +49,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GameForm.Designer.cs">
+      <DependentUpon>GameForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Generator.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="FootballPit.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="GameForm.resx">
+      <DependentUpon>GameForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -75,6 +85,20 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\vestigo\AE.Graphics\AE.Graphics.csproj">
+      <Project>{E334E390-4E69-4F44-9E36-8BBAEFBA166E}</Project>
+      <Name>AE.Graphics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\FM.Common\FM.Common.csproj">
+      <Project>{39D28BEF-C8EF-4F6A-98E6-E1333E933448}</Project>
+      <Name>FM.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\FM.Entities\FM.Entities.csproj">
+      <Project>{7FD73F3B-0714-4BD1-946E-B46673ABC904}</Project>
+      <Name>FM.Entities</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -63,7 +63,7 @@ namespace FM.Entities.Base
         public string Name { get; set; }
         public int LeagueLevel { get; set; }
 
-   
+
 
         public List<Occurrence> Cities { get; set; }
 
@@ -139,26 +139,51 @@ namespace FM.Entities.Generic
     {
         public String Name { get; set; }
         public LineUp StartingLineUp { get; set; }
-        public LineUp StartingBench { get; set; }
     }
 
 
 
     public class LineUp
     {
-        public LineUp(List<Player> players, Player centralPlayer, Player sweeper, Tactic tactic, Tackling tackling)
+        public LineUp(List<Player> players, Player centralPlayer, Player sweeper, Tactic tactic, Tackling tackling, Frequency longshots)
         {
             this.Players = players;
             this.Tackling = tackling;
             this.Tactic = tactic;
             this.CentralPlayer = centralPlayer;
             this.Sweeper = sweeper;
+            this.LongShots = longshots;
         }
 
         public List<Player> Players { get; set; }
         public Player CentralPlayer { get; set; }
 
         public Player Sweeper { get; set; }
+
+        public Frequency LongShots { get; set; }
+
+        public List<Player> Strikers
+        {
+            get
+            {
+                return Players.Where(p => p.Position == Position.Striker).ToList();
+            }
+        }
+
+        public List<Player> Midfielders
+        {
+            get
+            {
+                return Players.Where(p => p.Position == Position.Midfielder).ToList();
+            }
+        }
+        public List<Player> Defenders
+        {
+            get
+            {
+                return Players.Where(p => p.Position == Position.Defender).ToList();
+            }
+        }
         public Tactic Tactic { get; set; }
         public Tackling Tackling { get; set; }
 
@@ -214,6 +239,8 @@ namespace FM.Entities.Generic
         public static int MAX_CONSTITUTION = 20;
         public static int MAX_CHARISMA = 20;
         public static int MAX_SET_PLAY_SKILL = 20;
+        public static float MAX_RATING = 10f;
+        public static float INIT_RATING = 5f;
         public static int MAX_SKILL = MAX_BASE_SKILL + MAX_XPLEVEL;
         public static int LEVEL_CAP_LOG_BASE = 30;
 
@@ -224,10 +251,38 @@ namespace FM.Entities.Generic
         public float BaseSkill { get; set; }
         public float XPLevel { get; set; }
         public int XP { get; set; }
-       
+
         public float Fitness { get; set; }
         public float Constitution { get; set; }
         public float Charisma { get; set; }
+
+        private float rating = INIT_RATING;
+        public float Rating
+        {
+            get
+            {
+                return rating;
+            }
+            set
+            {
+                if (value < 0)
+                {
+                    rating = 0;
+                }
+                else
+                {
+                    if (value > MAX_RATING)
+                    {
+                        rating = MAX_RATING;
+                    }
+                    else
+                    {
+                        rating = value;
+                    }
+                }
+
+            }
+        }
 
         public float Moral { get; set; }
         public float SetPlaySkill { get; set; }
@@ -235,14 +290,14 @@ namespace FM.Entities.Generic
         public Position Position { get; set; }
 
 
-        public int LevelCap ()
+        public int LevelCap()
         {
             if (XPLevel == null)
             {
                 return 0;
             }
 
-            return (int) Math.Floor(XP_FOR_FIRST_LEVEL / Math.Log(XPLevel, LEVEL_CAP_LOG_BASE));
+            return (int)Math.Floor(XP_FOR_FIRST_LEVEL / Math.Log(XPLevel, LEVEL_CAP_LOG_BASE));
         }
 
         public void AccountXP(int xp)
@@ -310,10 +365,11 @@ namespace FM.Entities.Generic
         Offensive, Defensive
     }
 
-    public enum Formation
+    public enum Frequency
     {
-        Offensive, Defensive
+        High, Normal, Seldom
     }
+
 
     public enum Tackling
     {
