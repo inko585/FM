@@ -1,0 +1,139 @@
+﻿<ae:AEWindow x:Class="FM.Views.MatchWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FM.Views"
+          xmlns:ae="clr-namespace:AE.Graphics.Wpf;assembly=AE.Graphics.Wpf"
+             mc:Ignorable="d" 
+             Height="700" Width="700" WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <ResourceDictionary Source="pack://application:,,,/AE.Graphics.Wpf;component/Styles/AEStyles.xaml"/>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+        
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80"/>
+                <RowDefinition Height="0"/>
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.ColumnSpan="2" BorderThickness="1" BorderBrush="#FFACACAC" Margin="5,10,5,0">
+                <Grid Background="White">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="115*"/>
+                    <ColumnDefinition Width="33*"/>
+                </Grid.ColumnDefinitions>
+                
+                <Label Name="homeCLabel" FontSize="18" PreviewMouseDown="Club_PreviewMouseDown" Content="{Binding HomeClub.Name}" Style="{StaticResource LinkLabelStyle}"/>
+                <Label Content="{Binding MatchResult.HomeGoals}" FontWeight="Bold" FontSize="18" Grid.Column="1" HorizontalAlignment="Center"/>
+            
+            </Grid>
+                    <Label Content="Zuschauer: 10000" FontStyle="Italic" Grid.Row="1" Margin="5"/>
+                    <Grid Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="33*"/>
+                        <ColumnDefinition Width="115*"/>
+
+                    </Grid.ColumnDefinitions>
+
+
+                    <Label Name="awayCLabel" FontSize="18"  PreviewMouseDown="Club_PreviewMouseDown" Content="{Binding AwayClub.Name}" Grid.Column="1" Style="{StaticResource LinkLabelStyle}" HorizontalAlignment="Right"/>
+                    <Label Content="{Binding MatchResult.AwayGoals}" FontSize="18" FontWeight="Bold"  HorizontalAlignment="Center"/>
+                </Grid>
+                </Grid>
+            </Border>
+            <Border Grid.Row="1" Background="{StaticResource NavAreaColor}" Margin="5,5,5,0" Grid.ColumnSpan="2"/>
+            <ListBox  Margin="5,5,5,0" ItemsSource="{Binding MatchResult.HomeLineUp.ObservableStartingPlayers}"  ItemContainerStyle="{StaticResource UnselectableAEItemBox}" Grid.Row="3">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="40"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Content="{Binding FullName}" PreviewMouseDown="Player_PreviewMouseDown" Style="{StaticResource LinkLabelStyle}" Grid.Column="1"/>
+                            <Label Content="{Binding MaxSkill}" Grid.Column="2"/>
+                            <Label Content="{Binding PositionStringShort}"/>
+                        </Grid>
+
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <ListBox  Margin="5,5,5,0" ItemsSource="{Binding MatchResult.AwayLineUp.ObservableStartingPlayers}" ItemContainerStyle="{StaticResource UnselectableAEItemBox}" Grid.Row="3" Grid.Column="1">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="40"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Content="{Binding MaxSkill}" />
+                            <Label Content="{Binding FullName}" PreviewMouseDown="Player_PreviewMouseDown" Style="{StaticResource LinkLabelStyle}"  HorizontalAlignment="Right" Grid.Column="1"/>
+                            <Label Content="{Binding PositionStringShort}" Grid.Column="2"/>
+                        </Grid>
+
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+        </Grid>
+        <Grid Grid.Row="1" Margin="0,10,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition />
+
+            </Grid.RowDefinitions>
+            <!--<StackPanel Margin="5,0">
+            <Label Content="TORSCHÜTZEN" />
+                <Separator />
+            </StackPanel>-->
+            <Border BorderBrush="#FFACACAC" BorderThickness="1" Background="White" Margin="5,5,5,0" >
+                <Label Content="TORSCHÜTZEN" Margin="5,0" VerticalAlignment="Center"/>
+            </Border>
+            <ListBox Margin="5" ItemsSource="{Binding MatchResult.Scorers}"  ItemContainerStyle="{StaticResource UnselectableAEItemBox}" Grid.Row="1">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="50"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="{Binding Minute}"/>
+                        <Label Content="{Binding Scorer.FullName}" PreviewMouseDown="Scorer_PreviewMouseDown" Style="{StaticResource LinkLabelStyle}" Grid.Column="1"/>
+                        <Label Content="{Binding CurrentScore}" Grid.Column="2"/>
+                    </Grid>
+
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        </Grid>
+
+        <Button Content="OK" Style="{StaticResource MainButton}" IsCancel="True" Grid.Row="2" Width="100" Margin="10" HorizontalAlignment="Right"/>
+    </Grid>
+</ae:AEWindow>

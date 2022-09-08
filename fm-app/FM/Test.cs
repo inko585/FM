@@ -1,6 +1,5 @@
 ﻿
 using FM.Entities.Base;
-using FM.Entities.Generic;
 using FootballPit;
 using System;
 using System.Collections.Generic;
@@ -9,29 +8,48 @@ using System.Text;
 using System.Threading.Tasks;
 using FM.Generator;
 using FM.Common;
+using FM.Models.Generic;
 
 namespace FM
 {
     public class Test
     {
-        World w = World.ReadWorld(@"C:\Users\marshall\Documents\gendata7.xml");
+        World w = World.ReadWorld(@"C:\Users\marshall\Documents\gendata11.xml");
         public void Run()
         {
-            var c = new Club();
-            c.Name = "Verein 1";
-               var c2 = new Club();
-            c2.Name = "Verein 2";
-            var lu1 = new LineUp(new List<Player>() { NewPlayer(Position.Goalie), NewPlayer(Position.Defender), NewPlayer(Position.Defender), NewPlayer(Position.Defender), NewPlayer(Position.Defender), NewPlayer(Position.Midfielder), NewPlayer(Position.Midfielder), NewPlayer(Position.Midfielder), NewPlayer(Position.Midfielder), NewPlayer(Position.Striker), NewPlayer(Position.Striker) }, null, null, Tactic.Offensive, Tackling.Brutal, Frequency.Normal);
-            var lu2 = new LineUp(new List<Player>() { NewPlayer(Position.Goalie), NewPlayer(Position.Defender), NewPlayer(Position.Defender), NewPlayer(Position.Defender), NewPlayer(Position.Defender), NewPlayer(Position.Midfielder), NewPlayer(Position.Midfielder), NewPlayer(Position.Midfielder), NewPlayer(Position.Midfielder), NewPlayer(Position.Striker), NewPlayer(Position.Striker) }, null, null, Tactic.Offensive, Tackling.Brutal, Frequency.Normal);
-            c.StartingLineUp = lu1;
-            c2.StartingLineUp = lu2;
+            //var c = new Club();
+            //c.Name = "Verein 1";
+            //var c2 = new Club();
+            //c2.Name = "Verein 2";
+            //var lu1 = new LineUp(new List<Player>() { NewPlayer(Position.Goalie), NewPlayer(Position.Defender), NewPlayer(Position.Defender), NewPlayer(Position.Midfielder), NewPlayer(Position.Striker), NewPlayer(Position.Striker) }, null, null, Tactic.Offensive, Tackling.Clean, Frequency.Normal);
+            //lvl = 5;
+            //var lu2 = new LineUp(new List<Player>() { NewPlayer(Position.Goalie), NewPlayer(Position.Defender), NewPlayer(Position.Defender), NewPlayer(Position.Midfielder), NewPlayer(Position.Midfielder), NewPlayer(Position.Striker) }, null, null, Tactic.Defensive, Tackling.Brutal, Frequency.High);
+            //c.StartingLineUp = lu1;
+            //c2.StartingLineUp = lu2;
 
+
+
+            //var matches = new List<MatchResult>();
+            //20.Times(() =>
+            //{
+            var c = WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.Nations.First(), 6);
+            c.Coach.Philospophie = new PossessionPhilosophie();
+            var c2 = WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.Nations.First(), 6);
+            c2.Coach.Philospophie = new BalancedPhilosophie();
             var m = new Match();
-            m.HomeClub = c;
-            m.AwayClub = c2;
-            m.Simulate();
-            
-            
+            m.HomeCompetitor = new LeagueCompetitor() { Club = c, Points = 0 };
+            m.AwayCompetitor = new LeagueCompetitor() { Club = c, Points = 0 };
+            var mr = m.Simulate(false);
+            //Console.WriteLine(mr);
+            //});
+
+
+
+            Game.InitNewGame(w, 12);
+            var mw = new FM.Views.MainWindow();
+            mw.ShowDialog();
+
+
             //var p = Generator.Generator.GenerateRandomPlayer()
 
             //var m = new Match()
@@ -56,9 +74,11 @@ namespace FM
 
         }
 
+        int lvl = 6;
         private Player NewPlayer(Position p)
         {
-            return WorldGenerator.GenerateRandomPlayer(w, null, w.Nations[0], p, 9, 17, 34);
+            return WorldGenerator.GenerateRandomPlayer(w, null, w.Nations[0], p, lvl, 17, 37);
         }
+
     }
 }

@@ -7,9 +7,9 @@
     <ProjectGuid>{38AF8CEC-5275-42FE-8332-DABA257FA4A3}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WindowsFormsApplication1</RootNamespace>
-    <AssemblyName>WindowsFormsApplication1</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <RootNamespace>FM</RootNamespace>
+    <AssemblyName>FMApp</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -36,9 +36,12 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Messaging" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -47,20 +50,49 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GameForm.cs">
+    <Compile Include="LeagueController.cs" />
+    <Compile Include="Models\FootballUniverse.cs" />
+    <Compile Include="Models\NavItem.cs" />
+    <Compile Include="Models\Season.cs" />
+    <Compile Include="RichList.cs" />
+    <Compile Include="ViewModels\ClubViewModel.cs" />
+    <Compile Include="ViewModels\MatchDayViewModel.cs" />
+    <Compile Include="ViewModels\LeagueViewModel.cs" />
+    <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\PlayerViewModel.cs" />
+    <Compile Include="Views\ClubWindow.xaml.cs">
+      <DependentUpon>ClubWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\GameForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GameForm.Designer.cs">
+    <Compile Include="Views\GameForm.Designer.cs">
       <DependentUpon>GameForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Generator.cs" />
+    <Compile Include="Views\MatchDayControl.xaml.cs">
+      <DependentUpon>MatchDayControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\LeagueControl.xaml.cs">
+      <DependentUpon>LeagueControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Test.cs" />
     <Compile Include="FootballPit.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="GameForm.resx">
+    <Compile Include="Views\MatchWindow.xaml.cs">
+      <DependentUpon>MatchWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PlayerWindow.xaml.cs">
+      <DependentUpon>PlayerWindow.xaml</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Views\GameForm.resx">
       <DependentUpon>GameForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -87,8 +119,12 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\vestigo\AE.Graphics\AE.Graphics.csproj">
-      <Project>{E334E390-4E69-4F44-9E36-8BBAEFBA166E}</Project>
+    <ProjectReference Include="..\..\AE.Graphics.Wpf\AE.Graphics.Wpf.csproj">
+      <Project>{10ca2d3a-e09e-4be1-adb7-820f8ad5f8ce}</Project>
+      <Name>AE.Graphics.Wpf</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\AE.Graphics\AE.Graphics.csproj">
+      <Project>{e334e390-4e69-4f44-9e36-8bbaefba166e}</Project>
       <Name>AE.Graphics</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\FM.Common\FM.Common.csproj">
@@ -99,6 +135,32 @@
       <Project>{7FD73F3B-0714-4BD1-946E-B46673ABC904}</Project>
       <Name>FM.Entities</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Views\ClubWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MatchDayControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\LeagueControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MatchWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PlayerWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

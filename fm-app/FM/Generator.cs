@@ -1,11 +1,9 @@
 ﻿using FM.Common;
 using FM.Entities.Base;
-using FM.Entities.Generic;
+using FM.Models.Generic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FM.Generator
 {
@@ -25,10 +23,124 @@ namespace FM.Generator
         }
 
         public static int STANDARD_DEV = 5;
-        public static Player GenerateRandomPlayer(World w, League l, Nation n, Position p, int lvl, int fromAge, int toAge)
+        public static int ROOSTER_GOALIE_MIN = 2;
+        public static int ROOSTER_GOALIE_MAX = 3;
+        public static int ROOSTER_DEFENDER_MIN = 4;
+        public static int ROOSTER_DEFENDER_MAX = 6;
+        public static int ROOSTER_MIDFIELD_MIN = 4;
+        public static int ROOSTER_MIDFIELD_MAX = 6;
+        public static int ROOSTER_STRIKER_MIN = 4;
+        public static int ROOSTER_STRIKER_MAX = 6;
+        //public static int LEAGUE_SIZE = 12;
+
+        public static int GEN_MIN_AGE = 17;
+        public static int GEN_MAX_AGE = 36;
+
+        public static int MAX_PLAYER_GEN_LEVEL = 10;
+
+        public static LeagueAssociation GenerateRandomLeagueAssociation(World w, Association a)
+        {
+            var la = new LeagueAssociation();
+            la.Name = a.Name;
+            var curLevel = a.Power;
+            for (var i = 0; i < a.Depth; i++)
+            {
+                var l = new League();
+                l.Association = la;
+                l.Depth = i + 1;
+                for (var j = 0; j < Game.Instance.LeagueSize; j++)
+                {
+                    var n = GetRandomOccurrence(a.Nations, STANDARD_DEV).Text;
+                    l.Clubs.Add(GenerateRandomClub(w, a, w.GetNationByName(n), curLevel));
+                }
+                l.ResetStandings();
+
+                curLevel--;
+                la.Leagues.Add(l);
+            }
+
+            return la;
+        }
+
+        private static List<string> TakenNames = new List<string>();
+        public static Club GenerateRandomClub(World w, Association a, Nation n, int lvl)
+        {
+            var c = new Club();
+            string name = CreateRandomClubName(n);
+            while (TakenNames.Contains(name))
+            {
+                name = CreateRandomClubName(n);
+            }
+            c.Name = name;
+            TakenNames.Add(name);
+
+            c.Coach = GenerateRandomCoach(w, n);
+            c.Coach.Club = c;
+
+            var trueLvl = lvl - 0.5 + rnd.NextDouble();
+
+            GeneratePlayersForPositionAndClub(w, a, n, lvl, c, Position.Goalie, ROOSTER_GOALIE_MIN, ROOSTER_GOALIE_MAX);
+            GeneratePlayersForPositionAndClub(w, a, n, lvl, c, Position.Defender, ROOSTER_DEFENDER_MIN, ROOSTER_DEFENDER_MAX);
+            GeneratePlayersForPositionAndClub(w, a, n, lvl, c, Position.Midfielder, ROOSTER_MIDFIELD_MIN, ROOSTER_MIDFIELD_MAX);
+            GeneratePlayersForPositionAndClub(w, a, n, lvl, c, Position.Striker, ROOSTER_STRIKER_MIN, ROOSTER_STRIKER_MAX);
+
+            return c;
+        }
+
+        private static string CreateRandomClubName(Nation n)
+        {
+            var city = GetRandomOccurrence(n.Cities, STANDARD_DEV).Text;
+            var prefix = GetRandomOccurrence(n.FirstPrefixes, STANDARD_DEV).Text;
+            var prefix2 = "";
+            var suffix = "";
+            var name = "";
+            var secondPrefixDice = rnd.NextDouble();
+            if (secondPrefixDice <= 0.2)
+            {
+                prefix2 = GetRandomOccurrence(n.SecondPrefixes, STANDARD_DEV).Text;
+                name = prefix + " " + prefix2 + " " + city;
+            }
+            else if (secondPrefixDice >= 0.8)
+            {
+                suffix = GetRandomOccurrence(n.Suffixes, STANDARD_DEV).Text;
+                name = prefix + " " + city + " " + suffix;
+            }
+            else
+            {
+                name = prefix + " " + city;
+            }
+
+            return name;
+        }
+
+        private static void GeneratePlayersForPositionAndClub(World w, Association a, Nation n, double lvl, Club c, Position p, int min, int max)
+        {
+            var dice = rnd.Next(min, max);
+            for (var i = 0; i < dice; i++)
+            {
+                c.Rooster.Add(GenerateRandomPlayer(w, a, n, p, lvl, GEN_MIN_AGE, GEN_MAX_AGE));
+            }
+        }
+
+        private static List<IPhilospophie> Philospophies = new List<IPhilospophie> { new DefensivePhilosophie(), new OffensivePhilopshie(), new PossessionPhilosophie(), new BalancedPhilosophie() };
+        public static Coach GenerateRandomCoach(World w, Nation n)
+        {
+            var c = new Coach();
+            c.Nation = n;
+            GetRandomNameForNation(w, n, out string fn, out string ln);
+            c.FirstName = fn;
+            c.LastName = ln;
+
+            var philDice = rnd.Next(0, 3);
+            c.Philospophie = Philospophies[philDice];
+
+            return c;
+        }
+
+        public static Player GenerateRandomPlayer(World w, Association l, Nation n, Position p, double lvl, int fromAge, int toAge)
         {
             var nationDice = rnd.NextDouble();
-            var otherLeagues = w.Leagues.Where(ol => ol != l).ToList();
+            var otherLeagues = w.Associations.Where(ol => ol != l).ToList();
             Nation origin;
             if (otherLeagues.Count == 0 || nationDice <= 0.7)
             {
@@ -45,25 +157,75 @@ namespace FM.Generator
                 origin = w.GetNationByName(key);
             }
 
-            var playerEtOcc = GetRandomOccurrence(n.SubEthnies.Concat(new List<Occurrence>() { new Occurrence() { Text = n.MainEthnie.Name, ScaleValue = 10 } }).ToList(), 5);
-            var playerEt = w.GetEthnieByName(playerEtOcc.Text);
+
             string firstName;
             string lastName;
+            GetRandomNameForNation(w, n, out firstName, out lastName);
 
+            var age = rnd.Next(fromAge, toAge);
+            var baseskill = Math.Min(Player.MAX_BASE_SKILL, Util.GetGaussianRandom((Player.MAX_BASE_SKILL / Player.MAX_BASE_SKILL_GEN_LEVEL) * lvl, 5));
+            var charisma = Math.Round(Math.Min(Util.GetGaussianRandom(15, 3), 20));
+            var baseConst = (float)Math.Round(Math.Max(10, Math.Min(20, Util.GetGaussianRandom(20 - MAX_PLAYER_GEN_LEVEL + lvl, 2))), 0);
+
+
+            var xpLevel = 0d;
+            var consti = (float)baseConst;
+            for (int i = Player.MIN_AGE; i <= age; i++)
+            {
+                xpLevel += 2 * Math.Max(0, 30d - i) / (30d - Player.MIN_AGE);
+                if (i >= 31)
+                {
+                    consti -= consti * 0.01f * (i - 30);
+                }
+            }
+            var setplayskill = 100f;
+
+            while (setplayskill > 20)
+            {
+                setplayskill = (float)Math.Round(Math.Max(1, Util.GetGaussianRandom(18 - MAX_PLAYER_GEN_LEVEL + lvl, 5)), 0);
+            }
+
+            Player player = new Player()
+            {
+                Nation = origin,
+                FirstName = firstName,
+                LastName = lastName,
+                Position = p,
+                Age = age,
+                SkillBase = (int)Math.Floor(baseskill),
+                XPLevel = (int)Math.Floor(xpLevel),
+                Fitness = Player.MAX_FITNESS,
+                Moral = Player.MAX_MORAL,
+                ConstitutionBase = (float)baseConst,
+                Constitution = consti,
+                Charisma = (float)charisma,
+                SetPlaySkill = setplayskill
+            };
+
+            //player.XP = (int)Math.Floor(player.LevelCap() * (xpLevel - player.XPLevel));
+
+            return player;
+
+        }
+
+        private static void GetRandomNameForNation(World w, Nation n, out string firstName, out string lastName)
+        {
+            var playerEtOcc = GetRandomOccurrence(n.SubEthnies.Concat(new List<Occurrence>() { new Occurrence() { Text = n.MainEthnie.Name, ScaleValue = 10 } }).ToList(), 5);
+            var playerEt = w.GetEthnieByName(playerEtOcc.Text);
             if (!playerEt.Equals(n.MainEthnie))
             {
                 var subEt = (SubEthnieOccurrence)playerEtOcc as SubEthnieOccurrence;
                 double divider = subEt.FirstAndLastNamesRate + subEt.FirstNameRate + subEt.LastNameRate;
                 var nameCombiDice = rnd.NextDouble();
 
-                if (nameCombiDice <= ((double)subEt.FirstAndLastNamesRate)/divider)
+                if (nameCombiDice <= ((double)subEt.FirstAndLastNamesRate) / divider)
                 {
                     firstName = GetRandomValue(playerEt.FirstNames, STANDARD_DEV);
                     lastName = GetRandomValue(playerEt.LastNames, STANDARD_DEV);
                 }
                 else
                 {
-                    if (nameCombiDice <= ((double)subEt.FirstAndLastNamesRate + (double)subEt.LastNameRate)/divider)
+                    if (nameCombiDice <= ((double)subEt.FirstAndLastNamesRate + (double)subEt.LastNameRate) / divider)
                     {
                         firstName = GetRandomValue(n.MainEthnie.FirstNames, STANDARD_DEV);
                         lastName = GetRandomValue(playerEt.LastNames, 5);
@@ -74,46 +236,12 @@ namespace FM.Generator
                         lastName = GetRandomValue(n.MainEthnie.LastNames, STANDARD_DEV);
                     }
                 }
-            } else
+            }
+            else
             {
                 firstName = GetRandomValue(n.MainEthnie.FirstNames, STANDARD_DEV);
                 lastName = GetRandomValue(n.MainEthnie.LastNames, STANDARD_DEV);
             }
-
-            var age = rnd.Next(fromAge, toAge);
-            var baseskill = Math.Min(Player.MAX_BASE_SKILL, Util.GetGaussianRandom((Player.MAX_BASE_SKILL / Player.MAX_BASE_SKILL_GEN_LEVEL) * lvl, 5));
-            var charisma = rnd.Next(1, Player.MAX_CHARISMA);
-            var baseConst = rnd.Next(15, Player.MAX_CONSTITUTION);
-            var consti = baseConst - ((age - Player.MIN_AGE) / 2);
-            var xpLevel = 0d;
-            for (int i = 0; i < (age- Player.MIN_AGE); i++)
-            {
-                xpLevel += 1 - Math.Log(i + 1, Player.LEVEL_CAP_LOG_BASE);
-            }
-            var setplayskill = rnd.Next(1, Player.MAX_SET_PLAY_SKILL);
-
-            Player player = new Player()
-            {
-                Country = origin,
-                FirstName = firstName,
-                LastName = lastName,
-                Position = p,
-                Age = age,
-                BaseSkill = (int)Math.Floor(baseskill),
-                XPLevel = (int)Math.Floor(xpLevel),
-                Fitness = Player.MAX_FITNESS,
-                Moral = Player.MAX_MORAL, 
-                Constitution = consti,
-                Charisma = charisma,
-                SetPlaySkill = setplayskill       
-            };
-
-            player.XP = (int)Math.Floor(player.LevelCap() * (xpLevel - player.XPLevel));
-
-            return player;
-
         }
-
-
     }
 }

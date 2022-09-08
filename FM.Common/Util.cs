@@ -7,6 +7,8 @@ using System.Windows.Forms;
 
 namespace FM.Common
 {
+
+
     public static class RichInt
     {
 

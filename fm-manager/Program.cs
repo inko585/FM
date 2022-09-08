@@ -29,7 +29,7 @@ namespace fm_manager
         //public static Gen_Entities Entities = new Gen_Entities
         public static BindingList<Nation> Nations = new BindingList<Nation>();
         public static BindingList<Ethnie> Ethnies = new BindingList<Ethnie>();
-
+        public static BindingList<Association> Associations = new BindingList<Association>();
 
         public static void Export()
         {
@@ -38,7 +38,8 @@ namespace fm_manager
             var entities = new World()
             {
                 Nations = Nations.ToList(),
-                Ethnies = Ethnies.ToList()
+                Ethnies = Ethnies.ToList(),
+                Associations = Associations.ToList()
             };
 
             if (Util.TryGetXMLSavePath("gendata1.xml", out path))
@@ -61,6 +62,7 @@ namespace fm_manager
                 var w = World.ReadWorld(path);
                 Nations.Clear();
                 Ethnies.Clear();
+                Associations.Clear();
                 foreach (var n in w.Nations)
                 {
                     Nations.Add(n);
@@ -68,6 +70,10 @@ namespace fm_manager
                 foreach (var e in w.Ethnies)
                 {
                     Ethnies.Add(e);
+                }
+                foreach(var a in w.Associations)
+                {
+                    Associations.Add(a);
                 }
             }
 

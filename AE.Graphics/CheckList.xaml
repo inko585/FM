@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="AE.Graphics.CheckList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AE.Graphics"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <HierarchicalDataTemplate DataType="{x:Type local:CheckCollection}" >
+            <TreeViewItem ItemsSource="{Binding CheckCollection}" Header="{Binding RootDescription}"/>
+        </HierarchicalDataTemplate>
+    </UserControl.Resources>
+    <Grid>
+        <TreeView x:Name="treeView" ItemsSource="{Binding CheckCollection}">
+            <TreeView.ItemTemplate>
+                <DataTemplate>
+                    <WrapPanel>
+                        <CheckBox IsChecked="{Binding Checked}"/>
+                        <Image Source="{Binding Image}"/>
+                        <TextBlock SourceUpdated="{Binding Content}"/>
+                    </WrapPanel>
+                </DataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+    </Grid>
+</UserControl>

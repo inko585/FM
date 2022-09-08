@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1267
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FM.Common", "..\FM.Common\FM.Common.csproj", "{39D28BEF-C8EF-4F6A-98E6-E1333E933448}"
 EndProject
@@ -9,7 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FM.Entities", "..\FM.Entiti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FM.App", "FM\FM.App.csproj", "{38AF8CEC-5275-42FE-8332-DABA257FA4A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AE.Graphics", "..\..\vestigo\AE.Graphics\AE.Graphics.csproj", "{E334E390-4E69-4F44-9E36-8BBAEFBA166E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AE.Graphics", "..\AE.Graphics\AE.Graphics.csproj", "{E334E390-4E69-4F44-9E36-8BBAEFBA166E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AE.Graphics.Wpf", "..\AE.Graphics.Wpf\AE.Graphics.Wpf.csproj", "{10CA2D3A-E09E-4BE1-ADB7-820F8AD5F8CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,8 +53,19 @@ Global
 		{E334E390-4E69-4F44-9E36-8BBAEFBA166E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E334E390-4E69-4F44-9E36-8BBAEFBA166E}.Release|x86.ActiveCfg = Release|Any CPU
 		{E334E390-4E69-4F44-9E36-8BBAEFBA166E}.Release|x86.Build.0 = Release|Any CPU
+		{10CA2D3A-E09E-4BE1-ADB7-820F8AD5F8CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10CA2D3A-E09E-4BE1-ADB7-820F8AD5F8CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10CA2D3A-E09E-4BE1-ADB7-820F8AD5F8CE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{10CA2D3A-E09E-4BE1-ADB7-820F8AD5F8CE}.Debug|x86.Build.0 = Debug|Any CPU
+		{10CA2D3A-E09E-4BE1-ADB7-820F8AD5F8CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10CA2D3A-E09E-4BE1-ADB7-820F8AD5F8CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10CA2D3A-E09E-4BE1-ADB7-820F8AD5F8CE}.Release|x86.ActiveCfg = Release|Any CPU
+		{10CA2D3A-E09E-4BE1-ADB7-820F8AD5F8CE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1FE51E05-CD17-4939-9509-D1D17CB9F755}
 	EndGlobalSection
 EndGlobal

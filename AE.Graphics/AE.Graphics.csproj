@@ -1,0 +1,275 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E334E390-4E69-4F44-9E36-8BBAEFBA166E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AE.Graphics</RootNamespace>
+    <AssemblyName>AE.Graphics</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <CodeAnalysisRuleSet>..\AE.Common\AE.Common.ruleset</CodeAnalysisRuleSet>
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <CodeAnalysisRuleSet>..\AE.Common\AE.Common.ruleset</CodeAnalysisRuleSet>
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ICSharpCode.TextEditor">
+      <HintPath>lib\ICSharpCode.TextEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AbstractDataPane.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AbstractDataPane.Designer.cs">
+      <DependentUpon>AbstractDataPane.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AEForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AEGraphics.cs" />
+    <Compile Include="AEGridView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="AEListView.cs" />
+    <Compile Include="AETextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CheckList.xaml.cs">
+      <DependentUpon>CheckList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ColorTable.cs" />
+    <Compile Include="AETreeView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DataControlPane.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DynamicSelectionBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DynamicSelectionBox.Designer.cs">
+      <DependentUpon>DynamicSelectionBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="QuestionBoxWithDontShowMeAgain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="QuestionBoxWithDontShowMeAgain.Designer.cs">
+      <DependentUpon>QuestionBoxWithDontShowMeAgain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="QuestionBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="QuestionBox.Designer.cs">
+      <DependentUpon>QuestionBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AEMessageBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AEMessageBox.Designer.cs">
+      <DependentUpon>AEMessageBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CheckBoxSelectionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CheckBoxSelectionForm.Designer.cs">
+      <DependentUpon>CheckBoxSelectionForm.cs</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="RadioSelectionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RadioSelectionForm.Designer.cs">
+      <DependentUpon>RadioSelectionForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SpecialQuestionBoxWithDontShowMeAgain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SpecialQuestionBoxWithDontShowMeAgain.Designer.cs">
+      <DependentUpon>SpecialQuestionBoxWithDontShowMeAgain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SpecialQuestionBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SpecialQuestionBox.Designer.cs">
+      <DependentUpon>SpecialQuestionBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SpecialMessageBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SpecialMessageBox.Designer.cs">
+      <DependentUpon>SpecialMessageBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="NumberInputForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SourceInputForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FileSelectionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextInputForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ToolStripClipboard.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Xbutton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="AbstractDataPane.resx">
+      <DependentUpon>AbstractDataPane.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AEForm.resx">
+      <DependentUpon>AEForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AETreeView.resx">
+      <DependentUpon>AETreeView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataControlPane.resx">
+      <DependentUpon>DataControlPane.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DynamicSelectionBox.resx">
+      <DependentUpon>DynamicSelectionBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="QuestionBoxWithDontShowMeAgain.resx">
+      <DependentUpon>QuestionBoxWithDontShowMeAgain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="QuestionBox.resx">
+      <DependentUpon>QuestionBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AEMessageBox.resx">
+      <DependentUpon>AEMessageBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CheckBoxSelectionForm.resx">
+      <DependentUpon>CheckBoxSelectionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RadioSelectionForm.resx">
+      <DependentUpon>RadioSelectionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SpecialQuestionBoxWithDontShowMeAgain.resx">
+      <DependentUpon>SpecialQuestionBoxWithDontShowMeAgain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SpecialQuestionBox.resx">
+      <DependentUpon>SpecialQuestionBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SpecialMessageBox.resx">
+      <DependentUpon>SpecialMessageBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NumberInputForm.resx">
+      <DependentUpon>NumberInputForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SourceInputForm.resx">
+      <DependentUpon>SourceInputForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FileSelectionForm.resx">
+      <DependentUpon>FileSelectionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextInputForm.resx">
+      <DependentUpon>TextInputForm.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AE.Graphics.ruleset" />
+    <None Include="packages.config" />
+    <None Include="Resources\logo_n.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\onebit_31.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\symbol_remove.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\edit_remove.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\add.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\nexans_logo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\1464876363_Error.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="CheckList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ajax-loader %281%29.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\clipboard.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\packages\GitInfo.2.1.2\build\GitInfo.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\GitInfo.2.1.2\build\GitInfo.targets'))" />
+  </Target>
+  <Import Project="$(SolutionDir)\packages\GitInfo.2.1.2\build\GitInfo.targets" Condition="Exists('$(SolutionDir)\packages\GitInfo.2.1.2\build\GitInfo.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

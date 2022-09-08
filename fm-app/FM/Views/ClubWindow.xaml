@@ -1,0 +1,58 @@
+﻿<ae:AEWindow x:Class="FM.Views.ClubWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FM.Views"
+             xmlns:ae="clr-namespace:AE.Graphics.Wpf;assembly=AE.Graphics.Wpf"
+             mc:Ignorable="d" Width="800" Height="800" WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <ResourceDictionary Source="pack://application:,,,/AE.Graphics.Wpf;component/Styles/AEStyles.xaml"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"></RowDefinition>
+            <RowDefinition Height="1*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Border BorderThickness="1" BorderBrush="#FFACACAC"  Margin="5,5,5,0" >
+
+            <Grid Background="{StaticResource ListColor}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Content="{Binding Club.Name}" FontSize="16" FontWeight="Bold" Grid.Column="1"></Label>
+
+            </Grid>
+
+        </Border>
+        <ListBox Name="playerListBox" Margin="5,5,5,5" ItemsSource="{Binding Club.ObservableRooster}" Style="{StaticResource DefaultAEList}" ItemContainerStyle="{StaticResource UnselectableAEItemBox}" Grid.Row="1">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Name="posLabel" Content="{Binding Position}"/>
+                        <Label Name="nameLabel" PreviewMouseLeftButtonDown="NameLabel_PreviewMouseLeftButtonDown"  Content="{Binding FullName}" Grid.Column="1" Style="{StaticResource LinkLabelStyle}"/>
+                        <Label Name="nationLabel" Content="{Binding Nation.Short}" Grid.Column="2"/>
+                        <Label Name="ageLabel" Content="{Binding Age}" Grid.Column="3"/>
+                        <Label Name="skillLabel" Content="{Binding SkillMax}" Grid.Column="4"/>
+                        <Label Content="{Binding ValueOnField}" Grid.Column="5"/>
+                        <Label Content="{Binding SalaryStandard}" Grid.Column="6"/>
+
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</ae:AEWindow>

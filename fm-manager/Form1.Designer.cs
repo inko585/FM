@@ -30,7 +30,6 @@ namespace fm_manager
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.dataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -50,16 +49,16 @@ namespace fm_manager
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.splitContainer8 = new System.Windows.Forms.SplitContainer();
             this.splitContainer9 = new System.Windows.Forms.SplitContainer();
-            this.ethnieGrid = new DataGridView();
-            this.subnationGrid = new DataGridView();
-            this.prefix1Grid = new DataGridView();
+            this.ethnieGrid = new System.Windows.Forms.DataGridView();
+            this.subnationGrid = new System.Windows.Forms.DataGridView();
+            this.prefix1Grid = new System.Windows.Forms.DataGridView();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.splitContainer5 = new System.Windows.Forms.SplitContainer();
-            this.cityGrid = new DataGridView();
-            this.sponsorGrid = new DataGridView();
+            this.cityGrid = new System.Windows.Forms.DataGridView();
+            this.sponsorGrid = new System.Windows.Forms.DataGridView();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
-            this.prefix2Grid = new DataGridView();
-            this.suffixGrid = new DataGridView();
+            this.prefix2Grid = new System.Windows.Forms.DataGridView();
+            this.suffixGrid = new System.Windows.Forms.DataGridView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.splitContainer6 = new System.Windows.Forms.SplitContainer();
             this.ethnieTextBox = new System.Windows.Forms.TextBox();
@@ -70,8 +69,24 @@ namespace fm_manager
             this.ethnieApplyButton = new System.Windows.Forms.Button();
             this.ethnieResetButton = new System.Windows.Forms.Button();
             this.splitContainer7 = new System.Windows.Forms.SplitContainer();
-            this.firstNameGrid = new DataGridView();
-            this.lastNameGrid = new DataGridView();
+            this.firstNameGrid = new System.Windows.Forms.DataGridView();
+            this.lastNameGrid = new System.Windows.Forms.DataGridView();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.splitContainer10 = new System.Windows.Forms.SplitContainer();
+            this.associatonDepth = new System.Windows.Forms.NumericUpDown();
+            this.associatonLevel = new System.Windows.Forms.NumericUpDown();
+            this.label3 = new System.Windows.Forms.Label();
+            this.powerLabel = new System.Windows.Forms.Label();
+            this.associationTextBox = new System.Windows.Forms.TextBox();
+            this.leagueNameLabel = new System.Windows.Forms.Label();
+            this.associationDeleteBtn = new System.Windows.Forms.Button();
+            this.leagueLabel = new System.Windows.Forms.Label();
+            this.associationSelection = new System.Windows.Forms.ComboBox();
+            this.leagueOkButton = new System.Windows.Forms.Button();
+            this.leagueResetBtn = new System.Windows.Forms.Button();
+            this.nationGrid = new System.Windows.Forms.DataGridView();
+            this.label2 = new System.Windows.Forms.Label();
+            this.nationShortTextBox = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -121,6 +136,14 @@ namespace fm_manager
             this.splitContainer7.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.firstNameGrid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.lastNameGrid)).BeginInit();
+            this.tabPage3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer10)).BeginInit();
+            this.splitContainer10.Panel1.SuspendLayout();
+            this.splitContainer10.Panel2.SuspendLayout();
+            this.splitContainer10.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.associatonDepth)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.associatonLevel)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nationGrid)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -160,6 +183,7 @@ namespace fm_manager
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 24);
             this.tabControl1.Name = "tabControl1";
@@ -186,6 +210,8 @@ namespace fm_manager
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.nationShortTextBox);
+            this.splitContainer1.Panel1.Controls.Add(this.label2);
             this.splitContainer1.Panel1.Controls.Add(this.mainEthnieSelection);
             this.splitContainer1.Panel1.Controls.Add(this.label1);
             this.splitContainer1.Panel1.Controls.Add(this.nationTextBox);
@@ -207,7 +233,7 @@ namespace fm_manager
             // 
             this.mainEthnieSelection.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.mainEthnieSelection.FormattingEnabled = true;
-            this.mainEthnieSelection.Location = new System.Drawing.Point(139, 123);
+            this.mainEthnieSelection.Location = new System.Drawing.Point(97, 123);
             this.mainEthnieSelection.Name = "mainEthnieSelection";
             this.mainEthnieSelection.Size = new System.Drawing.Size(121, 21);
             this.mainEthnieSelection.TabIndex = 14;
@@ -249,7 +275,7 @@ namespace fm_manager
             // 
             // nationApplyButton
             // 
-            this.nationApplyButton.Location = new System.Drawing.Point(18, 183);
+            this.nationApplyButton.Location = new System.Drawing.Point(18, 213);
             this.nationApplyButton.Name = "nationApplyButton";
             this.nationApplyButton.Size = new System.Drawing.Size(97, 23);
             this.nationApplyButton.TabIndex = 7;
@@ -259,7 +285,7 @@ namespace fm_manager
             // 
             // nationResetButton
             // 
-            this.nationResetButton.Location = new System.Drawing.Point(139, 183);
+            this.nationResetButton.Location = new System.Drawing.Point(139, 213);
             this.nationResetButton.Name = "nationResetButton";
             this.nationResetButton.Size = new System.Drawing.Size(97, 23);
             this.nationResetButton.TabIndex = 6;
@@ -590,6 +616,171 @@ namespace fm_manager
             this.lastNameGrid.Size = new System.Drawing.Size(1067, 369);
             this.lastNameGrid.TabIndex = 0;
             // 
+            // tabPage3
+            // 
+            this.tabPage3.Controls.Add(this.splitContainer10);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(1430, 695);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "Verbände";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // splitContainer10
+            // 
+            this.splitContainer10.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer10.Location = new System.Drawing.Point(3, 3);
+            this.splitContainer10.Name = "splitContainer10";
+            // 
+            // splitContainer10.Panel1
+            // 
+            this.splitContainer10.Panel1.Controls.Add(this.associatonDepth);
+            this.splitContainer10.Panel1.Controls.Add(this.associatonLevel);
+            this.splitContainer10.Panel1.Controls.Add(this.label3);
+            this.splitContainer10.Panel1.Controls.Add(this.powerLabel);
+            this.splitContainer10.Panel1.Controls.Add(this.associationTextBox);
+            this.splitContainer10.Panel1.Controls.Add(this.leagueNameLabel);
+            this.splitContainer10.Panel1.Controls.Add(this.associationDeleteBtn);
+            this.splitContainer10.Panel1.Controls.Add(this.leagueLabel);
+            this.splitContainer10.Panel1.Controls.Add(this.associationSelection);
+            this.splitContainer10.Panel1.Controls.Add(this.leagueOkButton);
+            this.splitContainer10.Panel1.Controls.Add(this.leagueResetBtn);
+            // 
+            // splitContainer10.Panel2
+            // 
+            this.splitContainer10.Panel2.Controls.Add(this.nationGrid);
+            this.splitContainer10.Size = new System.Drawing.Size(1424, 689);
+            this.splitContainer10.SplitterDistance = 367;
+            this.splitContainer10.TabIndex = 0;
+            // 
+            // associatonDepth
+            // 
+            this.associatonDepth.Location = new System.Drawing.Point(90, 148);
+            this.associatonDepth.Name = "associatonDepth";
+            this.associatonDepth.Size = new System.Drawing.Size(120, 20);
+            this.associatonDepth.TabIndex = 33;
+            // 
+            // associatonLevel
+            // 
+            this.associatonLevel.Location = new System.Drawing.Point(90, 114);
+            this.associatonLevel.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.associatonLevel.Name = "associatonLevel";
+            this.associatonLevel.Size = new System.Drawing.Size(120, 20);
+            this.associatonLevel.TabIndex = 32;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(15, 150);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(57, 13);
+            this.label3.TabIndex = 31;
+            this.label3.Text = "Ligen Zahl";
+            // 
+            // powerLabel
+            // 
+            this.powerLabel.AutoSize = true;
+            this.powerLabel.Location = new System.Drawing.Point(15, 116);
+            this.powerLabel.Name = "powerLabel";
+            this.powerLabel.Size = new System.Drawing.Size(33, 13);
+            this.powerLabel.TabIndex = 30;
+            this.powerLabel.Text = "Level";
+            // 
+            // associationTextBox
+            // 
+            this.associationTextBox.Location = new System.Drawing.Point(78, 71);
+            this.associationTextBox.Name = "associationTextBox";
+            this.associationTextBox.Size = new System.Drawing.Size(240, 20);
+            this.associationTextBox.TabIndex = 29;
+            // 
+            // leagueNameLabel
+            // 
+            this.leagueNameLabel.AutoSize = true;
+            this.leagueNameLabel.Location = new System.Drawing.Point(15, 74);
+            this.leagueNameLabel.Name = "leagueNameLabel";
+            this.leagueNameLabel.Size = new System.Drawing.Size(35, 13);
+            this.leagueNameLabel.TabIndex = 28;
+            this.leagueNameLabel.Text = "Name";
+            // 
+            // associationDeleteBtn
+            // 
+            this.associationDeleteBtn.Location = new System.Drawing.Point(221, 28);
+            this.associationDeleteBtn.Name = "associationDeleteBtn";
+            this.associationDeleteBtn.Size = new System.Drawing.Size(97, 23);
+            this.associationDeleteBtn.TabIndex = 27;
+            this.associationDeleteBtn.Text = "Löschen";
+            this.associationDeleteBtn.UseVisualStyleBackColor = true;
+            this.associationDeleteBtn.Click += new System.EventHandler(this.associationDeleteBtn_Click);
+            // 
+            // leagueLabel
+            // 
+            this.leagueLabel.AutoSize = true;
+            this.leagueLabel.Location = new System.Drawing.Point(15, 33);
+            this.leagueLabel.Name = "leagueLabel";
+            this.leagueLabel.Size = new System.Drawing.Size(47, 13);
+            this.leagueLabel.TabIndex = 26;
+            this.leagueLabel.Text = "Verband";
+            // 
+            // associationSelection
+            // 
+            this.associationSelection.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.associationSelection.FormattingEnabled = true;
+            this.associationSelection.Location = new System.Drawing.Point(78, 30);
+            this.associationSelection.Name = "associationSelection";
+            this.associationSelection.Size = new System.Drawing.Size(121, 21);
+            this.associationSelection.TabIndex = 25;
+            this.associationSelection.SelectedIndexChanged += new System.EventHandler(this.associationSelection_SelectedIndexChanged);
+            // 
+            // leagueOkButton
+            // 
+            this.leagueOkButton.Location = new System.Drawing.Point(18, 206);
+            this.leagueOkButton.Name = "leagueOkButton";
+            this.leagueOkButton.Size = new System.Drawing.Size(97, 23);
+            this.leagueOkButton.TabIndex = 24;
+            this.leagueOkButton.Text = "Übernehmen";
+            this.leagueOkButton.UseVisualStyleBackColor = true;
+            this.leagueOkButton.Click += new System.EventHandler(this.leagueOkButton_Click);
+            // 
+            // leagueResetBtn
+            // 
+            this.leagueResetBtn.Location = new System.Drawing.Point(139, 206);
+            this.leagueResetBtn.Name = "leagueResetBtn";
+            this.leagueResetBtn.Size = new System.Drawing.Size(97, 23);
+            this.leagueResetBtn.TabIndex = 23;
+            this.leagueResetBtn.Text = "Zurücksetzen";
+            this.leagueResetBtn.UseVisualStyleBackColor = true;
+            this.leagueResetBtn.Click += new System.EventHandler(this.leagueResetBtn_Click);
+            // 
+            // nationGrid
+            // 
+            this.nationGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.nationGrid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.nationGrid.Location = new System.Drawing.Point(0, 0);
+            this.nationGrid.Name = "nationGrid";
+            this.nationGrid.Size = new System.Drawing.Size(1053, 689);
+            this.nationGrid.TabIndex = 0;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(15, 174);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(36, 13);
+            this.label2.TabIndex = 15;
+            this.label2.Text = "Kürzel";
+            // 
+            // nationShortTextBox
+            // 
+            this.nationShortTextBox.Location = new System.Drawing.Point(97, 171);
+            this.nationShortTextBox.Name = "nationShortTextBox";
+            this.nationShortTextBox.Size = new System.Drawing.Size(79, 20);
+            this.nationShortTextBox.TabIndex = 16;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -597,7 +788,6 @@ namespace fm_manager
             this.ClientSize = new System.Drawing.Size(1438, 745);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.menuStrip1);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "FM-Editor";
@@ -653,6 +843,15 @@ namespace fm_manager
             this.splitContainer7.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.firstNameGrid)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.lastNameGrid)).EndInit();
+            this.tabPage3.ResumeLayout(false);
+            this.splitContainer10.Panel1.ResumeLayout(false);
+            this.splitContainer10.Panel1.PerformLayout();
+            this.splitContainer10.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer10)).EndInit();
+            this.splitContainer10.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.associatonDepth)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.associatonLevel)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nationGrid)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -701,6 +900,22 @@ namespace fm_manager
         private System.Windows.Forms.Label ethnieNameLabel;
         private System.Windows.Forms.ComboBox mainEthnieSelection;
         private System.Windows.Forms.Label label1;
+        private TabPage tabPage3;
+        private SplitContainer splitContainer10;
+        private TextBox associationTextBox;
+        private Label leagueNameLabel;
+        private Button associationDeleteBtn;
+        private Label leagueLabel;
+        private ComboBox associationSelection;
+        private Button leagueOkButton;
+        private Button leagueResetBtn;
+        private NumericUpDown associatonDepth;
+        private NumericUpDown associatonLevel;
+        private Label label3;
+        private Label powerLabel;
+        private DataGridView nationGrid;
+        private TextBox nationShortTextBox;
+        private Label label2;
     }
 }
 
