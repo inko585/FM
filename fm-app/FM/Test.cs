@@ -32,14 +32,14 @@ namespace FM
             //var matches = new List<MatchResult>();
             //20.Times(() =>
             //{
-            var c = WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.Nations.First(), 6);
-            c.Coach.Philospophie = new PossessionPhilosophie();
-            var c2 = WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.Nations.First(), 6);
-            c2.Coach.Philospophie = new BalancedPhilosophie();
-            var m = new Match();
-            m.HomeCompetitor = new LeagueCompetitor() { Club = c, Points = 0 };
-            m.AwayCompetitor = new LeagueCompetitor() { Club = c, Points = 0 };
-            var mr = m.Simulate(false);
+            //var c = WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.Nations.First(), 6);
+            //c.Coach.Philospophie = new PossessionPhilosophie();
+            //var c2 = WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.Nations.First(), 6);
+            //c2.Coach.Philospophie = new BalancedPhilosophie();
+            //var m = new Match();
+            //m.HomeCompetitor = new LeagueCompetitor() { Club = c, Points = 0 };
+            //m.AwayCompetitor = new LeagueCompetitor() { Club = c, Points = 0 };
+            //var mr = m.Simulate(false);
             //Console.WriteLine(mr);
             //});
 

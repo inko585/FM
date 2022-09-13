@@ -31,11 +31,14 @@ namespace FM.Entities.Base
             Nations = new List<Nation>();
             Ethnies = new List<Ethnie>();
             Associations = new List<Association>();
+            AssociationLooks = new List<AssociationLook>();
+            PlayerLooks = new List<PlayerLook>();
         }
         public List<Nation> Nations { get; set; }
         public List<Ethnie> Ethnies { get; set; }
-
         public List<Association> Associations { get; set; }
+        public List<AssociationLook> AssociationLooks { get; set; }
+        public List<PlayerLook> PlayerLooks { get; set; }
 
         public Nation GetNationByName(string name)
         {
@@ -62,13 +65,9 @@ namespace FM.Entities.Base
 
     public class Nation
     {
-
-
         public string Name { get; set; }
         public string Short { get; set; }
         public int LeagueLevel { get; set; }
-
-
 
         public List<Occurrence> Cities { get; set; }
 
@@ -115,12 +114,68 @@ namespace FM.Entities.Base
         }
     }
 
+    public class AssociationLook
+    {
+        public string Name { get; set; }
+
+        public List<ColorPairOccurrence> ColorPairs { get; set; }
+
+        public List<Occurrence> Crests { get; set; }
+
+        public List<Occurrence> Tricots { get; set; }
+        public override string ToString()
+        {
+            return Name;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is AssociationLook))
+            {
+                return false;
+            }
+            return Name.Equals((obj as AssociationLook).Name);
+        }
+    }
+
+    public class PlayerLook
+    {
+        public string Name { get; set; }
+
+        public List<Occurrence> SkinColors { get; set; }
+        public List<Occurrence> HairColors { get; set; }
+        public List<Occurrence> EyeColors { get; set; }
+        public List<Occurrence> Heads { get; set; }
+        public List<Occurrence> Mouths { get; set; }
+        public List<Occurrence> Eyes { get; set; }
+
+
+        public override string ToString()
+        {
+            return Name;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is PlayerLook))
+            {
+                return false;
+            }
+            return Name.Equals((obj as PlayerLook).Name);
+        }
+    }
+
 
     public class Occurrence
     {
         public string Text { get; set; }
 
         public int ScaleValue { get; set; }
+    }
+
+    public class ColorPairOccurrence : Occurrence
+    {
+        public string Text2 { get; set; }
     }
 
     public class SubEthnieOccurrence : Occurrence

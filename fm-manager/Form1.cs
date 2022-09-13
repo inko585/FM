@@ -20,9 +20,14 @@ namespace fm_manager
             nationBindingSource.DataSource = Program.Nations;
             ethnieBindingSource.DataSource = Program.Ethnies;
             associationBindingSource.DataSource = Program.Associations;
+            lookAssociationBindingSource.DataSource = Program.AssociationLooks;
+            lookPlayerBindingSource.DataSource = Program.PlayerLooks;
             ethnieDeleteButton.Enabled = false;
             nationDeleteButton.Enabled = false;
             associationDeleteBtn.Enabled = false;
+            associationDeleteBtn.Enabled = false;
+            lookAssociationDeleteButton.Enabled = false;
+            lookPlayerDeleteButton.Enabled = false;
             ResetEditor();
 
         }
@@ -32,15 +37,21 @@ namespace fm_manager
         private BindingSource ethnieBindingSource = new BindingSource();
         private BindingSource subethnieBindingSource = new BindingSource();
         private BindingSource associationBindingSource = new BindingSource();
+        private BindingSource lookAssociationBindingSource = new BindingSource();
+        private BindingSource lookPlayerBindingSource = new BindingSource();
 
         private void ResetEditor()
         {
             nationBindingSource.DataSource = Program.Nations;
             ethnieBindingSource.DataSource = Program.Ethnies;
+            lookAssociationBindingSource.DataSource = Program.AssociationLooks;
+            lookPlayerBindingSource.DataSource = Program.PlayerLooks;
             nationSelection.DataSource = nationBindingSource.DataSource;
             ethnieSelection.DataSource = ethnieBindingSource.DataSource;
             associationSelection.DataSource = associationBindingSource.DataSource;
             mainEthnieSelection.DataSource = ethnieBindingSource.DataSource;
+            associationLookSelection.DataSource =lookAssociationBindingSource.DataSource;
+            playerLookSelection.DataSource = lookPlayerBindingSource.DataSource;
             nationSelection.DisplayMember = "Name";
             nationSelection.ValueMember = "Name";
             ethnieSelection.DisplayMember = "Name";
@@ -49,9 +60,15 @@ namespace fm_manager
             associationSelection.ValueMember = "Name";
             mainEthnieSelection.ValueMember = "Name";
             mainEthnieSelection.DisplayMember = "Name";
+            associationLookSelection.DisplayMember = "Name";
+            associationLookSelection.ValueMember = "Name";
+            playerLookSelection.DisplayMember = "Name";
+            playerLookSelection.ValueMember = "Name";
             ResetNationGrids();
             ResetEthnieGrids();
             ResetAssociationGrids();
+            ResetAssociationLookGrids();
+            ResetPlayerLookGrids();
         }
 
 
@@ -104,6 +121,23 @@ namespace fm_manager
                     {
                         Text = (string)r.Cells[0].Value,
                         ScaleValue = (int)r.Cells[1].Value
+                    });
+            }
+
+            return ret;
+        }
+
+        private List<ColorPairOccurrence> LoadFromColorPairGridView(DataGridView gridView)
+        {
+            var ret = new List<ColorPairOccurrence>();
+            foreach (DataGridViewRow r in gridView.Rows)
+            {
+                if (r.Cells[0].Value != null && !r.Cells[0].Value.Equals(""))
+                    ret.Add(new ColorPairOccurrence()
+                    {
+                        Text = (string)r.Cells[0].Value,
+                        Text2 = (string)r.Cells[1].Value,
+                        ScaleValue = (int)r.Cells[2].Value
                     });
             }
 
@@ -182,6 +216,23 @@ namespace fm_manager
 
         }
 
+        private void SetUpColorPairOccurrenceGridView(DataGridView gridView, string textName, string text2Name, string scaleName, IEnumerable<ColorPairOccurrence> occurrences)
+        {
+            gridView.Rows.Clear();
+            gridView.Columns.Clear();
+
+            gridView.Columns.Add(textName, textName);
+            gridView.Columns.Add(text2Name, text2Name);
+            AddNumberDropDown(gridView, scaleName, 1, 1, 10);
+            gridView.DefaultValuesNeeded += new DataGridViewRowEventHandler(dataGridView_DefaultValuesNeeded);
+
+            foreach (var o in occurrences)
+            {
+                gridView.Rows.Add(o.Text, o.Text2, o.ScaleValue);
+            }
+
+        }
+
 
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -193,6 +244,8 @@ namespace fm_manager
         private Nation SelectedNation = null;
         private Ethnie SelectedEthnie = null;
         private Association SelectedAssociation = null;
+        private AssociationLook SelectedAssociationLook = null;
+        private PlayerLook SelectedPlayerLook = null;
 
 
         private void nationApply_Click(object sender, EventArgs e)
@@ -254,6 +307,24 @@ namespace fm_manager
             SetUpDropDownOccurrenceGridView(nationGrid, "Nation", "Häufigkeit", typeof(Nation), nationBindingSource, new List<Occurrence>());            
         }
 
+        private void ResetAssociationLookGrids()
+        {
+            SetUpColorPairOccurrenceGridView(colorGrid, "Hauptfarbe", "Nebenfarbe", "Häufigkeit", new List<ColorPairOccurrence>());
+            SetUpOccurrenceGridView(crestGrid, "Wappen", "Häufigkeit", new List<Occurrence>());
+            SetUpOccurrenceGridView(tricotGrid, "Trikot", "Häufigkeit", new List<Occurrence>());
+        }
+
+        private void ResetPlayerLookGrids()
+        {
+            SetUpOccurrenceGridView(skinColorGrid, "Hautfarben", "Häufigkeit", new List<Occurrence>());
+            SetUpOccurrenceGridView(hairColorGrid, "Haarfarben", "Häufigkeit", new List<Occurrence>());
+            SetUpOccurrenceGridView(eyeColorGrid, "Augenfarben", "Häufigkeit", new List<Occurrence>());
+            SetUpOccurrenceGridView(headGrid, "Kopf & Haare", "Häufigkeit", new List<Occurrence>());
+            SetUpOccurrenceGridView(mouthGrid, "Mund & Bart", "Häufigkeit", new List<Occurrence>());
+            SetUpOccurrenceGridView(eyeGrid, "Augen & Brauen", "Häufigkeit", new List<Occurrence>());
+
+        }
+
         private void ResetNationEditor()
         {
             ResetNationGrids();
@@ -273,6 +344,26 @@ namespace fm_manager
             ethnieSelection.SelectedItem = null;
             ethnieTextBox.Text = "";
             ethnieDeleteButton.Enabled = false;
+
+        }
+
+        private void ResetAssociationLookEditor()
+        {
+            ResetAssociationLookGrids();
+            SelectedAssociationLook = null;
+            associationLookSelection.SelectedItem = null;
+            lookAssociationTextBox.Text = "";
+            lookAssociationDeleteButton.Enabled = false;
+
+        }
+
+        private void ResetPlayerLookEditor()
+        {
+            ResetPlayerLookGrids();
+            SelectedPlayerLook = null;
+            playerLookSelection.SelectedItem = null;
+            lookPlayerTextBox.Text = "";
+            lookPlayerDeleteButton.Enabled = false;
 
         }
 
@@ -332,6 +423,35 @@ namespace fm_manager
                 SelectedEthnie = e;
                 SetUpOccurrenceGridView(firstNameGrid, "Vorname", "Häufigkeit", e.FirstNames);
                 SetUpOccurrenceGridView(lastNameGrid, "Nachname", "Häufigkeit", e.LastNames);
+            }
+        }
+
+        private void LoadAssociationLook(AssociationLook l)
+        {
+            if (l != null)
+            {
+                lookAssociationTextBox.Text = l.Name;
+                lookAssociationDeleteButton.Enabled = true;
+                SelectedAssociationLook = l;
+                SetUpColorPairOccurrenceGridView(colorGrid, "Hauptfarbe", "Nebenfarbe", "Häufigkeit", l.ColorPairs);
+                SetUpOccurrenceGridView(crestGrid, "Wappen", "Häufigkeit", l.Crests);
+                SetUpOccurrenceGridView(tricotGrid, "Trikots", "Häufigkeit", l.Tricots);
+            }
+        }
+
+        private void LoadPlayerLook(PlayerLook l)
+        {
+            if (l != null)
+            {
+                lookPlayerTextBox.Text = l.Name;
+                lookPlayerDeleteButton.Enabled = true;
+                SelectedPlayerLook = l;
+                SetUpOccurrenceGridView(skinColorGrid, "Hautfarben", "Häufigkeit", l.SkinColors);
+                SetUpOccurrenceGridView(hairColorGrid, "Haarfarben", "Häufigkeit", l.HairColors);
+                SetUpOccurrenceGridView(eyeColorGrid, "Augenfarben", "Häufigkeit", l.EyeColors);
+                SetUpOccurrenceGridView(headGrid, "Kopf & Haare", "Häufigkeit", l.Heads);
+                SetUpOccurrenceGridView(mouthGrid, "Mund & Bart", "Häufigkeit", l.Mouths);
+                SetUpOccurrenceGridView(eyeGrid, "Augen & Brauen", "Häufigkeit", l.Eyes);
             }
         }
 
@@ -442,6 +562,19 @@ namespace fm_manager
             ResetEthnieEditor();
         }
 
+        private void DeleteAssociationLook()
+        {
+            Program.AssociationLooks.Remove(SelectedAssociationLook);
+            ResetAssociationLookEditor();
+        }
+
+        private void DeletePlayerLook()
+        {
+            Program.PlayerLooks.Remove(SelectedPlayerLook);
+            ResetPlayerLookEditor();
+        }
+
+
         private void DeleteAssociation()
         {
             Program.Associations.Remove(SelectedAssociation);
@@ -478,10 +611,91 @@ namespace fm_manager
             ResetEditor();
             ResetEthnieEditor();
             ResetNationEditor();
+            ResetAssociationLookEditor();
             ResetAssociationEditor();
             MessageBox.Show("Datensatz importiert!");
         }
 
 
+        private void associationLookDeleteButton_Click(object sender, EventArgs e)
+        {
+            DeleteAssociationLook();
+        }
+
+        private void associationLookResetButton_Click(object sender, EventArgs e)
+        {
+            ResetAssociationLookEditor();
+        }
+
+        private void associationLookOkButton_Click(object sender, EventArgs e)
+        {
+            var l = SelectedAssociationLook == null ? new AssociationLook() : SelectedAssociationLook;
+
+            if (lookAssociationTextBox.Text.Trim().Equals(""))
+            {
+                MessageBox.Show("Das Vereinsaussehen braucht einen Namen");
+            }
+            else
+            {
+                l.Name = lookAssociationTextBox.Text;
+                l.ColorPairs = LoadFromColorPairGridView(colorGrid);
+                l.Crests = LoadFromGridView(crestGrid);
+                l.Tricots = LoadFromGridView(tricotGrid);
+
+                if (SelectedAssociationLook == null)
+                {
+                    Program.AssociationLooks.Add(l);
+                }
+
+                ResetAssociationLookEditor();
+            }
+        }
+
+        private void associationLookSelection_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            LoadAssociationLook((AssociationLook)associationLookSelection.SelectedItem);
+        }
+
+        private void lookPlayerSelection_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            LoadPlayerLook((PlayerLook)playerLookSelection.SelectedItem);
+        }
+
+        private void lookPlayerDeleteButton_Click(object sender, EventArgs e)
+        {
+            DeletePlayerLook();
+        }
+
+        private void lookPlayerResetButton_Click(object sender, EventArgs e)
+        {
+            ResetPlayerLookEditor();
+        }
+
+        private void lookPlayerOkButton_Click(object sender, EventArgs e)
+        {
+            var l = SelectedPlayerLook == null ? new PlayerLook() : SelectedPlayerLook;
+
+            if (lookPlayerTextBox.Text.Trim().Equals(""))
+            {
+                MessageBox.Show("Das Spieleraussehen braucht einen Namen");
+            }
+            else
+            {
+                l.Name = lookPlayerTextBox.Text;
+                l.SkinColors = LoadFromGridView(skinColorGrid);
+                l.HairColors = LoadFromGridView(hairColorGrid);
+                l.EyeColors = LoadFromGridView(eyeColorGrid);
+                l.Heads = LoadFromGridView(headGrid);
+                l.Mouths = LoadFromGridView(mouthGrid);
+                l.Eyes = LoadFromGridView(eyeGrid);
+
+                if (SelectedPlayerLook == null)
+                {
+                    Program.PlayerLooks.Add(l);
+                }
+
+                ResetPlayerLookEditor();
+            }
+        }
     }
 }

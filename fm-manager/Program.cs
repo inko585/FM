@@ -30,6 +30,8 @@ namespace fm_manager
         public static BindingList<Nation> Nations = new BindingList<Nation>();
         public static BindingList<Ethnie> Ethnies = new BindingList<Ethnie>();
         public static BindingList<Association> Associations = new BindingList<Association>();
+        public static BindingList<AssociationLook> AssociationLooks = new BindingList<AssociationLook>();
+        public static BindingList<PlayerLook> PlayerLooks = new BindingList<PlayerLook>();
 
         public static void Export()
         {
@@ -39,7 +41,9 @@ namespace fm_manager
             {
                 Nations = Nations.ToList(),
                 Ethnies = Ethnies.ToList(),
-                Associations = Associations.ToList()
+                Associations = Associations.ToList(),
+                AssociationLooks = AssociationLooks.ToList(),
+                PlayerLooks = PlayerLooks.ToList()
             };
 
             if (Util.TryGetXMLSavePath("gendata1.xml", out path))
@@ -63,6 +67,8 @@ namespace fm_manager
                 Nations.Clear();
                 Ethnies.Clear();
                 Associations.Clear();
+                AssociationLooks.Clear();
+                PlayerLooks.Clear();
                 foreach (var n in w.Nations)
                 {
                     Nations.Add(n);
@@ -75,6 +81,16 @@ namespace fm_manager
                 {
                     Associations.Add(a);
                 }
+
+                foreach (var a in w.AssociationLooks)
+                {
+                    AssociationLooks.Add(a);
+                }
+                foreach (var p in w.PlayerLooks)
+                {
+                    PlayerLooks.Add(p);
+                }
+
             }
 
         }

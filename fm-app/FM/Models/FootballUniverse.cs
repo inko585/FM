@@ -3,11 +3,12 @@ using FM.Models.Season;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace FM.Models.Generic
 {
@@ -106,6 +107,16 @@ namespace FM.Models.Generic
             }
         }
 
+        public BitmapImage AssociationPic
+        {
+            get
+            {
+                return PixelArt.GetRandomCrest();
+            }
+        }
+
+       
+
 
         public Brush RankForeGroundColor
         {
@@ -177,6 +188,7 @@ namespace FM.Models.Generic
             Rooster = new List<Player>();
         }
         public String Name { get; set; }
+        
         public LineUp StartingLineUp
         {
             get
@@ -194,7 +206,15 @@ namespace FM.Models.Generic
         }
 
         public Coach Coach { get; set; }
+        public Crest Crest { get; set; }
 
+    }
+
+    public class Crest
+    {
+        public System.Drawing.Color MainColor { get; set; }
+        public System.Drawing.Color SecondColor { get; set; }
+        public string Motive { get; set; }
     }
 
 
@@ -454,6 +474,7 @@ namespace FM.Models.Generic
         public static float CONSTITUATIN_DECLINE_RATE = 0.4f;
 
 
+        public Face Face { get; set; }
         public Contract CurrentContract { get; set; }
         public Club Club
         {
@@ -536,6 +557,25 @@ namespace FM.Models.Generic
         public float Moral { get; set; }
         public float SetPlaySkill { get; set; }
         public Position Position { get; set; }
+
+        public BitmapImage ProfilePic
+        {
+            get
+            {
+                return PixelArt.GetRandomProfilePic();
+            }
+        }
+        public BitmapImage TricotPic
+        {
+            get
+            {
+                return PixelArt.GetRandomTricotPic();
+            }
+        }
+
+
+
+
         public string PositionString
         {
             get
@@ -667,6 +707,16 @@ namespace FM.Models.Generic
 
         //}
 
+    }
+
+    public class Face
+    {
+        public System.Drawing.Color SkinColor { get; set; }
+        public System.Drawing.Color HairColor { get; set; }
+        public System.Drawing.Color EyeColor { get; set; }
+        public string Head { get; set; }
+        public string Mouth { get; set; }
+        public string Eye { get; set; }
     }
 
     public enum Position

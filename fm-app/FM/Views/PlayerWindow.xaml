@@ -8,7 +8,7 @@
              mc:Ignorable="d" Width="800" Height="600" WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
-        <ResourceDictionary Source="pack://application:,,,/AE.Graphics.Wpf;component/Styles/AEStyles.xaml"/>
+        <!--<ResourceDictionary Source="pack://application:,,,/AE.Graphics.Wpf;component/Styles/AEStyles.xaml"/>-->
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -43,7 +43,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="0"/>
+                    <RowDefinition Height="120"/>
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="30"/>
@@ -57,8 +57,9 @@
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="463*"/>
                 </Grid.RowDefinitions>
-
-                <Label Content="Position:" Grid.Row="1" VerticalAlignment="Center"/>
+                    <Image Source="{Binding Player.ProfilePic}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="0" Grid.Column="0" Width="100" Height="100"></Image>
+                    <Image Source="{Binding Player.TricotPic}" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="1" Width="100" Height="100"></Image>
+                    <Label Content="Position:" Grid.Row="1" VerticalAlignment="Center"/>
                 <Label Content="{Binding Player.PositionString}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1"/>
                 
                 <Label Content="Alter:" Grid.Row="2" VerticalAlignment="Center"/>

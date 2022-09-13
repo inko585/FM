@@ -36,6 +36,7 @@
         </Border>
 
         <Border BorderThickness="1" BorderBrush="Black"  Margin="5,5,5,5" Grid.Row="1">
+            <ScrollViewer >
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -53,9 +54,8 @@
                     <Border BorderThickness="0,0,0.5,1" BorderBrush="Gray" Background="{Binding RankBackGroundColor}">
                         <Label  HorizontalAlignment="Center" Content="#" FontWeight="Bold"/>
                     </Border>
-
-                    <Border BorderThickness="0,0,0.5,1"  BorderBrush="Gray"   Grid.Column="1">
-                        <Label Content="Verein" Grid.Column="1" FontWeight="Bold"/>
+                    <Border BorderThickness="0,0,0.5,1"  BorderBrush="Gray" Grid.Column="1">
+                        <Label Content="Verein" FontWeight="Bold"/>
                     </Border>
                     <Border BorderThickness="0,0,0.5,1"   BorderBrush="Gray"  Grid.Column="2">
                         <Label  Content="+" HorizontalAlignment="Center" FontWeight="Bold"/>
@@ -67,12 +67,15 @@
                         <Label Name="pointsLabel" HorizontalAlignment="Center" FontWeight="Bold" Content="Punkte"/>
                     </Border>
                 </Grid>
+                
+                            
                 <ItemsControl  Background="White" ItemsSource="{Binding SelectedLeague.RankedClubs}" Grid.Row="1">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid>
+                                <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="50"></ColumnDefinition>
+                                <ColumnDefinition Width="60"></ColumnDefinition>
                                 <ColumnDefinition Width="*"></ColumnDefinition>
                                 <ColumnDefinition Width="50"></ColumnDefinition>
                                 <ColumnDefinition Width="50"></ColumnDefinition>
@@ -80,38 +83,42 @@
                                 <ColumnDefinition Width="50"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
                                 <Border BorderThickness="0,0,0.5,0.5" BorderBrush="Gray" Background="{Binding RankBackGroundColor}">
-                                <Label Name="positionLabel" HorizontalAlignment="Center" Content="{Binding Rank}" FontWeight="Bold"/>
+                                    <Label Name="positionLabel" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding Rank}" FontWeight="Bold"/>
                             </Border>
-
-                                <Border BorderThickness="0,0,0.5,0.5"  BorderBrush="Gray"   Grid.Column="1">
+                                <Border BorderThickness="0,0,0,0.5"  BorderBrush="Gray" Grid.Column="1">
+                                    <Image Source="{Binding AssociationPic}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,5"></Image>
+                                </Border>
+                                <Border BorderThickness="0,0,0.5,0.5"  BorderBrush="Gray"   Grid.Column="2">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="15"/>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="1*"/>
                                     </Grid.ColumnDefinitions>
-                                    <Label Name="nameLabel" PreviewMouseDown="NameLabel_PreviewMouseDown" Content="{Binding Club.Name}" Grid.Column="1" Style="{StaticResource LinkLabelStyle}">
+                                        <Label Name="nameLabel" PreviewMouseDown="NameLabel_PreviewMouseDown" Content="{Binding Club.Name}" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"  Style="{StaticResource LinkLabelStyle}">
    
                                 </Label>
                                 </Grid>
                             </Border>
-                                <Border BorderThickness="0,0,0.5,0.5"   BorderBrush="Gray"  Grid.Column="2">
-                                <Label Name="goalsLabel" Content="{Binding Goals}" HorizontalAlignment="Center" />
-                            </Border>
                                 <Border BorderThickness="0,0,0.5,0.5"   BorderBrush="Gray"  Grid.Column="3">
-                                <Label Name="counterGoalsLabel" HorizontalAlignment="Center"  Content="{Binding CounterGoals}"/>
+                                    <Label Name="goalsLabel" Content="{Binding Goals}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                                <Border BorderThickness="0,0,0.5,0.5"   BorderBrush="Gray"  Grid.Column="4">
+                                    <Label Name="counterGoalsLabel" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding CounterGoals}"/>
                                 </Border>
-                                <Border BorderThickness="0,0,0,0.5"   BorderBrush="Gray"  Grid.Column="4">
-                                <Label Name="pointsLabel" HorizontalAlignment="Center"  Content="{Binding Points}"/>
+                                <Border BorderThickness="0,0,0,0.5"   BorderBrush="Gray"  Grid.Column="5">
+                                    <Label Name="pointsLabel" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding Points}"/>
                             </Border>
                         </Grid>
 
 
                     </DataTemplate>
-
-                </ItemsControl.ItemTemplate>
+                        
+                    </ItemsControl.ItemTemplate>
             </ItemsControl>
+                
             </Grid>
+            </ScrollViewer>
         </Border>
     </Grid>
 
