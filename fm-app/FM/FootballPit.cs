@@ -36,27 +36,29 @@ namespace FootballPit
         }
 
         public bool IsPlayed { get; set; }
-        
+
 
         public MatchResult MatchResult { get; set; }
 
         public static int PENALTY_AREA_BORDER = 2;
         public static int FIELD_AREAS = 7;
-        public static double ATTK_FACTOR_INIT = 1.6;
-        public static double ATTK_FACTOR_AREA_MULTIPLIER = 0.88;
+        public static double ATTK_FACTOR_INIT = 1.5;
+        public static double ATTK_FACTOR_AREA_MULTIPLIER = 0.89;
         public static double GOALSHOT_FACTOR_INIT = 1.2;
         public static double GOALSHOT_AREA_MULTIPLIER = 0.82;
         public static double SWEEPER_PICK_FACTOR = 0.3;
         public static double CENTRALPLAYER_PICK_FACTOR = 0.3;
-        public static double FITNESS_DECAY_OFF = 4d;
-        public static double FITNESS_DECAY_DEF = 7d;
-        public static double FITNESS_DECAY_TACTIC_BONUS = 3d;
-        public static double FITNESS_DECAY_PASSIVE = 1.5d;
+        public static double FITNESS_DECAY_OFF = 2d;
+        public static double FITNESS_DECAY_DEF = 8d;
+        public static double FITNESS_DECAY_TACTIC_BONUS = 4d;
+        public static double FITNESS_DECAY_PASSIVE_OFF = 1.5d;
+        public static double FITNESS_DECAY_PASSIVE_DEF = 5d;
+        public static double FITNESS_DECAY_PASSIVE_TACTIC_BONUS = 2d;
         public static double ATTK_FACTOR_OFFENSIVE = 1.2;
         public static double ATTK_FACTOR_NORMAL = 1d;
-        public static double DEF_FACTOR_HARD_TACKLING = 1.3;
+        public static double DEF_FACTOR_HARD_TACKLING = 1.07;
         public static double DEF_FACTOR_NORMAL_TACKLING = 1d;
-        public static double DEF_FACTOR_LOW_TACKING = 0.8;
+        public static double DEF_FACTOR_LOW_TACKING = 0.93;
         //public static double DEF_FACTOR_OFFENSIVE = 0.8;
         //public static double DEF_FACTOR_NORMAL = 1;
         public static double GAME_LENGTH = 40;
@@ -66,11 +68,11 @@ namespace FootballPit
         public static double LONGSHOT_P_INIT_HIGH = 0.5;
         public static double LONGSHOT_P_INIT_LOW = 0.3;
         public static double LONGSHOT_P_AREA_MULTIPLIER = 0.5;
-        public static double FREEKICK_P = 0.08;
-        public static double FREEKICK_P_BRUTAL = 0.14;
-        public static double FREEKICK_P_CLEAN = 0.02;
+        public static double FREEKICK_P = 0.1;
+        public static double FREEKICK_P_BRUTAL = 0.22;
+        public static double FREEKICK_P_CLEAN = 0.01;
         public static double PENALTYSHOT_FACTOR = 1.4;
-        public static double FREEKICK_FACTOR_INIT = 1.2;
+        public static double FREEKICK_FACTOR_INIT = 1.25;
         public static double FREEKICK_FACTOR_AREA_MULTIPLIER = 0.9;
 
         public MatchResult Simulate(bool silent)
@@ -120,52 +122,70 @@ namespace FootballPit
                 }
                 else
                 {
-                    if (area > (FIELD_AREAS / 2) && IsFoul(defLineUp))
+                    if (Battle(offLineUp, defLineUp, area))
                     {
-                        var distance = FIELD_AREAS - area;
-                        var p = offLineUp.KickTaker;
-                        if (distance == 1)
-                        {
-                            gform.Log("Elfmeter für " + offClub.Name, i);
+                        area++;
+                        continue;
 
-                        }
-                        else
-                        {
-                            gform.Log("Freistoß für " + offClub.Name, i);
-                        }
-
-                        gform.Log(p.LastName + " schießt..", i);
-                        Thread.Sleep(tension_goalshot);
-                        if (FreeKickOrPenalty(offLineUp, defLineUp, area))
-                        {
-                            AddGoal(res, offClub, offLineUp.KickTaker, i);
-                            area = FIELD_AREAS / 2;
-                            gform.Log("Tor!", i);
-                        }
-                        else
-                        {
-                            area = FIELD_AREAS;
-                            gform.Log("Daneben!", i);
-                        }
                     }
                     else
                     {
-                        if (Battle(offLineUp, defLineUp, area))
+
+                        if (IsFoul(defLineUp))
                         {
-                            area++;
-                            continue;
+                            if (area > (FIELD_AREAS / 2))
+                            {
+                                var distance = FIELD_AREAS - area;
+                                var p = offLineUp.KickTaker;
+                                if (distance == 1)
+                                {
+                                    gform.Log("Elfmeter für " + offClub.Name, i);
+
+                                }
+                                else
+                                {
+                                    gform.Log("Freistoß für " + offClub.Name, i);
+                                }
+
+                                gform.Log(p.LastName + " schießt..", i);
+                                Thread.Sleep(tension_goalshot);
+                                if (FreeKickOrPenalty(offLineUp, defLineUp, area))
+                                {
+                                    AddGoal(res, offClub, offLineUp.KickTaker, i);
+                                    area = FIELD_AREAS / 2;
+                                    gform.Log("Tor!", i);
+                                }
+                                else
+                                {
+                                    area = FIELD_AREAS;
+                                    gform.Log("Daneben!", i);
+                                }
+                            }
+                            else
+                            {
+                                area++;
+                                area++;
+                                continue;
+                            }
                         }
+
+
                     }
-
                 }
-
                 SwitchPossession(currentHomeLU, currentAwayLU, out offClub, out defClub, ref offLineUp, out defLineUp, ref area);
 
             }
 
-            MatchResult = res;          
+            ResetFitness();
+            MatchResult = res;
             IsPlayed = true;
             return res;
+        }
+
+        private void ResetFitness()
+        {
+            HomeClub.Rooster.ForEach(p => p.Fitness = 100);
+            AwayClub.Rooster.ForEach(p => p.Fitness = 100);
         }
 
         private void SwitchPossession(LineUp currentHomeLU, LineUp currentAwayLU, out Club offClub, out Club defClub, ref LineUp offLineUp, out LineUp defLineUp, ref int area)
@@ -187,7 +207,7 @@ namespace FootballPit
             }
         }
 
-        public static Random Random = new Random(1860);
+        public static Random Random = new Random(DateTime.Now.Millisecond);
 
         public bool IsGoalShotFired(LineUp lu, int area)
         {
@@ -257,8 +277,8 @@ namespace FootballPit
             var r1 = RollSkill(offSingle.GoalThreat, offSkillAverage);
             var r2 = RollSkill(goalie.Keeping, goalie.Keeping);
 
-            offSingle.DecayFitness(4f);
-            goalie.DecayFitness(2f);
+            offSingle.DecayFitness(1f);
+            goalie.DecayFitness(3f);
 
             var goal = r1 * offFactor > r2;
 
@@ -291,8 +311,8 @@ namespace FootballPit
             var defFitAverage = def.FieldPlayers.Sum(x => x.Fitness) / def.FieldPlayers.Count;
 
 
-            var offSingle = off.FieldPlayers.OrderByDescending(x => (x.Attk + Util.GetGaussianRandom(offSkillAverage, offSkillAverage / 5)) * GetPickFactor(off, x, area, true)).First();
-            var defSingle = defPlayers.OrderByDescending(x => (x.Fitness + Util.GetGaussianRandom(defFitAverage, defFitAverage / 5)) * GetPickFactor(def, x, area, false)).First();
+            var offSingle = off.FieldPlayers.OrderByDescending(x => (x.Attk + Util.GetGaussianRandom(offSkillAverage, offSkillAverage / 10)) * GetPickFactor(off, x, area, true)).First();
+            var defSingle = def.FieldPlayers.OrderByDescending(x => (x.Fitness + Util.GetGaussianRandom(defFitAverage, defFitAverage / 10)) * GetPickFactor(def, x, area, false)).First();
 
             var offBonus = ((off.Tactic == Tactic.Offensive) ? ATTK_FACTOR_OFFENSIVE : ATTK_FACTOR_NORMAL);
             var offAreaFactor = ATTK_FACTOR_INIT * Math.Pow(ATTK_FACTOR_AREA_MULTIPLIER, area);
@@ -305,11 +325,11 @@ namespace FootballPit
             offSingle.DecayFitness((float)decayOff);
             foreach (var pl in offPlayers.Where(oP => oP != offSingle))
             {
-                pl.DecayFitness((float)FITNESS_DECAY_PASSIVE);
+                pl.DecayFitness((float)FITNESS_DECAY_PASSIVE_OFF);
             }
             foreach (var pl in defPlayers.Where(dP => dP != defSingle))
             {
-                pl.DecayFitness((float)FITNESS_DECAY_PASSIVE);
+                pl.DecayFitness((float)(def.Tactic == Tactic.Defensive ? FITNESS_DECAY_PASSIVE_TACTIC_BONUS : FITNESS_DECAY_PASSIVE_DEF));
             }
             defSingle.DecayFitness((float)decayDef);
 
@@ -348,7 +368,7 @@ namespace FootballPit
 
         internal double RollSkill(double singleSkill, double avgSkill)
         {
-            return Util.GetGaussianRandom(singleSkill, Player.MAX_SKILL / 2.5) * 0.5 + Util.GetGaussianRandom(avgSkill, Player.MAX_SKILL / 2.5) * 0.5;
+            return Util.GetGaussianRandom(singleSkill, Player.MAX_SKILL / 3) * 0.5 + Util.GetGaussianRandom(avgSkill, Player.MAX_SKILL / 3) * 0.5;
         }
 
         //internal double RollSkill(double singleSkill, double singleSkill2, double avgSkill)
@@ -403,6 +423,8 @@ namespace FootballPit
         {
             return HomeClub.Name + " (" + HomeLineUp.Players.Average(p => p.SkillMax) + ") - " + AwayClub.Name + " (" + AwayLineUp.Players.Average(p => p.SkillMax) + ") " + ResultString;
         }
+
+
     }
 
     public class Substitution

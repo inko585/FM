@@ -3,14 +3,32 @@ using FM.Entities.Base;
 using FM.Models.Generic;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 namespace FM.Generator
 {
     public class WorldGenerator
     {
-        internal static Random rnd = new Random();
+        internal static Random rnd = new Random(DateTime.Now.Millisecond);
 
+        public static List<Tuple<Color, Color>> ClubColors = new List<Tuple<Color, Color>>()
+        {
+            new Tuple<Color, Color>(Color.Red, Color.White),
+            new Tuple<Color, Color>(Color.Blue, Color.White),
+            new Tuple<Color, Color>(Color.Black, Color.White),
+            new Tuple<Color, Color>(Color.Brown, Color.White),
+            new Tuple<Color, Color>(Color.Salmon, Color.White),
+            new Tuple<Color, Color>(Color.Green, Color.White),
+            new Tuple<Color, Color>(Color.Yellow, Color.Black),
+            new Tuple<Color, Color>(Color.Yellow, Color.Blue),
+            new Tuple<Color, Color>(Color.Green, Color.Black),
+            new Tuple<Color, Color>(Color.Purple, Color.White),
+            new Tuple<Color, Color>(Color.Red, Color.Blue),
+            new Tuple<Color, Color>(Color.Green, Color.Red),
+            new Tuple<Color, Color>(Color.Red, Color.Blue)
+
+        };
 
         public static string GetRandomValue(List<Occurrence> occurrences, double variant)
         {
@@ -31,12 +49,15 @@ namespace FM.Generator
         public static int ROOSTER_MIDFIELD_MAX = 6;
         public static int ROOSTER_STRIKER_MIN = 4;
         public static int ROOSTER_STRIKER_MAX = 6;
+        public static int MAX_GEN_LEVEL = 7;
         //public static int LEAGUE_SIZE = 12;
 
         public static int GEN_MIN_AGE = 17;
         public static int GEN_MAX_AGE = 36;
 
-        public static int MAX_PLAYER_GEN_LEVEL = 10;
+        //public static int MAX_PLAYER_GEN_LEVEL = 10;
+        
+        public static int MAX_ELO = 3000;
 
         public static LeagueAssociation GenerateRandomLeagueAssociation(World w, Association a)
         {
@@ -48,10 +69,13 @@ namespace FM.Generator
                 var l = new League();
                 l.Association = la;
                 l.Depth = i + 1;
+                l.Power = a.Power - i;
                 for (var j = 0; j < Game.Instance.LeagueSize; j++)
                 {
                     var n = GetRandomOccurrence(a.Nations, STANDARD_DEV).Text;
-                    l.Clubs.Add(GenerateRandomClub(w, a, w.GetNationByName(n), curLevel));
+                    var club = GenerateRandomClub(w, a, w.GetNationByName(n), curLevel);
+                    l.Clubs.Add(club);
+                    club.Leagues.Add(l);
                 }
                 l.ResetStandings();
 
@@ -78,6 +102,9 @@ namespace FM.Generator
             c.Coach.Club = c;
 
             var trueLvl = lvl - 0.5 + rnd.NextDouble();
+
+            var relativeLevel = trueLvl / MAX_GEN_LEVEL;
+            c.Elo = (int)Math.Round(relativeLevel * MAX_ELO);
 
             GeneratePlayersForPositionAndClub(w, a, n, lvl, c, Position.Goalie, ROOSTER_GOALIE_MIN, ROOSTER_GOALIE_MAX);
             GeneratePlayersForPositionAndClub(w, a, n, lvl, c, Position.Defender, ROOSTER_DEFENDER_MIN, ROOSTER_DEFENDER_MAX);
@@ -118,7 +145,9 @@ namespace FM.Generator
             var dice = rnd.Next(min, max);
             for (var i = 0; i < dice; i++)
             {
-                c.Rooster.Add(GenerateRandomPlayer(w, a, n, p, lvl, GEN_MIN_AGE, GEN_MAX_AGE));
+                var player = GenerateRandomPlayer(w, a, n, p, lvl, GEN_MIN_AGE, GEN_MAX_AGE);
+                player.CurrentContract = new Contract() { Club = c, Player = player, RunTime = rnd.Next(1, 3), Salary = player.SalaryStandard };
+                c.Rooster.Add(player);
             }
         }
 
@@ -131,7 +160,7 @@ namespace FM.Generator
             c.FirstName = fn;
             c.LastName = ln;
 
-            var philDice = rnd.Next(0, 3);
+            var philDice = rnd.Next(0, 4);
             c.Philospophie = Philospophies[philDice];
 
             return c;
@@ -163,9 +192,9 @@ namespace FM.Generator
             GetRandomNameForNation(w, n, out firstName, out lastName);
 
             var age = rnd.Next(fromAge, toAge);
-            var baseskill = Math.Min(Player.MAX_BASE_SKILL, Util.GetGaussianRandom((Player.MAX_BASE_SKILL / Player.MAX_BASE_SKILL_GEN_LEVEL) * lvl, 5));
+            var baseskill = Math.Min(Player.MAX_BASE_SKILL, Util.GetGaussianRandom((Player.MAX_BASE_SKILL / MAX_GEN_LEVEL) * lvl, 5));
             var charisma = Math.Round(Math.Min(Util.GetGaussianRandom(15, 3), 20));
-            var baseConst = (float)Math.Round(Math.Max(10, Math.Min(20, Util.GetGaussianRandom(20 - MAX_PLAYER_GEN_LEVEL + lvl, 2))), 0);
+            var baseConst = (float)Math.Round(Math.Max(10, Math.Min(20, Util.GetGaussianRandom(18 - MAX_GEN_LEVEL + lvl, 2))), 0);
 
 
             var xpLevel = 0d;
@@ -182,7 +211,7 @@ namespace FM.Generator
 
             while (setplayskill > 20)
             {
-                setplayskill = (float)Math.Round(Math.Max(1, Util.GetGaussianRandom(18 - MAX_PLAYER_GEN_LEVEL + lvl, 5)), 0);
+                setplayskill = (float)Math.Round(Math.Max(1, Util.GetGaussianRandom(18 - MAX_GEN_LEVEL + lvl, 5)), 0);
             }
 
             Player player = new Player()
@@ -244,4 +273,6 @@ namespace FM.Generator
             }
         }
     }
+
+    
 }

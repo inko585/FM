@@ -80,8 +80,8 @@
                 <Label Content="Moral:" VerticalAlignment="Center" Grid.Row="11"/>
                 
 
-            </Grid>
-        </Border>
+                </Grid>
+            </Border>
         </Grid>
     </Grid>
 </ae:AEWindow>

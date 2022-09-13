@@ -21,10 +21,11 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="10"/>
                     <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="100"/>
                 </Grid.ColumnDefinitions>
 
                 <Label Content="{Binding Club.Name}" FontSize="16" FontWeight="Bold" Grid.Column="1"></Label>
-
+                <Label Content="{Binding Club.SponsorMoney}" Grid.Column="2"/>
             </Grid>
 
         </Border>
@@ -47,8 +48,8 @@
                         <Label Name="nationLabel" Content="{Binding Nation.Short}" Grid.Column="2"/>
                         <Label Name="ageLabel" Content="{Binding Age}" Grid.Column="3"/>
                         <Label Name="skillLabel" Content="{Binding SkillMax}" Grid.Column="4"/>
-                        <Label Content="{Binding ValueOnField}" Grid.Column="5"/>
-                        <Label Content="{Binding SalaryStandard}" Grid.Column="6"/>
+                        <Label Content="{Binding SalaryStandard}" Grid.Column="5"/>
+                        <Label Content="{Binding ExampleContractP}" Grid.Column="6"/>
 
                     </Grid>
                 </DataTemplate>
