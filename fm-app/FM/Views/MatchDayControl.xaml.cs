@@ -42,7 +42,12 @@ namespace FM.Views
 
         private void Club_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-
+            var c = (sender as Label).DataContext as Club;
+            if (c != null)
+            {
+                var cView = new ClubWindow(c);
+                cView.ShowDialog();
+            }
         }
     }
 }

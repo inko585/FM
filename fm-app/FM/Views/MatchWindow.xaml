@@ -76,7 +76,7 @@
                                 <ColumnDefinition Width="40"/>
                             </Grid.ColumnDefinitions>
                             <Label Content="{Binding FullName}" PreviewMouseDown="Player_PreviewMouseDown" Style="{StaticResource LinkLabelStyle}" Grid.Column="1"/>
-                            <Label Content="{Binding MaxSkill}" Grid.Column="2"/>
+                            <Label Content="{Binding SkillMax}" Grid.Column="2"/>
                             <Label Content="{Binding PositionStringShort}"/>
                         </Grid>
 
@@ -92,7 +92,7 @@
                                 <ColumnDefinition Width="1*"/>
                                 <ColumnDefinition Width="40"/>
                             </Grid.ColumnDefinitions>
-                            <Label Content="{Binding MaxSkill}" />
+                            <Label Content="{Binding SkillMax}" />
                             <Label Content="{Binding FullName}" PreviewMouseDown="Player_PreviewMouseDown" Style="{StaticResource LinkLabelStyle}"  HorizontalAlignment="Right" Grid.Column="1"/>
                             <Label Content="{Binding PositionStringShort}" Grid.Column="2"/>
                         </Grid>

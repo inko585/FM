@@ -1,4 +1,5 @@
-﻿using FM.Entities.Base;
+﻿using FM.Common;
+using FM.Entities.Base;
 using FM.Models.Season;
 using System;
 using System.Collections.Generic;
@@ -130,6 +131,7 @@ namespace FM.Models.Generic
         public List<Club> Clubs { get; set; }
         public List<LeagueCompetitor> Standings { get; set; }
         public int Depth { get; set; }
+        public int Power { get; set; }
 
         public MatchDay LatestMatchDay
         {
@@ -168,13 +170,28 @@ namespace FM.Models.Generic
         {
             Standings = Clubs.Select(c => new LeagueCompetitor() { Club = c, Points = 0, Goals = 0, CounterGoals = 0, League = this }).ToList();
         }
+
+        public double GetAverageValueForPosition(Position p)
+        {
+            var clubAverages = new List<double>();
+            foreach (var c in Clubs)
+            {
+                var players = c.StartingLineUp.Players.Where(pl => pl.Position == p);
+                var avClub = players.Average(pl => pl.ValueOnField);
+                clubAverages.Add(avClub);
+            }
+
+            return clubAverages.Average();
+        }
     }
 
     public class Club
     {
+
         public Club()
         {
             Rooster = new List<Player>();
+            Leagues = new List<League>();
         }
         public String Name { get; set; }
         public LineUp StartingLineUp
@@ -194,6 +211,54 @@ namespace FM.Models.Generic
         }
 
         public Coach Coach { get; set; }
+
+        public int Budget { get; set; }
+
+        public int Account { get; set; }
+        public int Savings { get; set; }
+
+        public int StadiumCapacity { get; set; }
+
+        public int Elo { get; set; }
+
+        public int SponsorMoney
+        {
+            get
+            {
+                return (int)(Math.Round(Math.Pow(Elo, 2.8)/1000000) * 1500);
+            }
+        }
+
+        public double Attraction { get; set; }
+
+        public double Publicity { get; set; }
+
+        //public double GetInterestFor(Player p)
+        //{
+
+        //}
+
+        public void LookForPlayers()
+        {
+            var positions = new List<Position> { Position.Goalie, Position.Defender, Position.Midfielder, Position.Striker };
+            var avLeague = positions.ToDictionary(p => p, p => this.Leagues.OrderBy(l => l.Power).First().GetAverageValueForPosition(p));
+            var need4pos = positions.ToDictionary(p => p, p => GetNeedForPosition(p, avLeague[p]));
+
+        }
+
+        private double GetNeedForPosition(Position p, double avLeague)
+        {
+            var avLineup = this.StartingLineUp.Players.Where(pl => pl.Position == p).Average(pl => pl.ValueOnField);
+            var qualityFactor = avLeague / avLineup;
+
+            var roosterCountPos = this.Rooster.Where(pl => pl.Position == p).Count();
+            var lineUpCountPos = this.StartingLineUp.Players.Where(pl => pl.Position == p).Count();
+            var quantityFactor = (lineUpCountPos * 2) / roosterCountPos;
+
+            return qualityFactor * quantityFactor;
+        }
+
+        public List<League> Leagues { get; set; }
 
     }
 
@@ -307,7 +372,7 @@ namespace FM.Models.Generic
 
         public Tackling GetPreferredTackling()
         {
-            return Tackling.Brutal;
+            return Tackling.Clean;
         }
 
         public Tactic GetPreferredTactic()
@@ -330,7 +395,7 @@ namespace FM.Models.Generic
 
         Tackling IPhilospophie.GetPreferredTackling()
         {
-            return Tackling.Clean;
+            return Tackling.Brutal;
         }
 
         Tactic IPhilospophie.GetPreferredTactic()
@@ -358,7 +423,7 @@ namespace FM.Models.Generic
 
         Tactic IPhilospophie.GetPreferredTactic()
         {
-            return Tactic.Offensive;
+            return Tactic.Defensive;
         }
     }
 
@@ -381,10 +446,16 @@ namespace FM.Models.Generic
 
         Tactic IPhilospophie.GetPreferredTactic()
         {
-            return Tactic.Defensive;
+            return Tactic.Offensive;
         }
     }
 
+    public class Manager : Human
+    {
+        public Club Club { get; set; }
+
+
+    }
 
     public class Coach : Human
     {
@@ -439,7 +510,6 @@ namespace FM.Models.Generic
         public static int MIN_STARTING_CONSITUTION = 15;
         public static int MIN_AGE = 17;
         public static int XP_FOR_FIRST_LEVEL = 150;
-        public static int MAX_BASE_SKILL_GEN_LEVEL = 7;
         public static int MAX_FITNESS = 100;
         public static int MAX_MORAL = 100;
         public static int MAX_BASE_SKILL = 80;
@@ -451,7 +521,7 @@ namespace FM.Models.Generic
         public static float INIT_RATING = 5f;
         public static int MAX_SKILL = MAX_BASE_SKILL + MAX_XPLEVEL;
         public static int LEVEL_CAP_LOG_BASE = 30;
-        public static float CONSTITUATIN_DECLINE_RATE = 0.4f;
+        public static float CONSTITUTION_DECLINE_RATE = 0.4f;
 
 
         public Contract CurrentContract { get; set; }
@@ -587,7 +657,7 @@ namespace FM.Models.Generic
         {
             get
             {
-                return SkillMax * (Moral / MAX_MORAL) * ((Position == Position.Defender) ? 0.8f : (Position == Position.Striker) ? 1.3f : 1f);
+                return SkillMax * (Moral / MAX_MORAL) * ((Position == Position.Defender) ? 0.75f : (Position == Position.Striker) ? 1.25f : 1f);
             }
         }
 
@@ -596,7 +666,8 @@ namespace FM.Models.Generic
             get
             {
 
-                return Position == Position.Goalie ? 0f : SkillCurrent * ((Position == Position.Defender) ? 0.8f : 1f);
+                return Position == Position.Goalie ? 0f : SkillCurrent * ((Position == Position.Defender) ? 0.75f : (Position == Position.Midfielder) ? 1.25f : 1f);
+
 
             }
         }
@@ -607,7 +678,7 @@ namespace FM.Models.Generic
             get
             {
 
-                return Position == Position.Goalie ? 0f : SkillCurrent * ((Position == Position.Defender) ? 1.3f : (Position == Position.Striker) ? 0.8f : 0.9f);
+                return Position == Position.Goalie ? 0f : SkillCurrent * ((Position == Position.Defender) ? 1.25f : (Position == Position.Striker) ? 0.85f : 1f);
             }
 
         }
@@ -616,7 +687,7 @@ namespace FM.Models.Generic
         {
             get
             {
-                return Position == Position.Goalie ? SkillMax : 0f;
+                return Position == Position.Goalie ? SkillMax * 1.15f : 0f;
             }
         }
 
@@ -637,25 +708,72 @@ namespace FM.Models.Generic
             }
         }
 
-        public double SalaryStandard
+        public int SalaryStandard
         {
             get
             {
-                return (double)Math.Round(Math.Pow(80, ValueOnField), 1) * 1000d;
+                return (int)Math.Round(Math.Pow(ValueOnField*10, 2), 1) * 2000;
             }
         }
 
-        //public double GetSalaryExpectationForClub(Club c)
-        //{
-        //    var teamPowerFactor = 1 + (c.StartingLineUp.Players.Sum(p => p.ValueOnField) / 6) / ValueOnField;
-        //    var playersForPos = c.StartingLineUp.Players.Where(p => p.Position == Position);
-        //    var posCompetitionFactor = (playersForPos.Sum(p => p.ValueOnField) / playersForPos.Count()) > ValueOnField ? 1.2 : 1;
-        //    var moralFactor = 1d;
-        //    if (c == this.Club)
-        //    {
-        //        moralFactor = 0.75 + (1 - (Moral / MAX_MORAL));
-        //    }
-        //}
+        public double ExampleContractP
+        {
+            get
+            {
+                return GetSalaryExpectationForClub(this.Club);
+            }
+        }
+
+        public double GetContractP(Club c, double salaryOffer)
+        {
+            var teamPowerFactor = (c.StartingLineUp.Players.Sum(p => p.ValueOnField) / 6) / ValueOnField;
+            var playersForPos = c.StartingLineUp.Players.Where(p => p.Position == Position);
+            var posCompetitionFactor = (playersForPos.Sum(p => p.ValueOnField) / playersForPos.Count()) > ValueOnField ? 0.8 : 1;
+            var moralFactor = 1d;
+            if (c == this.Club)
+            {
+                moralFactor = 1.25 - (1 - (Moral / MAX_MORAL));
+            }
+            var moneyfactor = salaryOffer / SalaryStandard;
+            var timeFactor = 1d;
+            if (CurrentContract != null)
+            {
+                if (CurrentContract.RunTime > 1)
+                {
+                    timeFactor = timeFactor * (CurrentContract.RunTime - 1) * Math.Pow(0.97, Season.Season.CurrentSeason.FootballWeeks.Count());
+                }
+                timeFactor = timeFactor * (Math.Pow(0.97, Season.Season.CurrentSeason.CurrentWeek.Number / Season.Season.CurrentSeason.FootballWeeks.Count()));
+            }
+
+
+            return teamPowerFactor * posCompetitionFactor * moralFactor * timeFactor;
+        }
+        public int GetSalaryExpectationForClub(Club c)
+        {
+            if (CurrentContract != null && CurrentContract.RunTime > 1)
+            {
+                return -1;
+            }
+            var teamPowerFactor = ValueOnField / (c.StartingLineUp.Players.Sum(p => p.ValueOnField) / 6);
+
+            var playersForPos = c.StartingLineUp.Players.Where(p => p.Position == Position);
+            var posCompetitionFactor = (playersForPos.Sum(p => p.ValueOnField) / playersForPos.Count()) > ValueOnField ? 1.2 : 1;
+            var moralFactor = 1d;
+            if (c == this.Club)
+            {
+                moralFactor = 0.75 + (1 - (Moral / MAX_MORAL));
+            }
+
+            var timeFactor = 1d;
+            if (CurrentContract != null)
+            {
+                timeFactor = timeFactor * Math.Pow(1.02, (Season.Season.CurrentSeason.FootballWeeks.Count() - Season.Season.CurrentSeason.CurrentWeek.Number));
+            }
+
+
+            var salaryRaw = SalaryStandard * teamPowerFactor * posCompetitionFactor * moralFactor * timeFactor;
+            return (int)Math.Round(salaryRaw / 1000, 1) * 1000;
+        }
 
         public void DecayFitness(float level)
         {
