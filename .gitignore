@@ -78,3 +78,8 @@ fm-app/FM/obj/Debug/Views/MatchWindow.g.cs
 fm-app/FM/obj/Debug/Views/MatchWindow.g.i.cs
 fm-app/FM/obj/Debug/Views/PlayerWindow.g.cs
 fm-app/FM/obj/Debug/Views/PlayerWindow.g.i.cs
+fm-app/.vs/FM/v15/Server/sqlite3/storage.ide
+AE.Graphics.Wpf/obj/Debug/AE.Graphics.Wpf.csprojAssemblyReference.cache
+fm-app/FM/bin/
+fm-app/FM/obj/
+fm-app/FM/FM.App.csproj.user

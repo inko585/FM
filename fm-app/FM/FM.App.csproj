@@ -56,6 +56,7 @@
     <Compile Include="LeagueController.cs" />
     <Compile Include="Models\FootballUniverse.cs" />
     <Compile Include="Models\NavItem.cs" />
+    <Compile Include="Models\PixelArt.cs" />
     <Compile Include="Models\Season.cs" />
     <Compile Include="RichList.cs" />
     <Compile Include="ViewModels\ClubViewModel.cs" />
