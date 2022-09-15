@@ -223,24 +223,57 @@ namespace FM.Models.Generic
         }
 
         public Coach Coach { get; set; }
+        public int SeasonIncomeEstimation
+        {
+            get
+            {
+                var stadiumEarnings = (int)Math.Round((Leagues.SelectMany(l => l.CurrentSeasonMatchDays).Count() / 2) * Game.ENTREE_FEE * Math.Min(StadiumCapacity, ViewerAttractionEstimation));
+                var sponsorEarnings = SponsorMoneyCurrentSeason;
+
+                return stadiumEarnings + sponsorEarnings;
+            }
+        }
+
+        public int Account { get; set; }
+        public int Savings { get; set; }
+        public int StadiumLevel { get; set; }
+
+        public int StadiumCapacity
+        {
+            get
+            {
+                return StadiumLevel * 1500;
+            }
+        }
+
+        public int Elo { get; set; }
+
+        public int SponsorMoneyCurrentSeason { get; set; }
+
+        public int SponsorMoneyPotential
+        {
+            get
+            {
+                return (int)(Math.Round(Math.Pow(Elo, 2.8) / 1000000) * 1500);
+            }
+        }
+
+        public double ViewerAttractionEstimation { get; set; }
+
+
+        public double ViewerAttraction
+        {
+            get
+            {
+                return (int)(Math.Round(Math.Pow(Elo, 1.8) / 70));
+            }
+        }
+
         public Crest Crest { get; set; }
 
         public int Budget { get; set; }
 
-        public int Account { get; set; }
-        public int Savings { get; set; }
 
-        public int StadiumCapacity { get; set; }
-
-        public int Elo { get; set; }
-
-        public int SponsorMoney
-        {
-            get
-            {
-                return (int)(Math.Round(Math.Pow(Elo, 2.8)/1000000) * 1500);
-            }
-        }
 
         public double Attraction { get; set; }
 
