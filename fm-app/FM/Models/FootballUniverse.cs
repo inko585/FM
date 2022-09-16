@@ -214,21 +214,49 @@ namespace FM.Models.Generic
         public ClubColors ClubColors { get; set; }
         public string Crest { get; set; }
         public string Dress { get; set; }
-
-        public int Budget { get; set; }
-
-        public int Account { get; set; }
-        public int Savings { get; set; }
-
-        public int StadiumCapacity { get; set; }
-
-        public int Elo { get; set; }
-
-        public int SponsorMoney
+        public int SeasonIncomeEstimation
         {
             get
             {
-                return (int)(Math.Round(Math.Pow(Elo, 2.8)/1000000) * 1500);
+                var stadiumEarnings = (int)Math.Round((Leagues.SelectMany(l => l.CurrentSeasonMatchDays).Count() / 2) * Game.ENTREE_FEE * Math.Min(StadiumCapacity, ViewerAttractionEstimation));
+                var sponsorEarnings = SponsorMoneyCurrentSeason;
+
+                return stadiumEarnings + sponsorEarnings;
+            }
+        }
+
+        public int Account { get; set; }
+        public int Savings { get; set; }
+        public int StadiumLevel { get; set; }
+
+        public int StadiumCapacity
+        {
+            get
+            {
+                return StadiumLevel * 1500;
+            }
+        }
+
+        public int Elo { get; set; }
+
+        public int SponsorMoneyCurrentSeason { get; set; }
+
+        public int SponsorMoneyPotential
+        {
+            get
+            {
+                return (int)(Math.Round(Math.Pow(Elo, 2.8) / 1000000) * 1500);
+            }
+        }
+
+        public double ViewerAttractionEstimation { get; set; }
+
+
+        public double ViewerAttraction
+        {
+            get
+            {
+                return (int)(Math.Round(Math.Pow(Elo, 1.8) / 70));
             }
         }
 
@@ -247,6 +275,10 @@ namespace FM.Models.Generic
                 return PixelArt.GetDressImage(this.ClubColors, this.Dress);
             }
         }
+
+        public int Budget { get; set; }
+
+
 
         public double Attraction { get; set; }
 

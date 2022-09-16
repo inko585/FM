@@ -86,11 +86,14 @@ namespace FM.Generator
 
             c.Coach = GenerateRandomCoach(w, n);
             c.Coach.Club = c;
-
+            
             var trueLvl = lvl - 0.5 + rnd.NextDouble();
+            c.StadiumLevel = Math.Max(1, (int)Util.GetGaussianRandom(trueLvl * 1.5, 1));
 
             var relativeLevel = trueLvl / MAX_GEN_LEVEL;
             c.Elo = (int)Math.Round(relativeLevel * MAX_ELO);
+            c.SponsorMoneyCurrentSeason = c.SponsorMoneyPotential;
+            c.ViewerAttractionEstimation = c.ViewerAttraction;
 
             GeneratePlayersForPositionAndClub(w, a, n, lvl, c, pl, Position.Goalie, ROOSTER_GOALIE_MIN, ROOSTER_GOALIE_MAX);
             GeneratePlayersForPositionAndClub(w, a, n, lvl, c, pl, Position.Defender, ROOSTER_DEFENDER_MIN, ROOSTER_DEFENDER_MAX);
