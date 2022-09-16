@@ -5,10 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FM.Views"
              xmlns:ae="clr-namespace:AE.Graphics.Wpf;assembly=AE.Graphics.Wpf"
-             mc:Ignorable="d" Width="800" Height="600" WindowStartupLocation="CenterScreen">
+             mc:Ignorable="d" Width="500" Height="600" WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
-        <!--<ResourceDictionary Source="pack://application:,,,/AE.Graphics.Wpf;component/Styles/AEStyles.xaml"/>-->
+        <ResourceDictionary Source="pack://application:,,,/AE.Graphics.Wpf;component/Styles/AEStyles.xaml"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -33,55 +33,61 @@
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="205"/>
             </Grid.ColumnDefinitions>
         
         <Border BorderThickness="1" BorderBrush="#FFACACAC"  Margin="5,5,5,5" Grid.Row="2" >
-            <Grid Background="{StaticResource ListColor}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="120"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="120"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="20"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="463*"/>
-                </Grid.RowDefinitions>
-                    <Image Source="{Binding Player.ProfilePic}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="0" Grid.Column="0" Width="100" Height="100"></Image>
-                    <Image Source="{Binding Player.TricotPic}" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="1" Width="100" Height="100"></Image>
+                <Grid Background="{StaticResource ListColor}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="0"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="463*"/>
+                    </Grid.RowDefinitions>
+
                     <Label Content="Position:" Grid.Row="1" VerticalAlignment="Center"/>
-                <Label Content="{Binding Player.PositionString}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1"/>
-                
-                <Label Content="Alter:" Grid.Row="2" VerticalAlignment="Center"/>
-                <Label Content="{Binding Player.Age}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="2" Grid.Column="1"/>
-                <Label Content="Nationalität:"  VerticalAlignment="Center" Grid.Row="3"/>
-                <Label Content="{Binding Player.Nation.Name}" FontWeight="Bold"  VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="3" Grid.Column="1"/>
-                <Label Content="Marktwert:"  VerticalAlignment="Center" Grid.Row="4"/>
-                <Label Content="Vertragslaufzeit:" VerticalAlignment="Center" Grid.Row="5"/>
-                <Label Content="Spielstärke:" VerticalAlignment="Center" Grid.Row="7"/>
-                <Label Content="{Binding Player.MaxSkill}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="7" Grid.Column="1"/>
-                
-                <Label Content="Konstitution:" VerticalAlignment="Center" Grid.Row="8"/>
-                <Label Content="{Binding Player.Constitution}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="8" Grid.Column="1"/>
-                <Label Content="Standards:" VerticalAlignment="Center" Grid.Row="9"/>
-                <Label Content="{Binding Player.SetPlaySkill}" VerticalAlignment="Center" FontWeight="Bold" HorizontalAlignment="Left" Grid.Row="9" Grid.Column="1"/>
-                <Label Content="Charisma:" VerticalAlignment="Center" Grid.Row="10"/>
-                <Label Content="{Binding Player.Charisma}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="10" Grid.Column="1"/>
-                <Label Content="Moral:" VerticalAlignment="Center" Grid.Row="11"/>
-                
+                    <Label Content="{Binding Player.PositionString}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1"/>
+
+                    <Label Content="Alter:" Grid.Row="2" VerticalAlignment="Center"/>
+                    <Label Content="{Binding Player.Age}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="2" Grid.Column="1"/>
+                    <Label Content="Nationalität:"  VerticalAlignment="Center" Grid.Row="3"/>
+                    <Label Content="{Binding Player.Nation.Name}" FontWeight="Bold"  VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="3" Grid.Column="1"/>
+                    <Label Content="Marktwert:"  VerticalAlignment="Center" Grid.Row="4"/>
+                    <Label Content="Vertragslaufzeit:" VerticalAlignment="Center" Grid.Row="5"/>
+                    <Label Content="Spielstärke:" VerticalAlignment="Center" Grid.Row="7"/>
+                    <Label Content="{Binding Player.MaxSkill}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="7" Grid.Column="1"/>
+
+                    <Label Content="Konstitution:" VerticalAlignment="Center" Grid.Row="8"/>
+                    <Label Content="{Binding Player.Constitution}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="8" Grid.Column="1"/>
+                    <Label Content="Standards:" VerticalAlignment="Center" Grid.Row="9"/>
+                    <Label Content="{Binding Player.SetPlaySkill}" VerticalAlignment="Center" FontWeight="Bold" HorizontalAlignment="Left" Grid.Row="9" Grid.Column="1"/>
+                    <Label Content="Charisma:" VerticalAlignment="Center" Grid.Row="10"/>
+                    <Label Content="{Binding Player.Charisma}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="10" Grid.Column="1"/>
+                    <Label Content="Moral:" VerticalAlignment="Center" Grid.Row="11"/>
+
 
                 </Grid>
             </Border>
+            <Grid Background="{StaticResource ListColor}" Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="200"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Image Source="{Binding Player.ProfileImage}" VerticalAlignment="Top" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" Width="200" Height="200"></Image>
+            </Grid>
         </Grid>
     </Grid>
 </ae:AEWindow>

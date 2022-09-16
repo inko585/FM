@@ -6,10 +6,10 @@
              xmlns:local="clr-namespace:FM.Views"
           xmlns:ae="clr-namespace:AE.Graphics.Wpf;assembly=AE.Graphics.Wpf"
              mc:Ignorable="d" 
-             Height="700" Width="700" WindowStartupLocation="CenterScreen">
+             Height="900" Width="700" WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
-        <ResourceDictionary Source="pack://application:,,,/AE.Graphics.Wpf;component/Styles/AEStyles.xaml"/>
+        <!--<ResourceDictionary Source="pack://application:,,,/AE.Graphics.Wpf;component/Styles/AEStyles.xaml"/>-->
     </Window.Resources>
     
     <Grid>
@@ -21,8 +21,8 @@
         
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="80"/>
-                <RowDefinition Height="0"/>
+                <RowDefinition/>
+                <RowDefinition/>
                 <RowDefinition />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -33,7 +33,7 @@
             <Border Grid.ColumnSpan="2" BorderThickness="1" BorderBrush="#FFACACAC" Margin="5,10,5,0">
                 <Grid Background="White">
                     <Grid.RowDefinitions>
-                        <RowDefinition/>
+                        <RowDefinition Height="60"/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -45,23 +45,26 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="115*"/>
                     <ColumnDefinition Width="33*"/>
+                    <ColumnDefinition Width="33*"/>
                 </Grid.ColumnDefinitions>
-                
-                <Label Name="homeCLabel" FontSize="18" PreviewMouseDown="Club_PreviewMouseDown" Content="{Binding HomeClub.Name}" Style="{StaticResource LinkLabelStyle}"/>
-                <Label Content="{Binding MatchResult.HomeGoals}" FontWeight="Bold" FontSize="18" Grid.Column="1" HorizontalAlignment="Center"/>
+
+                        <Label Name="homeCLabel" FontSize="18" PreviewMouseDown="Club_PreviewMouseDown" HorizontalAlignment="Right" VerticalAlignment="Center" Content="{Binding HomeClub.Name}" Style="{StaticResource LinkLabelStyle}" Margin="0,0,10,0" Grid.Column="0" />
+                        <Image Source="{Binding HomeClub.DressImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1" Margin="0,5,0,5"></Image>
+                        <Label Content="{Binding MatchResult.HomeGoals}" FontWeight="Bold" FontSize="18" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             
             </Grid>
                     <Label Content="Zuschauer: 10000" FontStyle="Italic" Grid.Row="1" Margin="5"/>
                     <Grid Grid.Column="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="33*"/>
+                        <ColumnDefinition Width="33*"/>
                         <ColumnDefinition Width="115*"/>
 
                     </Grid.ColumnDefinitions>
 
-
-                    <Label Name="awayCLabel" FontSize="18"  PreviewMouseDown="Club_PreviewMouseDown" Content="{Binding AwayClub.Name}" Grid.Column="1" Style="{StaticResource LinkLabelStyle}" HorizontalAlignment="Right"/>
-                    <Label Content="{Binding MatchResult.AwayGoals}" FontSize="18" FontWeight="Bold"  HorizontalAlignment="Center"/>
+                        <Label Content="{Binding MatchResult.AwayGoals}" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                        <Image Source="{Binding AwayClub.DressImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1" Margin="0,5,0,5"></Image>
+                        <Label Name="awayCLabel" FontSize="18"  PreviewMouseDown="Club_PreviewMouseDown" VerticalAlignment="Center" Content="{Binding AwayClub.Name}" Grid.Column="2" Style="{StaticResource LinkLabelStyle}" HorizontalAlignment="Left" Margin="10,0,0,0"/>
                 </Grid>
                 </Grid>
             </Border>
@@ -72,12 +75,14 @@
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="60"/>
                                 <ColumnDefinition Width="1*"/>
                                 <ColumnDefinition Width="40"/>
                             </Grid.ColumnDefinitions>
-                            <Label Content="{Binding FullName}" PreviewMouseDown="Player_PreviewMouseDown" Style="{StaticResource LinkLabelStyle}" Grid.Column="1"/>
-                            <Label Content="{Binding SkillMax}" Grid.Column="2"/>
-                            <Label Content="{Binding PositionStringShort}"/>
+                            <Label Content="{Binding PositionStringShort}" Grid.Column="0" VerticalAlignment="Center"/>
+                            <Image Source="{Binding PlayerImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1" Margin="0,5,0,5" ></Image>
+                            <Label Content="{Binding FullName}" PreviewMouseDown="Player_PreviewMouseDown" Style="{StaticResource LinkLabelStyle}" VerticalAlignment="Center"  Grid.Column="2"/>
+                            <Label Content="{Binding SkillMax}" Grid.Column="3" VerticalAlignment="Center"/>
                         </Grid>
 
                     </DataTemplate>
@@ -90,11 +95,13 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="40"/>
                                 <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="60"/>
                                 <ColumnDefinition Width="40"/>
                             </Grid.ColumnDefinitions>
-                            <Label Content="{Binding SkillMax}" />
-                            <Label Content="{Binding FullName}" PreviewMouseDown="Player_PreviewMouseDown" Style="{StaticResource LinkLabelStyle}"  HorizontalAlignment="Right" Grid.Column="1"/>
-                            <Label Content="{Binding PositionStringShort}" Grid.Column="2"/>
+                            <Label Content="{Binding SkillMax}" Grid.Column="0" VerticalAlignment="Center"/>
+                            <Label Content="{Binding FullName}" PreviewMouseDown="Player_PreviewMouseDown" Style="{StaticResource LinkLabelStyle}"  HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Column="1"/>
+                            <Image Source="{Binding PlayerImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="2" Margin="0,5,0,5" ></Image>
+                            <Label Content="{Binding PositionStringShort}" VerticalAlignment="Center" Grid.Column="3"/>
                         </Grid>
 
                     </DataTemplate>
@@ -121,12 +128,14 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="60"/>
                             <ColumnDefinition Width="1*"/>
                             <ColumnDefinition Width="50"/>
                         </Grid.ColumnDefinitions>
-                        <Label Content="{Binding Minute}"/>
-                        <Label Content="{Binding Scorer.FullName}" PreviewMouseDown="Scorer_PreviewMouseDown" Style="{StaticResource LinkLabelStyle}" Grid.Column="1"/>
-                        <Label Content="{Binding CurrentScore}" Grid.Column="2"/>
+                            <Label Content="{Binding Minute}" VerticalAlignment="Center" Grid.Column="0"/>
+                            <Image Source="{Binding Scorer.PlayerImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1" Margin="0,5,0,5" ></Image>
+                            <Label Content="{Binding Scorer.FullName}" PreviewMouseDown="Scorer_PreviewMouseDown" VerticalAlignment="Center" Style="{StaticResource LinkLabelStyle}" Grid.Column="2"/>
+                            <Label Content="{Binding CurrentScore}" VerticalAlignment="Center" Grid.Column="3"/>
                     </Grid>
 
                 </DataTemplate>

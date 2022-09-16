@@ -1079,7 +1079,7 @@
                                 
                             </Separator.Style>
                         </Separator>
-                        <ContentControl VerticalContentAlignment="Center" Height="30">
+                        <ContentControl VerticalContentAlignment="Center" Height="60">
                             <ContentPresenter VerticalAlignment="Center" Margin="5,0,0,0"/>
                         </ContentControl>
                     </StackPanel>

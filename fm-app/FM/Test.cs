@@ -68,8 +68,8 @@ namespace FM
 
             50.Times(() =>
             {
-                var c = WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.Nations.First(), w.Associations.First().Power);
-                var c2 = WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.Nations.First(), w.Associations.First().Power);
+                var c = WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.AssociationLooks.First(), w.PlayerLooks.First(), w.Nations.First(), w.Associations.First().Power);
+                var c2 = WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.AssociationLooks.First(), w.PlayerLooks.First(), w.Nations.First(), w.Associations.First().Power);
                 //WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.Nations.First(), w.Associations.First().Power);
                 var m = new Match();
                 m.HomeCompetitor = new LeagueCompetitor() { Club = c, Points = 0 };

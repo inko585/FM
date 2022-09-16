@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FM.Models.Generic;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -8,148 +9,119 @@ namespace FM.Models
 {
     public static class PixelArt
     {
-        private static Random rnd = new Random();
-        private static ColorConverter converter = new ColorConverter();
-
-        private static List<Tuple<Color, Color>> ClubColors = new List<Tuple<Color, Color>>()
+        public static BitmapImage GetCrestImage(ClubColors cc, string template)
         {
-            new Tuple<Color, Color>(Color.Crimson, Color.FloralWhite),
-            new Tuple<Color, Color>(Color.Blue, Color.FloralWhite),
-            new Tuple<Color, Color>(Color.Black, Color.FloralWhite),
-            new Tuple<Color, Color>(Color.Brown, Color.FloralWhite),
-            new Tuple<Color, Color>(Color.Salmon, Color.FloralWhite),
-            new Tuple<Color, Color>(Color.Green, Color.FloralWhite),
-            new Tuple<Color, Color>(Color.Gold, Color.Black),
-            new Tuple<Color, Color>(Color.Gold, Color.Blue),
-            new Tuple<Color, Color>(Color.Green, Color.Black),
-            new Tuple<Color, Color>(Color.Purple, Color.FloralWhite),
-            new Tuple<Color, Color>(Color.Crimson, Color.Blue),
-            new Tuple<Color, Color>(Color.Green, Color.Crimson),
-            new Tuple<Color, Color>(Color.Crimson, Color.Blue)
-        };
-
-        private static List<Color> SkinColors = new List<Color>()
+            return BitmapToImageSource(DoubleSize(MakeIntransparent(GetCrest(cc, template))));
+        }
+        public static Bitmap GetCrest(ClubColors cc, string template)
         {
-            Color.AntiqueWhite,
-            Color.Bisque,
-            Color.PeachPuff,
-            Color.PapayaWhip,
-            Color.DarkSalmon,
-            Color.MistyRose,
-            Color.BurlyWood,
-            Color.Tan,
-            Color.Chocolate,
-            Color.SaddleBrown,
-            Color.Peru,
-            Color.Sienna
-        };
+            var crest = new Bitmap(GetBitmapFromText(BitmapType.Crests, template));
 
-        private static List<Color> HairColors = new List<Color>()
-        {
-            Color.Black,
-            Color.DimGray,
-            Color.Gold,
-            Color.Goldenrod,
-            Color.DarkRed,
-            Color.Sienna,
-            Color.Peru,
-            Color.PaleGoldenrod,
-            Color.Orange
-        };
+            crest = RecolorBitmap(crest, Color.Red, cc.MainColor);
+            crest = RecolorBitmap(crest, Color.Yellow, cc.SecondColor);
 
-        private static List<Color> EyeColors = new List<Color>()
-        {
-            Color.LimeGreen,
-            Color.DeepSkyBlue,
-            Color.CadetBlue,
-            Color.SaddleBrown,
-            Color.PaleTurquoise,
-            Color.YellowGreen,
-            Color.DarkOliveGreen
-        };
-
-        public static BitmapImage GetRandomProfilePic()
-        {
-            var skinColor = GetRandomSkinColor();
-            var hairColor = GetRandomHairColor();
-            var eyeColor = GetRandomEyeColor();
-
-            return CreatePlayer(skinColor, hairColor, eyeColor);
+            return crest;
         }
 
-        public static BitmapImage GetRandomTricotPic()
+        public static BitmapImage GetDressImage(ClubColors cc, string template)
         {
-            var clubColors = GetClubColor();
-            var clubColor1 = clubColors.Item1;
-            var clubColor2 = clubColors.Item2;
-
-            return CreateTricot(clubColor1, clubColor2);
+            return BitmapToImageSource(DoubleSize(MakeIntransparent(GetDress(cc, template))));
         }
 
-        public static BitmapImage GetRandomCrest()
+        public static Bitmap GetDress(ClubColors cc, string template)
         {
-            var clubColors = GetClubColor();
-            var clubColor1 = clubColors.Item1;
-            var clubColor2 = clubColors.Item2;
+            var dress = new Bitmap(GetBitmapFromText(BitmapType.Dresses, template));
 
-            return CreateCrest(clubColor1, clubColor2);
+            dress = RecolorBitmap(dress, Color.Red, cc.MainColor);
+            dress = RecolorBitmap(dress, Color.Yellow, cc.SecondColor);
+
+            return dress;
         }
 
-        private static BitmapImage CreatePlayer(Color skinColor, Color hairColor, Color eyeColor)
+        public static BitmapImage GetFaceImage(Face f)
         {
-            
-            var allHeads = Directory.GetFiles("../../Images/Heads/", "*.png");
-            var headPath = allHeads[rnd.Next(allHeads.Length)];
-            var head = new Bitmap(headPath);
-
-            var allEyes = Directory.GetFiles("../../Images/Eyes/", "*.png");
-            var eyePath = allEyes[rnd.Next(allEyes.Length)];
-            var eye = new Bitmap(eyePath);
-
-            var allMouths = Directory.GetFiles("../../Images/Mouths/", "*.png");
-            var mouthPath = allMouths[rnd.Next(allMouths.Length)];
-            var mouth = new Bitmap(mouthPath);
-
-            head = RecolorBitmap(head, Color.Red, skinColor);
-            head = RecolorBitmap(head, Color.Yellow, hairColor);
-
-            eye = RecolorBitmap(eye, Color.Red, eyeColor);
-            eye = RecolorBitmap(eye, Color.Yellow, hairColor);
-
-            mouth = RecolorBitmap(mouth, Color.Yellow, hairColor);
-
-            var player = CombineBitmaps(head, eye);
-
-            player = CombineBitmaps(player, mouth);
-
-            return BitmapToImageSource(DoubleSize(MakeIntransparent(player)));
+            return BitmapToImageSource(DoubleSize(MakeIntransparent(GetFace(f))));
         }
 
-        private static BitmapImage CreateTricot(Color darkColor, Color lightColor)
+        public static Bitmap GetFace(Face f)
         {
-            var allTricots = Directory.GetFiles("../../Images/Tricots/", "*.png");
-            var tricotPath = allTricots[rnd.Next(allTricots.Length)];
-            var tricot = new Bitmap(tricotPath);
+            var head = new Bitmap(GetBitmapFromText(BitmapType.Heads, f.Head));
+            var mouth = new Bitmap(GetBitmapFromText(BitmapType.Mouths, f.Mouth));
+            var eye = new Bitmap(GetBitmapFromText(BitmapType.Eyes, f.Eye));
 
+            head = RecolorBitmap(head, Color.Red, f.SkinColor);
+            head = RecolorBitmap(head, Color.Yellow, f.HairColor);
+            mouth = RecolorBitmap(mouth, Color.Yellow, f.HairColor);
+            eye = RecolorBitmap(eye, Color.Yellow, f.HairColor);
+            eye = RecolorBitmap(eye, Color.Red, f.EyeColor);
 
-            tricot = RecolorBitmap(tricot, Color.Red, darkColor);
-            tricot = RecolorBitmap(tricot, Color.Yellow, lightColor);
+            var face = CombineBitmaps(head, mouth);
+            face = CombineBitmaps(face, eye);
 
-            return BitmapToImageSource(DoubleSize(MakeIntransparent(tricot)));
+            return face;
         }
 
-        private static BitmapImage CreateCrest(Color darkColor, Color lightColor)
+        public static BitmapImage GetPlayerImage(Face face, ClubColors cc, string dress)
         {
-            var allCrests = Directory.GetFiles("../../Images/Crests/", "*.png");
-            var crestPath = allCrests[rnd.Next(allCrests.Length)];
+            return BitmapToImageSource(DoubleSize(MakeIntransparent(GetPlayer(face, cc, dress))));
+        }
 
-            var crest = new Bitmap(crestPath);
+        public static Bitmap GetPlayer(Face f, ClubColors cc, string d)
+        {
+            var face = GetFace(f);
+            var dress = GetDress(cc, d);
 
+            var cutDress = CutBitmap(dress, 50, 11);
 
-            crest = RecolorBitmap(crest, Color.Red, darkColor);
-            crest = RecolorBitmap(crest, Color.Yellow, lightColor);
+            var profile = CombineBitmaps(face, cutDress, 0, 39);
 
-            return BitmapToImageSource(DoubleSize(MakeIntransparent(crest)));
+            return profile;
+        }
+
+        public static BitmapImage GetProfileImage(Face face, ClubColors cc, string dress, int money)
+        {
+            return BitmapToImageSource(DoubleSize(DoubleSize(MakeIntransparent(GetProfile(face, cc, dress, money)))));
+        }
+
+        public static Bitmap GetProfile(Face f, ClubColors cc, string d, int money)
+        {
+            var player = GetPlayer(f, cc, d);
+
+            var stadium = GetStadium(money);
+
+            player = CombineBitmaps(stadium, player);
+
+            return player;
+        }
+
+        public static Bitmap GetStadium(int money)
+        {
+            if(money > 500000)
+            {
+                return GetBitmapFromText(BitmapType.Stadium, "Big");
+            }
+            else if(money > 50000)
+            {
+                return GetBitmapFromText(BitmapType.Stadium, "Medium");
+            }
+            else
+            {
+                return GetBitmapFromText(BitmapType.Stadium, "Small");
+            }
+        }
+
+        private static Bitmap GetBitmapFromText(BitmapType type, string text)
+        {
+            var path = "../../Images/" + type.ToString() + "/" + text + ".png";
+
+            if(File.Exists(path))
+            {
+                return new Bitmap(path);
+            }
+            else
+            {
+                return new Bitmap("../../Images/FileNotFound.png");
+            }
         }
 
         private static Bitmap RecolorBitmap(Bitmap bitmap, Color oldColor, Color newColor)
@@ -188,16 +160,16 @@ namespace FM.Models
                 return bitmapimage;
             }
         }
-        private static Bitmap CombineBitmaps(Bitmap under, Bitmap over)
+        private static Bitmap CombineBitmaps(Bitmap under, Bitmap over, int xOffset = 0, int yOffset = 0)
         {
-            for (int x = 0; x < under.Width; x++)
+            for (int x = 0; x < over.Width; x++)
             {
-                for (int y = 0; y < under.Height; y++)
+                for (int y = 0; y < over.Height; y++)
                 {
                     var overColor = over.GetPixel(x, y);
                     if (!IsTransparent(overColor))
                     {
-                        under.SetPixel(x, y, overColor);
+                        under.SetPixel(x + xOffset, y + yOffset, overColor);
                     }
                 }
             }
@@ -205,9 +177,25 @@ namespace FM.Models
             return under;
         }
 
+        private static Bitmap CutBitmap(Bitmap oldBitmap, int xSize, int ySize)
+        {
+            var newBitmap = new Bitmap(xSize, ySize);
+
+            for (int x = 0; x < xSize; x++)
+            {
+                for (int y = 0; y < ySize; y++)
+                {
+                    var pixel = oldBitmap.GetPixel(x, y);
+                    newBitmap.SetPixel(x, y, pixel);
+                }
+            }
+
+            return newBitmap;
+        }
+
         private static Bitmap DoubleSize(Bitmap bitmap)
         {
-            var newBitmap = new Bitmap(100, 100);
+            var newBitmap = new Bitmap(bitmap.Width*2, bitmap.Height*2);
 
             for (int x = 0; x < bitmap.Width; x++)
             {
@@ -245,27 +233,11 @@ namespace FM.Models
         {
             return c.A == 0;
         }
+       
 
-        private static Tuple<Color, Color> GetClubColor()
+        private enum BitmapType
         {
-            return ClubColors[rnd.Next(0, ClubColors.Count)];
-        }
-
-        private static Color GetRandomSkinColor()
-        {
-            return (Color)converter.ConvertFromString("PeachPuff");
-
-            //return SkinColors[rnd.Next(0, SkinColors.Count)];
-        }
-
-        private static Color GetRandomHairColor()
-        {
-            return HairColors[rnd.Next(0, HairColors.Count)];
-        }
-
-        private static Color GetRandomEyeColor()
-        {
-            return EyeColors[rnd.Next(0, EyeColors.Count)];
+            Crests,Eyes,Heads,Mouths,Dresses, Stadium
         }
     }
 }

@@ -122,7 +122,7 @@ namespace FM.Entities.Base
 
         public List<Occurrence> Crests { get; set; }
 
-        public List<Occurrence> Tricots { get; set; }
+        public List<Occurrence> Dresses { get; set; }
         public override string ToString()
         {
             return Name;

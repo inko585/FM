@@ -95,7 +95,7 @@ namespace fm_manager
             this.splitContainer12 = new System.Windows.Forms.SplitContainer();
             this.colorGrid = new System.Windows.Forms.DataGridView();
             this.splitContainer13 = new System.Windows.Forms.SplitContainer();
-            this.tricotGrid = new System.Windows.Forms.DataGridView();
+            this.dressGrid = new System.Windows.Forms.DataGridView();
             this.crestGrid = new System.Windows.Forms.DataGridView();
             this.tabPage5 = new System.Windows.Forms.TabPage();
             this.splitContainer14 = new System.Windows.Forms.SplitContainer();
@@ -192,7 +192,7 @@ namespace fm_manager
             this.splitContainer13.Panel1.SuspendLayout();
             this.splitContainer13.Panel2.SuspendLayout();
             this.splitContainer13.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.tricotGrid)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dressGrid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.crestGrid)).BeginInit();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer14)).BeginInit();
@@ -982,7 +982,7 @@ namespace fm_manager
             // 
             // splitContainer13.Panel1
             // 
-            this.splitContainer13.Panel1.Controls.Add(this.tricotGrid);
+            this.splitContainer13.Panel1.Controls.Add(this.dressGrid);
             // 
             // splitContainer13.Panel2
             // 
@@ -992,15 +992,15 @@ namespace fm_manager
             this.splitContainer13.SplitterWidth = 3;
             this.splitContainer13.TabIndex = 0;
             // 
-            // tricotGrid
+            // dressGrid
             // 
-            this.tricotGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.tricotGrid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tricotGrid.Location = new System.Drawing.Point(0, 0);
-            this.tricotGrid.Name = "tricotGrid";
-            this.tricotGrid.RowHeadersWidth = 51;
-            this.tricotGrid.Size = new System.Drawing.Size(298, 691);
-            this.tricotGrid.TabIndex = 1;
+            this.dressGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dressGrid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dressGrid.Location = new System.Drawing.Point(0, 0);
+            this.dressGrid.Name = "dressGrid";
+            this.dressGrid.RowHeadersWidth = 51;
+            this.dressGrid.Size = new System.Drawing.Size(298, 691);
+            this.dressGrid.TabIndex = 1;
             // 
             // crestGrid
             // 
@@ -1377,7 +1377,7 @@ namespace fm_manager
             this.splitContainer13.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer13)).EndInit();
             this.splitContainer13.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.tricotGrid)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dressGrid)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.crestGrid)).EndInit();
             this.tabPage5.ResumeLayout(false);
             this.splitContainer14.Panel1.ResumeLayout(false);
@@ -1488,7 +1488,7 @@ namespace fm_manager
         private SplitContainer splitContainer12;
         private DataGridView colorGrid;
         private SplitContainer splitContainer13;
-        private DataGridView tricotGrid;
+        private DataGridView dressGrid;
         private DataGridView crestGrid;
         private TabPage tabPage5;
         private SplitContainer splitContainer14;
