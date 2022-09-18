@@ -83,3 +83,7 @@ AE.Graphics.Wpf/obj/Debug/AE.Graphics.Wpf.csprojAssemblyReference.cache
 fm-app/FM/bin/
 fm-app/FM/obj/
 fm-app/FM/FM.App.csproj.user
+AE.Graphics/obj/Debug/AE.Graphics.csprojAssemblyReference.cache
+FM.Common/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
+FM.Common/obj/Debug/FM.Common.csprojAssemblyReference.cache
+FM.Entities/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
