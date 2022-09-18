@@ -1,13 +1,9 @@
-﻿using FM.Common;
-using FM.Entities.Base;
+﻿using FM.Entities.Base;
 using FM.Models.Season;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -25,7 +21,10 @@ namespace FM.Models.Generic
         public static void InitNewGame(World w, int leagueSize)
         {
             Instance = new Game(w, leagueSize);
-            Instance.FootballUniverse.LeagueAssociations = w.Associations.Select(a => Generator.WorldGenerator.GenerateRandomLeagueAssociation(w, a)).ToList();
+            //TODO use the correct looks here
+            var al = w.AssociationLooks.First();
+            var pl = w.PlayerLooks.First();
+            Instance.FootballUniverse.LeagueAssociations = w.Associations.Select(a => Generator.WorldGenerator.GenerateRandomLeagueAssociation(w, a, al, pl)).ToList();
             Season.Season.InitSeasons();
         }
 
@@ -107,17 +106,6 @@ namespace FM.Models.Generic
                 }
             }
         }
-
-        public BitmapImage AssociationPic
-        {
-            get
-            {
-                return PixelArt.GetRandomCrest();
-            }
-        }
-
-       
-
 
         public Brush RankForeGroundColor
         {
@@ -223,6 +211,9 @@ namespace FM.Models.Generic
         }
 
         public Coach Coach { get; set; }
+        public ClubColors ClubColors { get; set; }
+        public string Crest { get; set; }
+        public string Dress { get; set; }
         public int SeasonIncomeEstimation
         {
             get
@@ -269,7 +260,21 @@ namespace FM.Models.Generic
             }
         }
 
-        public Crest Crest { get; set; }
+        public BitmapImage CrestImage
+        {
+            get
+            {
+                return PixelArt.GetCrestImage(this.ClubColors, this.Crest);
+            }
+        }
+
+        public BitmapImage DressImage
+        {
+            get
+            {
+                return PixelArt.GetDressImage(this.ClubColors, this.Dress);
+            }
+        }
 
         public int Budget { get; set; }
 
@@ -308,13 +313,11 @@ namespace FM.Models.Generic
 
     }
 
-    public class Crest
+    public class ClubColors
     {
         public System.Drawing.Color MainColor { get; set; }
         public System.Drawing.Color SecondColor { get; set; }
-        public string Motive { get; set; }
     }
-
 
 
     public class LineUp
@@ -661,23 +664,29 @@ namespace FM.Models.Generic
         public float SetPlaySkill { get; set; }
         public Position Position { get; set; }
 
-        public BitmapImage ProfilePic
+        public BitmapImage FaceImage
         {
             get
             {
-                return PixelArt.GetRandomProfilePic();
+                return PixelArt.GetFaceImage(this.Face);
             }
         }
-        public BitmapImage TricotPic
+
+        public BitmapImage PlayerImage
         {
             get
             {
-                return PixelArt.GetRandomTricotPic();
+                return PixelArt.GetPlayerImage(this.Face, this.Club.ClubColors, this.Club.Dress);
             }
         }
 
-
-
+        public BitmapImage ProfileImage
+        {
+            get
+            {
+                return PixelArt.GetProfileImage(this.Face, this.Club.ClubColors, this.Club.Dress, this.Club.SponsorMoney);
+            }
+        }
 
         public string PositionString
         {

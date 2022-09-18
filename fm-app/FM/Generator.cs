@@ -11,24 +11,7 @@ namespace FM.Generator
     public class WorldGenerator
     {
         internal static Random rnd = new Random(DateTime.Now.Millisecond);
-
-        public static List<Tuple<Color, Color>> ClubColors = new List<Tuple<Color, Color>>()
-        {
-            new Tuple<Color, Color>(Color.Red, Color.White),
-            new Tuple<Color, Color>(Color.Blue, Color.White),
-            new Tuple<Color, Color>(Color.Black, Color.White),
-            new Tuple<Color, Color>(Color.Brown, Color.White),
-            new Tuple<Color, Color>(Color.Salmon, Color.White),
-            new Tuple<Color, Color>(Color.Green, Color.White),
-            new Tuple<Color, Color>(Color.Yellow, Color.Black),
-            new Tuple<Color, Color>(Color.Yellow, Color.Blue),
-            new Tuple<Color, Color>(Color.Green, Color.Black),
-            new Tuple<Color, Color>(Color.Purple, Color.White),
-            new Tuple<Color, Color>(Color.Red, Color.Blue),
-            new Tuple<Color, Color>(Color.Green, Color.Red),
-            new Tuple<Color, Color>(Color.Red, Color.Blue)
-
-        };
+        private static ColorConverter converter = new ColorConverter();
 
         public static string GetRandomValue(List<Occurrence> occurrences, double variant)
         {
@@ -56,10 +39,10 @@ namespace FM.Generator
         public static int GEN_MAX_AGE = 36;
 
         //public static int MAX_PLAYER_GEN_LEVEL = 10;
-        
+
         public static int MAX_ELO = 3000;
 
-        public static LeagueAssociation GenerateRandomLeagueAssociation(World w, Association a)
+        public static LeagueAssociation GenerateRandomLeagueAssociation(World w, Association a, AssociationLook al, PlayerLook pl)
         {
             var la = new LeagueAssociation();
             la.Name = a.Name;
@@ -73,7 +56,7 @@ namespace FM.Generator
                 for (var j = 0; j < Game.Instance.LeagueSize; j++)
                 {
                     var n = GetRandomOccurrence(a.Nations, STANDARD_DEV).Text;
-                    var club = GenerateRandomClub(w, a, w.GetNationByName(n), curLevel);
+                    var club = GenerateRandomClub(w, a, al, pl, w.GetNationByName(n), curLevel);
                     l.Clubs.Add(club);
                     club.Leagues.Add(l);
                 }
@@ -87,7 +70,7 @@ namespace FM.Generator
         }
 
         private static List<string> TakenNames = new List<string>();
-        public static Club GenerateRandomClub(World w, Association a, Nation n, int lvl)
+        public static Club GenerateRandomClub(World w, Association a, AssociationLook al, PlayerLook pl, Nation n, int lvl)
         {
             var c = new Club();
             string name = CreateRandomClubName(n);
@@ -96,6 +79,9 @@ namespace FM.Generator
                 name = CreateRandomClubName(n);
             }
             c.Name = name;
+            c.ClubColors = GenerateRandomClubColors(al);
+            c.Crest = GenerateRandomCrest(al);
+            c.Dress = GenerateRandomDress(al);
             TakenNames.Add(name);
 
             c.Coach = GenerateRandomCoach(w, n);
@@ -109,12 +95,65 @@ namespace FM.Generator
             c.SponsorMoneyCurrentSeason = c.SponsorMoneyPotential;
             c.ViewerAttractionEstimation = c.ViewerAttraction;
 
-            GeneratePlayersForPositionAndClub(w, a, n, lvl, c, Position.Goalie, ROOSTER_GOALIE_MIN, ROOSTER_GOALIE_MAX);
-            GeneratePlayersForPositionAndClub(w, a, n, lvl, c, Position.Defender, ROOSTER_DEFENDER_MIN, ROOSTER_DEFENDER_MAX);
-            GeneratePlayersForPositionAndClub(w, a, n, lvl, c, Position.Midfielder, ROOSTER_MIDFIELD_MIN, ROOSTER_MIDFIELD_MAX);
-            GeneratePlayersForPositionAndClub(w, a, n, lvl, c, Position.Striker, ROOSTER_STRIKER_MIN, ROOSTER_STRIKER_MAX);
+            GeneratePlayersForPositionAndClub(w, a, n, lvl, c, pl, Position.Goalie, ROOSTER_GOALIE_MIN, ROOSTER_GOALIE_MAX);
+            GeneratePlayersForPositionAndClub(w, a, n, lvl, c, pl, Position.Defender, ROOSTER_DEFENDER_MIN, ROOSTER_DEFENDER_MAX);
+            GeneratePlayersForPositionAndClub(w, a, n, lvl, c, pl, Position.Midfielder, ROOSTER_MIDFIELD_MIN, ROOSTER_MIDFIELD_MAX);
+            GeneratePlayersForPositionAndClub(w, a, n, lvl, c, pl, Position.Striker, ROOSTER_STRIKER_MIN, ROOSTER_STRIKER_MAX);
 
             return c;
+        }
+
+        public static string GenerateRandomCrest(AssociationLook al)
+        {
+            return GetRandomOccurrence(al.Crests, STANDARD_DEV).Text;
+        }
+
+        public static string GenerateRandomDress(AssociationLook al)
+        {
+            return GetRandomOccurrence(al.Dresses, STANDARD_DEV).Text;
+        }
+
+        public static ClubColors GenerateRandomClubColors(AssociationLook al)
+        {
+            var colors = GetRandomOccurrence(al.ColorPairs.Select(cp => (Occurrence)cp).ToList(), STANDARD_DEV) as ColorPairOccurrence;
+            return new ClubColors()
+            {
+                MainColor = GetColorFromText(colors.Text),
+                SecondColor = GetColorFromText(colors.Text2)
+            };
+        }
+
+        public static Face GenerateRandomFace(PlayerLook pl)
+        {
+            var skinColor = GetRandomOccurrence(pl.SkinColors, STANDARD_DEV);
+            var hairColor = GetRandomOccurrence(pl.HairColors, STANDARD_DEV);
+            var eyeColor = GetRandomOccurrence(pl.EyeColors, STANDARD_DEV);
+            var head = GetRandomOccurrence(pl.Heads, STANDARD_DEV);
+            var mouth = GetRandomOccurrence(pl.Mouths, STANDARD_DEV);
+            var eye = GetRandomOccurrence(pl.Eyes, STANDARD_DEV);
+
+            return new Face()
+            {
+                SkinColor = GetColorFromText(skinColor.Text),
+                HairColor = GetColorFromText(hairColor.Text),
+                EyeColor = GetColorFromText(eyeColor.Text),
+                Head = head.Text,
+                Mouth = mouth.Text,
+                Eye = eye.Text
+            };
+        }
+
+        private static Color GetColorFromText(string name)
+        {
+            try
+            {
+                return (Color)converter.ConvertFromString(name);
+            }
+            catch(Exception e)
+            {
+                //not existing Color was used in FM Editor
+                return Color.Pink;
+            }
         }
 
         private static string CreateRandomClubName(Nation n)
@@ -143,12 +182,12 @@ namespace FM.Generator
             return name;
         }
 
-        private static void GeneratePlayersForPositionAndClub(World w, Association a, Nation n, double lvl, Club c, Position p, int min, int max)
+        private static void GeneratePlayersForPositionAndClub(World w, Association a, Nation n, double lvl, Club c, PlayerLook pl, Position p, int min, int max)
         {
             var dice = rnd.Next(min, max);
             for (var i = 0; i < dice; i++)
             {
-                var player = GenerateRandomPlayer(w, a, n, p, lvl, GEN_MIN_AGE, GEN_MAX_AGE);
+                var player = GenerateRandomPlayer(w, a, n, pl, p, lvl, GEN_MIN_AGE, GEN_MAX_AGE);
                 player.CurrentContract = new Contract() { Club = c, Player = player, RunTime = rnd.Next(1, 3), Salary = player.SalaryStandard };
                 c.Rooster.Add(player);
             }
@@ -169,7 +208,7 @@ namespace FM.Generator
             return c;
         }
 
-        public static Player GenerateRandomPlayer(World w, Association l, Nation n, Position p, double lvl, int fromAge, int toAge)
+        public static Player GenerateRandomPlayer(World w, Association l, Nation n, PlayerLook pl, Position p, double lvl, int fromAge, int toAge)
         {
             var nationDice = rnd.NextDouble();
             var otherLeagues = w.Associations.Where(ol => ol != l).ToList();
@@ -231,7 +270,8 @@ namespace FM.Generator
                 ConstitutionBase = (float)baseConst,
                 Constitution = consti,
                 Charisma = (float)charisma,
-                SetPlaySkill = setplayskill
+                SetPlaySkill = setplayskill,
+                Face = GenerateRandomFace(pl)
             };
 
             //player.XP = (int)Math.Floor(player.LevelCap() * (xpLevel - player.XPLevel));
@@ -277,5 +317,5 @@ namespace FM.Generator
         }
     }
 
-    
+
 }

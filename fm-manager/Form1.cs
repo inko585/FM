@@ -311,7 +311,7 @@ namespace fm_manager
         {
             SetUpColorPairOccurrenceGridView(colorGrid, "Hauptfarbe", "Nebenfarbe", "Häufigkeit", new List<ColorPairOccurrence>());
             SetUpOccurrenceGridView(crestGrid, "Wappen", "Häufigkeit", new List<Occurrence>());
-            SetUpOccurrenceGridView(tricotGrid, "Trikot", "Häufigkeit", new List<Occurrence>());
+            SetUpOccurrenceGridView(dressGrid, "Trikot", "Häufigkeit", new List<Occurrence>());
         }
 
         private void ResetPlayerLookGrids()
@@ -435,7 +435,7 @@ namespace fm_manager
                 SelectedAssociationLook = l;
                 SetUpColorPairOccurrenceGridView(colorGrid, "Hauptfarbe", "Nebenfarbe", "Häufigkeit", l.ColorPairs);
                 SetUpOccurrenceGridView(crestGrid, "Wappen", "Häufigkeit", l.Crests);
-                SetUpOccurrenceGridView(tricotGrid, "Trikots", "Häufigkeit", l.Tricots);
+                SetUpOccurrenceGridView(dressGrid, "Trikots", "Häufigkeit", l.Dresses);
             }
         }
 
@@ -640,7 +640,7 @@ namespace fm_manager
                 l.Name = lookAssociationTextBox.Text;
                 l.ColorPairs = LoadFromColorPairGridView(colorGrid);
                 l.Crests = LoadFromGridView(crestGrid);
-                l.Tricots = LoadFromGridView(tricotGrid);
+                l.Dresses = LoadFromGridView(dressGrid);
 
                 if (SelectedAssociationLook == null)
                 {

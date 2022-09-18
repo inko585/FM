@@ -43,17 +43,20 @@
                 <DataTemplate>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="500"/>
+                            <ColumnDefinition Width="250"/>
+                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="250"/>
+                            <ColumnDefinition Width="*"/>
 
                         </Grid.ColumnDefinitions>
-
-                        <Label PreviewMouseDown="Club_PreviewMouseDown" Name="homeLabel" Content="{Binding HomeClub.Name}"/>
-                        <Label Name="divider"  Content=" - " Grid.Column="1"/>
-                        <Label PreviewMouseDown="Club_PreviewMouseDown" Name="awayLabel" Content="{Binding AwayClub.Name}" Grid.Column="2" Margin="0,0,10,0"/>
-                        <Label PreviewMouseDown="Result_PreviewMouseDown" Name="resultLabel" Content="{Binding MatchResult.ResultString}" FontWeight="Bold" HorizontalAlignment="Left" Grid.Column="3"/>
+                        <Label PreviewMouseDown="Club_PreviewMouseDown" Name="homeLabel" Content="{Binding HomeClub.Name}" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Column="0" FontSize="14"/>
+                        <Image Source="{Binding HomeClub.CrestImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1" ></Image>
+                        <Label Name="divider"  Content=" - " FontWeight="Bold" Grid.Column="2" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Image Source="{Binding AwayClub.CrestImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="3"></Image>
+                        <Label PreviewMouseDown="Club_PreviewMouseDown" Name="awayLabel" Content="{Binding AwayClub.Name}" VerticalAlignment="Center" Grid.Column="4" Margin="0,0,10,0" FontSize="14"/>
+                        <Label PreviewMouseDown="Result_PreviewMouseDown" Name="resultLabel" Content="{Binding MatchResult.ResultString}" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="5" FontSize="16"/>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
