@@ -67,8 +67,6 @@ namespace fm_manager
             this.ethnieApplyButton = new System.Windows.Forms.Button();
             this.ethnieResetButton = new System.Windows.Forms.Button();
             this.splitContainer7 = new System.Windows.Forms.SplitContainer();
-            this.firstNameGrid = new System.Windows.Forms.DataGridView();
-            this.lastNameGrid = new System.Windows.Forms.DataGridView();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.splitContainer10 = new System.Windows.Forms.SplitContainer();
             this.associatonDepth = new System.Windows.Forms.NumericUpDown();
@@ -121,6 +119,10 @@ namespace fm_manager
             this.dataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.splitContainer20 = new System.Windows.Forms.SplitContainer();
+            this.firstNameGrid = new System.Windows.Forms.DataGridView();
+            this.lastNameGrid = new System.Windows.Forms.DataGridView();
+            this.playerLookGrid = new System.Windows.Forms.DataGridView();
             TabControl = new System.Windows.Forms.TabControl();
             TabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -168,8 +170,6 @@ namespace fm_manager
             this.splitContainer7.Panel1.SuspendLayout();
             this.splitContainer7.Panel2.SuspendLayout();
             this.splitContainer7.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.firstNameGrid)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.lastNameGrid)).BeginInit();
             this.tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer10)).BeginInit();
             this.splitContainer10.Panel1.SuspendLayout();
@@ -226,6 +226,13 @@ namespace fm_manager
             ((System.ComponentModel.ISupportInitialize)(this.mouthGrid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.eyeGrid)).BeginInit();
             this.menuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer20)).BeginInit();
+            this.splitContainer20.Panel1.SuspendLayout();
+            this.splitContainer20.Panel2.SuspendLayout();
+            this.splitContainer20.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.firstNameGrid)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.lastNameGrid)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.playerLookGrid)).BeginInit();
             this.SuspendLayout();
             // 
             // TabControl
@@ -664,34 +671,14 @@ namespace fm_manager
             // 
             // splitContainer7.Panel1
             // 
-            this.splitContainer7.Panel1.Controls.Add(this.firstNameGrid);
+            this.splitContainer7.Panel1.Controls.Add(this.splitContainer20);
             // 
             // splitContainer7.Panel2
             // 
-            this.splitContainer7.Panel2.Controls.Add(this.lastNameGrid);
+            this.splitContainer7.Panel2.Controls.Add(this.playerLookGrid);
             this.splitContainer7.Size = new System.Drawing.Size(1071, 689);
             this.splitContainer7.SplitterDistance = 313;
             this.splitContainer7.TabIndex = 0;
-            // 
-            // firstNameGrid
-            // 
-            this.firstNameGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.firstNameGrid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.firstNameGrid.Location = new System.Drawing.Point(0, 0);
-            this.firstNameGrid.Name = "firstNameGrid";
-            this.firstNameGrid.RowHeadersWidth = 51;
-            this.firstNameGrid.Size = new System.Drawing.Size(1071, 313);
-            this.firstNameGrid.TabIndex = 0;
-            // 
-            // lastNameGrid
-            // 
-            this.lastNameGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.lastNameGrid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lastNameGrid.Location = new System.Drawing.Point(0, 0);
-            this.lastNameGrid.Name = "lastNameGrid";
-            this.lastNameGrid.RowHeadersWidth = 51;
-            this.lastNameGrid.Size = new System.Drawing.Size(1071, 372);
-            this.lastNameGrid.TabIndex = 0;
             // 
             // tabPage3
             // 
@@ -1293,6 +1280,52 @@ namespace fm_manager
             this.saveToolStripMenuItem.Text = "Export";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
+            // splitContainer20
+            // 
+            this.splitContainer20.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer20.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer20.Name = "splitContainer20";
+            // 
+            // splitContainer20.Panel1
+            // 
+            this.splitContainer20.Panel1.Controls.Add(this.firstNameGrid);
+            // 
+            // splitContainer20.Panel2
+            // 
+            this.splitContainer20.Panel2.Controls.Add(this.lastNameGrid);
+            this.splitContainer20.Size = new System.Drawing.Size(1071, 313);
+            this.splitContainer20.SplitterDistance = 518;
+            this.splitContainer20.TabIndex = 0;
+            // 
+            // firstNameGrid
+            // 
+            this.firstNameGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.firstNameGrid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.firstNameGrid.Location = new System.Drawing.Point(0, 0);
+            this.firstNameGrid.Name = "firstNameGrid";
+            this.firstNameGrid.RowHeadersWidth = 51;
+            this.firstNameGrid.Size = new System.Drawing.Size(518, 313);
+            this.firstNameGrid.TabIndex = 1;
+            // 
+            // lastNameGrid
+            // 
+            this.lastNameGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.lastNameGrid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lastNameGrid.Location = new System.Drawing.Point(0, 0);
+            this.lastNameGrid.Name = "lastNameGrid";
+            this.lastNameGrid.RowHeadersWidth = 51;
+            this.lastNameGrid.Size = new System.Drawing.Size(549, 313);
+            this.lastNameGrid.TabIndex = 1;
+            // 
+            // playerLookGrid
+            // 
+            this.playerLookGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.playerLookGrid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.playerLookGrid.Location = new System.Drawing.Point(0, 0);
+            this.playerLookGrid.Name = "playerLookGrid";
+            this.playerLookGrid.Size = new System.Drawing.Size(1071, 372);
+            this.playerLookGrid.TabIndex = 0;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1351,8 +1384,6 @@ namespace fm_manager
             this.splitContainer7.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer7)).EndInit();
             this.splitContainer7.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.firstNameGrid)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.lastNameGrid)).EndInit();
             this.tabPage3.ResumeLayout(false);
             this.splitContainer10.Panel1.ResumeLayout(false);
             this.splitContainer10.Panel1.PerformLayout();
@@ -1413,6 +1444,13 @@ namespace fm_manager
             ((System.ComponentModel.ISupportInitialize)(this.eyeGrid)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.splitContainer20.Panel1.ResumeLayout(false);
+            this.splitContainer20.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer20)).EndInit();
+            this.splitContainer20.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.firstNameGrid)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.lastNameGrid)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.playerLookGrid)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1435,8 +1473,6 @@ namespace fm_manager
         private DataGridView suffixGrid;
         private System.Windows.Forms.SplitContainer splitContainer6;
         private System.Windows.Forms.SplitContainer splitContainer7;
-        private DataGridView firstNameGrid;
-        private DataGridView lastNameGrid;
         private System.Windows.Forms.Button nationDeleteButton;
         private System.Windows.Forms.Button nationApplyButton;
         private System.Windows.Forms.Button nationResetButton;
@@ -1510,6 +1546,10 @@ namespace fm_manager
         private DataGridView headGrid;
         private DataGridView hairColorGrid;
         private DataGridView eyeColorGrid;
+        private SplitContainer splitContainer20;
+        private DataGridView firstNameGrid;
+        private DataGridView lastNameGrid;
+        private DataGridView playerLookGrid;
     }
 }
 

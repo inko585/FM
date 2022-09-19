@@ -11,6 +11,7 @@ namespace FM.Models.Generic
 {
     public class Game
     {
+        public static readonly int ENTREE_FEE = 10;
         public static Game Instance { get; private set; }
         private Game(World w, int leagueSize)
         {
@@ -23,8 +24,7 @@ namespace FM.Models.Generic
             Instance = new Game(w, leagueSize);
             //TODO use the correct looks here
             var al = w.AssociationLooks.First();
-            var pl = w.PlayerLooks.First();
-            Instance.FootballUniverse.LeagueAssociations = w.Associations.Select(a => Generator.WorldGenerator.GenerateRandomLeagueAssociation(w, a, al, pl)).ToList();
+            Instance.FootballUniverse.LeagueAssociations = w.Associations.Select(a => Generator.WorldGenerator.GenerateRandomLeagueAssociation(w, a, al)).ToList();
             Season.Season.InitSeasons();
         }
 
@@ -684,7 +684,7 @@ namespace FM.Models.Generic
         {
             get
             {
-                return PixelArt.GetProfileImage(this.Face, this.Club.ClubColors, this.Club.Dress, this.Club.SponsorMoney);
+                return PixelArt.GetProfileImage(this.Face, this.Club.ClubColors, this.Club.Dress, this.Club.StadiumCapacity);
             }
         }
 

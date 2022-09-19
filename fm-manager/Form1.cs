@@ -144,6 +144,23 @@ namespace fm_manager
             return ret;
         }
 
+        private List<PlayerLookOccurrence> LoadFromPlayerLookGridView(DataGridView gridView)
+        {
+            var ret = new List<PlayerLookOccurrence>();
+            foreach (DataGridViewRow r in gridView.Rows)
+            {
+                if (r.Cells[0].Value != null && !r.Cells[0].Value.Equals(""))
+                    ret.Add(new PlayerLookOccurrence()
+                    {
+                        PlayerLook = (PlayerLook)r.Cells[0].Value,
+                        ScaleValue = (int)r.Cells[1].Value,
+                    });
+            }
+
+            return ret;
+
+        }
+
         private List<SubEthnieOccurrence> LoadFromEthnieGridView(DataGridView gridView)
         {
             var ret = new List<SubEthnieOccurrence>();
@@ -300,6 +317,7 @@ namespace fm_manager
         {
             SetUpOccurrenceGridView(firstNameGrid, "Vorname", "Häufigkeit", new List<Occurrence>());
             SetUpOccurrenceGridView(lastNameGrid, "Nachname", "Häufigkeit", new List<Occurrence>());
+            SetUpDropDownOccurrenceGridView(playerLookGrid, "Spieler Aussehen", "Häufigkeit", typeof(PlayerLook), lookPlayerBindingSource, new List<Occurrence>());
         }
 
         private void ResetAssociationGrids()
@@ -423,6 +441,7 @@ namespace fm_manager
                 SelectedEthnie = e;
                 SetUpOccurrenceGridView(firstNameGrid, "Vorname", "Häufigkeit", e.FirstNames);
                 SetUpOccurrenceGridView(lastNameGrid, "Nachname", "Häufigkeit", e.LastNames);
+                SetUpDropDownOccurrenceGridView(playerLookGrid, "Spieler Aussehen", "Häufigkeit", typeof(PlayerLook), lookPlayerBindingSource, e.Appearences);
             }
         }
 
@@ -446,9 +465,9 @@ namespace fm_manager
                 lookPlayerTextBox.Text = l.Name;
                 lookPlayerDeleteButton.Enabled = true;
                 SelectedPlayerLook = l;
-                SetUpOccurrenceGridView(skinColorGrid, "Hautfarben", "Häufigkeit", l.SkinColors);
-                SetUpOccurrenceGridView(hairColorGrid, "Haarfarben", "Häufigkeit", l.HairColors);
-                SetUpOccurrenceGridView(eyeColorGrid, "Augenfarben", "Häufigkeit", l.EyeColors);
+                SetUpOccurrenceGridView(skinColorGrid, "Hautfarbe", "Häufigkeit", l.SkinColors);
+                SetUpOccurrenceGridView(hairColorGrid, "Haarfarbe", "Häufigkeit", l.HairColors);
+                SetUpOccurrenceGridView(eyeColorGrid, "Augenfarbe", "Häufigkeit", l.EyeColors);
                 SetUpOccurrenceGridView(headGrid, "Kopf & Haare", "Häufigkeit", l.Heads);
                 SetUpOccurrenceGridView(mouthGrid, "Mund & Bart", "Häufigkeit", l.Mouths);
                 SetUpOccurrenceGridView(eyeGrid, "Augen & Brauen", "Häufigkeit", l.Eyes);
@@ -501,6 +520,7 @@ namespace fm_manager
                 et.Name = ethnieTextBox.Text;
                 et.FirstNames = LoadFromGridView(firstNameGrid);
                 et.LastNames = LoadFromGridView(lastNameGrid);
+                et.Appearences = LoadFromGridView(playerLookGrid);
 
                 if (SelectedEthnie == null)
                 {
@@ -613,6 +633,7 @@ namespace fm_manager
             ResetNationEditor();
             ResetAssociationLookEditor();
             ResetAssociationEditor();
+            ResetPlayerLookEditor();
             MessageBox.Show("Datensatz importiert!");
         }
 
