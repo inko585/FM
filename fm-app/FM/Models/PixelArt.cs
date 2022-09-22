@@ -46,12 +46,16 @@ namespace FM.Models
         public static Bitmap GetFace(Face f)
         {
             var head = new Bitmap(GetBitmapFromText(BitmapType.Heads, f.Head));
+            var hair = new Bitmap(GetBitmapFromText(BitmapType.Heads, f.Head));
+
             var mouth = new Bitmap(GetBitmapFromText(BitmapType.Mouths, f.Mouth));
+            
             var eye = new Bitmap(GetBitmapFromText(BitmapType.Eyes, f.Eye));
 
             head = RecolorBitmap(head, Color.Red, f.SkinColor);
             head = RecolorBitmap(head, Color.Yellow, f.HairColor);
             mouth = RecolorBitmap(mouth, Color.Yellow, f.HairColor);
+            
             eye = RecolorBitmap(eye, Color.Yellow, f.HairColor);
             eye = RecolorBitmap(eye, Color.Red, f.EyeColor);
 
@@ -78,29 +82,29 @@ namespace FM.Models
             return profile;
         }
 
-        public static BitmapImage GetProfileImage(Face face, ClubColors cc, string dress, int money)
+        public static BitmapImage GetProfileImage(Face face, ClubColors cc, string dress, int capacity)
         {
-            return BitmapToImageSource(DoubleSize(DoubleSize(MakeIntransparent(GetProfile(face, cc, dress, money)))));
+            return BitmapToImageSource(DoubleSize(DoubleSize(MakeIntransparent(GetProfile(face, cc, dress, capacity)))));
         }
 
-        public static Bitmap GetProfile(Face f, ClubColors cc, string d, int money)
+        public static Bitmap GetProfile(Face f, ClubColors cc, string d, int capacity)
         {
             var player = GetPlayer(f, cc, d);
 
-            var stadium = GetStadium(money);
+            var stadium = GetStadium(capacity);
 
             player = CombineBitmaps(stadium, player);
 
             return player;
         }
 
-        public static Bitmap GetStadium(int money)
+        public static Bitmap GetStadium(int capacity)
         {
-            if(money > 500000)
+            if(capacity >= 12000)
             {
                 return GetBitmapFromText(BitmapType.Stadium, "Big");
             }
-            else if(money > 50000)
+            else if(capacity >= 4500)
             {
                 return GetBitmapFromText(BitmapType.Stadium, "Medium");
             }
@@ -132,6 +136,7 @@ namespace FM.Models
                 {
                     if (CompareColor(bitmap.GetPixel(x, y), oldColor))
                     {
+                        
                         bitmap.SetPixel(x, y, newColor);
                     }
                 }

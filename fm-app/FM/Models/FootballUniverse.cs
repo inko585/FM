@@ -664,28 +664,45 @@ namespace FM.Models.Generic
         public float SetPlaySkill { get; set; }
         public Position Position { get; set; }
 
+        private BitmapImage faceImage;
         public BitmapImage FaceImage
         {
             get
             {
-                return PixelArt.GetFaceImage(this.Face);
+                if (faceImage == null)
+                {
+                    faceImage = PixelArt.GetFaceImage(this.Face);
+                }
+                return faceImage;                
             }
         }
 
+        private BitmapImage playerImage;
         public BitmapImage PlayerImage
         {
             get
             {
-                return PixelArt.GetPlayerImage(this.Face, this.Club.ClubColors, this.Club.Dress);
+                if (playerImage == null)
+                {
+                    playerImage = PixelArt.GetPlayerImage(this.Face, this.Club.ClubColors, this.Club.Dress);
+                }
+                return playerImage;
             }
         }
 
+        private BitmapImage profileImage;
         public BitmapImage ProfileImage
         {
             get
             {
-                return PixelArt.GetProfileImage(this.Face, this.Club.ClubColors, this.Club.Dress, this.Club.StadiumCapacity);
+                if (profileImage == null)
+                {
+                    profileImage = PixelArt.GetProfileImage(this.Face, this.Club.ClubColors, this.Club.Dress, this.Club.StadiumCapacity);
+                }
+                return profileImage;
             }
+
+            
         }
 
         public string PositionString

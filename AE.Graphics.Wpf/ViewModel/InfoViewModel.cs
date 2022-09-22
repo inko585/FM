@@ -1,5 +1,6 @@
-﻿using DocumentFormat.OpenXml.InkML;
+﻿//using DocumentFormat.OpenXml.InkML;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace AE.Graphics.Wpf.ViewModel
 {

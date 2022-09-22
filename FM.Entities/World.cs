@@ -51,6 +51,11 @@ namespace FM.Entities.Base
             return Ethnies.FirstOrDefault(e => e.Name.Equals(name));
         }
 
+        public PlayerLook GetPlayerLookByName(string name)
+        {
+            return PlayerLooks.FirstOrDefault(pl => pl.Name.Equals(name));
+        }
+
        
 
     }
@@ -98,6 +103,8 @@ namespace FM.Entities.Base
         public List<Occurrence> FirstNames { get; set; }
 
         public List<Occurrence> LastNames { get; set; }
+
+        public List<Occurrence> Appearences { get; set; }
 
         public override string ToString()
         {
@@ -184,6 +191,11 @@ namespace FM.Entities.Base
         public int FirstAndLastNamesRate { get; set; }
         public int FirstNameRate { get; set; }
         public int LastNameRate { get; set; }
+    }
+
+    public class PlayerLookOccurrence : Occurrence
+    {
+        public PlayerLook PlayerLook { get; set; }
     }
 
 

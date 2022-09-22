@@ -42,7 +42,7 @@ namespace FM.Generator
 
         public static int MAX_ELO = 3000;
 
-        public static LeagueAssociation GenerateRandomLeagueAssociation(World w, Association a, AssociationLook al, PlayerLook pl)
+        public static LeagueAssociation GenerateRandomLeagueAssociation(World w, Association a, AssociationLook al)
         {
             var la = new LeagueAssociation();
             la.Name = a.Name;
@@ -56,7 +56,7 @@ namespace FM.Generator
                 for (var j = 0; j < Game.Instance.LeagueSize; j++)
                 {
                     var n = GetRandomOccurrence(a.Nations, STANDARD_DEV).Text;
-                    var club = GenerateRandomClub(w, a, al, pl, w.GetNationByName(n), curLevel);
+                    var club = GenerateRandomClub(w, a, al, w.GetNationByName(n), curLevel);
                     l.Clubs.Add(club);
                     club.Leagues.Add(l);
                 }
@@ -70,7 +70,7 @@ namespace FM.Generator
         }
 
         private static List<string> TakenNames = new List<string>();
-        public static Club GenerateRandomClub(World w, Association a, AssociationLook al, PlayerLook pl, Nation n, int lvl)
+        public static Club GenerateRandomClub(World w, Association a, AssociationLook al, Nation n, int lvl)
         {
             var c = new Club();
             string name = CreateRandomClubName(n);
@@ -95,10 +95,10 @@ namespace FM.Generator
             c.SponsorMoneyCurrentSeason = c.SponsorMoneyPotential;
             c.ViewerAttractionEstimation = c.ViewerAttraction;
 
-            GeneratePlayersForPositionAndClub(w, a, n, lvl, c, pl, Position.Goalie, ROOSTER_GOALIE_MIN, ROOSTER_GOALIE_MAX);
-            GeneratePlayersForPositionAndClub(w, a, n, lvl, c, pl, Position.Defender, ROOSTER_DEFENDER_MIN, ROOSTER_DEFENDER_MAX);
-            GeneratePlayersForPositionAndClub(w, a, n, lvl, c, pl, Position.Midfielder, ROOSTER_MIDFIELD_MIN, ROOSTER_MIDFIELD_MAX);
-            GeneratePlayersForPositionAndClub(w, a, n, lvl, c, pl, Position.Striker, ROOSTER_STRIKER_MIN, ROOSTER_STRIKER_MAX);
+            GeneratePlayersForPositionAndClub(w, a, n, lvl, c, Position.Goalie, ROOSTER_GOALIE_MIN, ROOSTER_GOALIE_MAX);
+            GeneratePlayersForPositionAndClub(w, a, n, lvl, c, Position.Defender, ROOSTER_DEFENDER_MIN, ROOSTER_DEFENDER_MAX);
+            GeneratePlayersForPositionAndClub(w, a, n, lvl, c, Position.Midfielder, ROOSTER_MIDFIELD_MIN, ROOSTER_MIDFIELD_MAX);
+            GeneratePlayersForPositionAndClub(w, a, n, lvl, c, Position.Striker, ROOSTER_STRIKER_MIN, ROOSTER_STRIKER_MAX);
 
             return c;
         }
@@ -182,12 +182,12 @@ namespace FM.Generator
             return name;
         }
 
-        private static void GeneratePlayersForPositionAndClub(World w, Association a, Nation n, double lvl, Club c, PlayerLook pl, Position p, int min, int max)
+        private static void GeneratePlayersForPositionAndClub(World w, Association a, Nation n, double lvl, Club c, Position p, int min, int max)
         {
             var dice = rnd.Next(min, max);
             for (var i = 0; i < dice; i++)
             {
-                var player = GenerateRandomPlayer(w, a, n, pl, p, lvl, GEN_MIN_AGE, GEN_MAX_AGE);
+                var player = GenerateRandomPlayer(w, a, n, p, lvl, GEN_MIN_AGE, GEN_MAX_AGE);
                 player.CurrentContract = new Contract() { Club = c, Player = player, RunTime = rnd.Next(1, 3), Salary = player.SalaryStandard };
                 c.Rooster.Add(player);
             }
@@ -198,7 +198,8 @@ namespace FM.Generator
         {
             var c = new Coach();
             c.Nation = n;
-            GetRandomNameForNation(w, n, out string fn, out string ln);
+            var etOcc = GetRandomOccurrence(n.SubEthnies.Concat(new List<Occurrence>() { new Occurrence() { Text = n.MainEthnie.Name, ScaleValue = 10 } }).ToList(), 5);
+            GetRandomName(w, n, etOcc, out string fn, out string ln);
             c.FirstName = fn;
             c.LastName = ln;
 
@@ -208,7 +209,7 @@ namespace FM.Generator
             return c;
         }
 
-        public static Player GenerateRandomPlayer(World w, Association l, Nation n, PlayerLook pl, Position p, double lvl, int fromAge, int toAge)
+        public static Player GenerateRandomPlayer(World w, Association l, Nation n, Position p, double lvl, int fromAge, int toAge)
         {
             var nationDice = rnd.NextDouble();
             var otherLeagues = w.Associations.Where(ol => ol != l).ToList();
@@ -231,8 +232,11 @@ namespace FM.Generator
 
             string firstName;
             string lastName;
-            GetRandomNameForNation(w, n, out firstName, out lastName);
+            var playerEtOcc = GetRandomOccurrence(n.SubEthnies.Concat(new List<Occurrence>() { new Occurrence() { Text = n.MainEthnie.Name, ScaleValue = 10 } }).ToList(), 5);
+            var eth = w.GetEthnieByName(playerEtOcc.Text);
+            GetRandomName(w, n, playerEtOcc, out firstName, out lastName);
 
+            var pl = GetRandomOccurrence(eth.Appearences, STANDARD_DEV);
             var age = rnd.Next(fromAge, toAge);
             var baseskill = Math.Min(Player.MAX_BASE_SKILL, Util.GetGaussianRandom((Player.MAX_BASE_SKILL / MAX_GEN_LEVEL) * lvl, 5));
             var charisma = Math.Round(Math.Min(Util.GetGaussianRandom(15, 3), 20));
@@ -271,7 +275,7 @@ namespace FM.Generator
                 Constitution = consti,
                 Charisma = (float)charisma,
                 SetPlaySkill = setplayskill,
-                Face = GenerateRandomFace(pl)
+                Face = GenerateRandomFace(w.GetPlayerLookByName(pl.Text))
             };
 
             //player.XP = (int)Math.Floor(player.LevelCap() * (xpLevel - player.XPLevel));
@@ -280,13 +284,13 @@ namespace FM.Generator
 
         }
 
-        private static void GetRandomNameForNation(World w, Nation n, out string firstName, out string lastName)
+        private static void GetRandomName(World w, Nation n, Occurrence etOcc, out string firstName, out string lastName)
         {
-            var playerEtOcc = GetRandomOccurrence(n.SubEthnies.Concat(new List<Occurrence>() { new Occurrence() { Text = n.MainEthnie.Name, ScaleValue = 10 } }).ToList(), 5);
-            var playerEt = w.GetEthnieByName(playerEtOcc.Text);
+            
+            var playerEt = w.GetEthnieByName(etOcc.Text);
             if (!playerEt.Equals(n.MainEthnie))
             {
-                var subEt = (SubEthnieOccurrence)playerEtOcc as SubEthnieOccurrence;
+                var subEt = etOcc as SubEthnieOccurrence;
                 double divider = subEt.FirstAndLastNamesRate + subEt.FirstNameRate + subEt.LastNameRate;
                 var nameCombiDice = rnd.NextDouble();
 
