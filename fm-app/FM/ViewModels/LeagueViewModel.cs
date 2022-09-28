@@ -21,12 +21,13 @@ namespace FM.ViewModels
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
-        
+
 
         public LeagueViewModel()
         {
             LeagueAssociations = new ObservableCollection<LeagueAssociation>(Game.Instance.FootballUniverse.LeagueAssociations);
             Season.CurrentSeason.OnSeasonProgress += HandleProgress;
+            Season.OnSeasonChange += HandleSeasonSwitch;
             SelectedLeagueAssociation = Game.Instance.PlayerLeagueAssociation;
             SelectedLeague = Game.Instance.PlayerLeague;
             //NotifyPropertyChanged("LeagueAssociations");
@@ -35,8 +36,15 @@ namespace FM.ViewModels
         public void HandleProgress(object o, EventArgs e)
         {
             var s = o as Season;
-            SelectedLeague = SelectedLeague;            
+            SelectedLeague = SelectedLeague;
             NotifyPropertyChanged("SelectedLeague");
+        }
+
+        public void HandleSeasonSwitch(object o, EventArgs e)
+        {
+            SelectedLeague = SelectedLeague;
+            NotifyPropertyChanged("SelectedLeague");
+            Season.CurrentSeason.OnSeasonProgress += HandleProgress;
         }
 
         public ObservableCollection<LeagueAssociation> LeagueAssociations { get; set; }

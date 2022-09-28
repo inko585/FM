@@ -32,6 +32,20 @@ namespace FM
             Game.InitNewGame(w, 12);
             var mw = new FM.Views.MainWindow();
 
+            var leagues = Game.Instance.FootballUniverse.LeagueAssociations.First().Leagues;
+
+            foreach(var l in leagues)
+            {
+                Console.WriteLine("League " + l.Depth);
+                Console.WriteLine("Club                 Attraction/SponsorMoney/StadiumIncome/Expenses:Budget");
+                Console.WriteLine("------------------------------------------------------------------------------");
+                foreach (var c in l.Clubs.OrderByDescending(c => c.Attraction))
+                {
+                    Console.WriteLine($"{c.Name}           { c.Attraction}/{c.SponsorMoneyCurrentSeason}/{c.StadiumIncomeEstimation}/{c.SalaryExpenseEstimationCurrentSeason}:{c.BudgetCurrentSeason}");
+                }
+                Console.WriteLine("------------------------------------------------------------------------------");
+            }
+
             var totalCount = new Dictionary<string, int>();
             var winCount = new Dictionary<string, int>();
             var winGoals = new List<int>();

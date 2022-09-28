@@ -179,6 +179,15 @@ namespace FootballPit
             ResetFitness();
             MatchResult = res;
             IsPlayed = true;
+
+            foreach(var p in currentHomeLU.Players)
+            {
+                p.AccountXP(Game.XP_MATCH);
+            }
+            foreach(var p in currentAwayLU.Players)
+            {
+                p.AccountXP(Game.XP_MATCH);
+            }
             return res;
         }
 

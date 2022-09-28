@@ -53,7 +53,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LeagueController.cs" />
+    <Compile Include="FootballController.cs" />
     <Compile Include="Models\FootballUniverse.cs" />
     <Compile Include="Models\NavItem.cs" />
     <Compile Include="Models\PixelArt.cs" />

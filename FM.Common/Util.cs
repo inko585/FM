@@ -20,6 +20,14 @@ namespace FM.Common
             }
         }
 
+        public static void Times(this int times, Action<int> action)
+        {
+            for (int i = 0; i < times; i++)
+            {
+                action(i);
+            }
+        }
+
 
         public static void Times(this int times, Action action)
         {
@@ -90,5 +98,6 @@ namespace FM.Common
                 return false;
             }
         }
+
     }
 }

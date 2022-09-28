@@ -20,17 +20,127 @@ namespace FM.Models.Season
 
         public delegate void EventHandler(object sender, EventArgs e);
         public event EventHandler OnSeasonProgress;
+        public static event EventHandler OnSeasonChange;
 
-        public static void InitSeasons(List<LeagueAssociation> la_ = null)
+
+        public static void InitSeasons()
         {
-            CurrentSeason = CreateSeason(la_);
+            CurrentSeason = CreateSeason();
         }
         public static Season CurrentSeason { get; private set; }
 
-        public static Season CreateSeason(List<LeagueAssociation> la_ = null)
+        public static void NextSeason()
+        {
+            
+
+
+            foreach (var la in Game.Instance.FootballUniverse.LeagueAssociations)
+            {
+
+                var downwards = new List<Club>();
+                for (int i = 0; i < la.Leagues.Count; i++)
+                {
+                    var newTeams = new List<Club>();
+                    newTeams.AddRange(downwards);
+
+                    if (i < la.Leagues.Count - 1)
+                    {
+                        downwards = la.Leagues[i].RankedClubs.Skip(10).Select(lc => lc.Club).ToList();
+                    }
+
+                    foreach (var c in downwards)
+                    {
+                        c.Elo -= 250;
+                        la.Leagues[i].Clubs.Remove(c);
+                    }
+
+                    la.Leagues[i].Clubs.AddRange(newTeams);
+                }
+
+                var upwards = new List<Club>();
+                for (int i = la.Leagues.Count - 1; i >= 0; i--)
+                {
+                    var newTeams = new List<Club>();
+                    newTeams.AddRange(upwards);
+
+                    if (i > 0)
+                    {
+                        upwards = la.Leagues[i].RankedClubs.Take(2).Select(lc => lc.Club).ToList();
+                    }
+
+                    foreach (var c in upwards)
+                    {
+                        c.Elo += 250;
+                        la.Leagues[i].Clubs.Remove(c);
+                    }
+
+                    la.Leagues[i].Clubs.AddRange(newTeams);
+                }
+
+                foreach (var l in la.Leagues)
+                {
+                    l.ResetStandings();
+                }
+            }
+
+            var next = CreateSeason();
+
+            foreach (var c in Game.Instance.FootballUniverse.Clubs)
+            {
+                c.SponsorMoneyCurrentSeason = c.SponsorMoneyPotential;
+            }
+
+            CurrentSeason = next;
+
+            var leavingPlayers = new List<Player>();
+            foreach (var p in Game.Instance.FootballUniverse.Players)
+            {
+                p.Age++;
+                p.Constitution -=  p.Constitution * 0.01f * (p.Age - 30);
+                p.ContractCurrent.RunTime--;
+                if (p.ContractCurrent.RunTime == 0)
+                {
+                    p.Club.Rooster.Remove(p);
+                    p.ContractCurrent = null;
+                    if (p.ContractComing != null)
+                    {
+                        p.ContractCurrent = p.ContractComing;
+                        p.ContractComing = null;
+                        p.ContractCurrent.SignedOn = next;
+                    } else
+                    {
+                        leavingPlayers.Add(p);
+                    }
+                }
+            }
+
+            foreach (var p in leavingPlayers)
+            {
+                Console.WriteLine(p.FullName + " " + p.Age + " " + p.SkillMax);
+            }
+
+            foreach (var c in Game.Instance.FootballUniverse.Clubs)
+            {
+                c.Rooster.AddRange(c.JoiningPlayers);
+                c.JoiningPlayers.Clear();
+                c.TransferIncomeCurrentSeason = 0;
+                c.TransferExpensesCurrentSeason = 0;
+                c.TalentPromotion();
+            }
+
+            if (OnSeasonChange == null)
+            {
+                return;
+            }
+
+            EventArgs args = new EventArgs();
+            OnSeasonChange(next, args);
+        }
+
+        public static Season CreateSeason()
         {
             var season = new Season();
-            var leagueAssociations = la_ ?? Game.Instance.FootballUniverse.LeagueAssociations;
+            var leagueAssociations = Game.Instance.FootballUniverse.LeagueAssociations;
             var weekCount = leagueAssociations.Max(la => la.Leagues.First().Clubs.Count - 1) * 2 + 2;
 
             for (int i = 0; i < weekCount; i++)
@@ -137,45 +247,71 @@ namespace FM.Models.Season
 
         public void Progress()
         {
-            foreach (var md in CurrentWeek.MatchDays)
+            if (CurrentWeek.Number == FootballWeeks.Count)
             {
-                foreach (var m in md.Matches)
+                NextSeason();
+            }
+            else
+            {
+                if (CurrentWeek.Number <= 3)
                 {
-                    m.Simulate(true);
-                    AdjustElo(m.MatchResult);
-                    if (m.MatchResult.HomeGoals > m.MatchResult.AwayGoals)
+                    foreach (var club in Game.Instance.FootballUniverse.Clubs)
                     {
-                        m.HomeCompetitor.Points += 3;
+                        club.LookForImprovement(true);
                     }
-                    else
+                }
+                else
+                {
+                    foreach (var club in Game.Instance.FootballUniverse.Clubs)
                     {
-                        if (m.MatchResult.AwayGoals > m.MatchResult.HomeGoals)
+                        club.PlanNextYearRooster();
+                    }
+                }
+                foreach (var md in CurrentWeek.MatchDays)
+                {
+                    foreach (var m in md.Matches)
+                    {
+                        m.Simulate(true);
+                        AdjustElo(m.MatchResult);
+                        if (m.MatchResult.HomeGoals > m.MatchResult.AwayGoals)
                         {
-                            m.AwayCompetitor.Points += 3;
+                            m.HomeCompetitor.Points += 3;
                         }
                         else
                         {
-                            m.HomeCompetitor.Points++;
-                            m.AwayCompetitor.Points++;
+                            if (m.MatchResult.AwayGoals > m.MatchResult.HomeGoals)
+                            {
+                                m.AwayCompetitor.Points += 3;
+                            }
+                            else
+                            {
+                                m.HomeCompetitor.Points++;
+                                m.AwayCompetitor.Points++;
+                            }
                         }
+
+                        m.HomeCompetitor.Goals += m.MatchResult.HomeGoals;
+                        m.AwayCompetitor.CounterGoals += m.MatchResult.HomeGoals;
+                        m.AwayCompetitor.Goals += m.MatchResult.AwayGoals;
+                        m.HomeCompetitor.CounterGoals += m.MatchResult.AwayGoals;
                     }
-
-                    m.HomeCompetitor.Goals += m.MatchResult.HomeGoals;
-                    m.AwayCompetitor.CounterGoals += m.MatchResult.HomeGoals;
-                    m.AwayCompetitor.Goals += m.MatchResult.AwayGoals;
-                    m.HomeCompetitor.CounterGoals += m.MatchResult.AwayGoals;
                 }
+
+                foreach(var p in Game.Instance.FootballUniverse.Players)
+                {
+                    p.Train();
+                }
+
+                CurrentWeekIndex++;
+
+                if (OnSeasonProgress == null)
+                {
+                    return;
+                }
+
+                EventArgs args = new EventArgs();
+                OnSeasonProgress(this, args);
             }
-
-            CurrentWeekIndex++;
-
-            if (OnSeasonProgress == null)
-            {
-                return;
-            }
-
-            EventArgs args = new EventArgs();
-            OnSeasonProgress(this, args);
         }
 
         public void AdjustElo(MatchResult mr)

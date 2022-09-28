@@ -30,7 +30,15 @@ namespace FM.ViewModels
             SelectedLeague = Game.Instance.PlayerLeague;
             SelectedMatchDay = SelectedLeague.LatestMatchDay;
             Season.CurrentSeason.OnSeasonProgress += HandleProgress;
+            Season.OnSeasonChange += HandleSeasonSwitch;
             //NotifyPropertyChanged("LeagueAssociations");
+        }
+
+        public void HandleSeasonSwitch(object o, EventArgs e)
+        {
+            Season.CurrentSeason.OnSeasonProgress += HandleProgress;
+            SelectedMatchDay = SelectedLeague.LatestMatchDay;
+            //NotifyPropertyChanged("SelectedMatchDay.ObservableMatches");
         }
 
         public void HandleProgress(object o, EventArgs e)
