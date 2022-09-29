@@ -38,6 +38,13 @@ namespace FM.ViewModels
                 UserControl = new MatchDayControl()
             });
 
+            NavItems.Add(new NavItem()
+            {
+                Category = "STATISTIKEN",
+                Name = "Transfers",
+                UserControl = new TransferControl()
+            });
+
             NotifyPropertyChanged("NavItems");
 
             CollectionView.Refresh();

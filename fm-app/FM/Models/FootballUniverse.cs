@@ -55,10 +55,16 @@ namespace FM.Models.Generic
         public FootballUniverse(World w)
         {
             World = w;
+            TransferList = new List<Transfer>();
         }
         public World World { get; set; }
         public List<LeagueAssociation> LeagueAssociations { get; set; }
         private List<Club> clubs;
+        public List<Transfer> TransferList { get; set; }
+
+        
+
+
         public List<Club> Clubs
         {
             get
@@ -195,6 +201,12 @@ namespace FM.Models.Generic
             }
         }
 
+        
+
+
+
+
+
         public void ResetStandings()
         {
             Standings = Clubs.Select(c => new LeagueCompetitor() { Club = c, Points = 0, Goals = 0, CounterGoals = 0, League = this }).ToList();
@@ -206,7 +218,11 @@ namespace FM.Models.Generic
             foreach (var c in Clubs)
             {
                 var players = c.StartingLineUp.Players.Where(pl => pl.Position == p);
-                var avClub = players.Average(pl => pl.ValueOnField);
+                var avClub = 0d;
+                if (players.Any())
+                {
+                    avClub = players.Average(pl => pl.ValueOnField);
+                }
                 clubAverages.Add(avClub);
             }
 
@@ -515,7 +531,14 @@ namespace FM.Models.Generic
 
             foreach (var pos in posOrder)
             {
-                var av = Rooster.Where(pl => pl.Position == pos.Key).Average(pl => pl.ValueOnField);
+                var players = Rooster.Where(pl => pl.Position == pos.Key);
+                var av = 0d;
+
+                if (players.Any())
+                {
+                    av = players.Average(pl => pl.ValueOnField);
+                }
+                
                 var fittingPlayersForPosition = Game.Instance.FootballUniverse.Players.Where(p =>
                 p.WillSignContract && p.Position == pos.Key && p.ValueOnField > av &&
                 (currentSeason || (p.ContractComing == null && p.ContractCurrent.RunTime == 1 && ((p.Club == this && Season.Season.CurrentSeason.CurrentWeek.Number == 10) || Season.Season.CurrentSeason.CurrentWeek.Number > 11))) &&
@@ -531,7 +554,7 @@ namespace FM.Models.Generic
                         var sal = bf.GetSalaryExpectationForClub(this, true);
                         if ((sal + bf.Price) < BudgetCurrentSeason)
                         {
-                            FootballHelper.TransferPlayer(bf, this, 3, sal);
+                            FootballHelper.TransferPlayer(bf, this, Season.Season.CurrentSeason, 3, sal);
                             break;
                         }
                     }
@@ -550,7 +573,12 @@ namespace FM.Models.Generic
 
         private double GetNeedForPosition(Position p, double avLeague)
         {
-            var avLineup = this.StartingLineUp.Players.Where(pl => pl.Position == p).Average(pl => pl.ValueOnField);
+            var avLineup = 0d;
+            var players = this.StartingLineUp.Players.Where(pl => pl.Position == p);
+            if (players.Any())
+            {
+                avLineup = players.Average(pl => pl.ValueOnField);
+            }
             var qualityFactor = avLeague / avLineup;
 
             int quantityFactor = GetQuantityNeedForPosition(p);
@@ -562,8 +590,16 @@ namespace FM.Models.Generic
         {
             var roosterCountPos = this.Rooster.Where(pl => pl.Position == p).Count();
             var lineUpCountPos = this.StartingLineUp.Players.Where(pl => pl.Position == p).Count();
-            var quantityFactor = (lineUpCountPos * 2) / roosterCountPos;
-            return quantityFactor;
+            if(roosterCountPos == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                var quantityFactor = (lineUpCountPos * 2) / roosterCountPos;
+                return quantityFactor;
+            }
+            
         }
 
         public List<League> Leagues { get; set; }
@@ -1199,6 +1235,26 @@ namespace FM.Models.Generic
 
         //}
 
+    }
+
+    public class Transfer
+    {
+        public Player Player { get; set; }
+        public Club From { get; set; }
+        public Club To { get; set; }
+        public int Year { get; set; }
+        public int Week { get; set; }
+        public int Price { get; set; }
+
+        public Transfer(Player player, Club from,  Club to, int year, int week, int price)
+        {
+            Player = player;
+            From = from;
+            To = to;
+            Year = year;
+            Week = week;
+            Price = price;
+        }
     }
 
     public class Face

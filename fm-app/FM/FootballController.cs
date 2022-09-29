@@ -28,7 +28,7 @@ namespace FM
             c.JoiningPlayers.Add(p);
         }
 
-        public static void TransferPlayer(Player p, Club c, int contractRunTime, int salary)
+        public static void TransferPlayer(Player p, Club c, Season s, int contractRunTime, int salary)
         {
             var sellingClub = p.Club;
 
@@ -39,6 +39,8 @@ namespace FM
             c.TransferExpensesCurrentSeason += p.Price;
 
             Console.WriteLine("Transfer " + p.FullName + ": " + sellingClub.Name + " => " + c.Name + " (" + p.Price + ")");
+
+            Game.Instance.FootballUniverse.TransferList.Add(new Transfer(p, sellingClub, c, s.Year, s.CurrentWeek.Number, p.Price));
 
             p.ContractCurrent = new Contract()
             {

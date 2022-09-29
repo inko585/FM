@@ -1,0 +1,133 @@
+﻿<UserControl x:Class="FM.Views.TransferControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FM.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="900">
+    <UserControl.Resources>
+        <ResourceDictionary Source="pack://application:,,,/AE.Graphics.Wpf;component/Styles/AEStyles.xaml"/>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"></RowDefinition>
+            <RowDefinition Height="1*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Border BorderThickness="1" BorderBrush="#FFACACAC"  Margin="5,5,5,0" >
+
+            <Grid Background="{StaticResource ListColor}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="10*"/>
+                    <RowDefinition Height="12*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Verband" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom"/>
+                <ComboBox ItemsSource="{Binding LeagueAssociations}" SelectedItem="{Binding SelectedLeagueAssociation}" DisplayMemberPath="Name" Grid.Column="1" Grid.Row="1" Margin="0,5,30,10"/>
+                <Label Content="Liga" Grid.Row="0" Grid.Column="2" VerticalAlignment="Bottom"/>
+                <ComboBox  ItemsSource="{Binding SelectedLeagueAssociation.ObservableLeagues}" SelectedItem="{Binding SelectedLeague}" DisplayMemberPath="Depth" Grid.Column="2" Grid.Row="1"  Margin="0,5,30,10"/>
+            </Grid>
+        </Border>
+
+        <Border BorderThickness="1" BorderBrush="Black"  Margin="5,5,5,5" Grid.Row="1">
+            <ScrollViewer >
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Background="LightGray">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50"></ColumnDefinition>
+                            <ColumnDefinition Width="50"></ColumnDefinition>
+                            <ColumnDefinition Width="200"></ColumnDefinition>
+                            <ColumnDefinition Width="200"></ColumnDefinition>
+                            <ColumnDefinition Width="30"></ColumnDefinition>
+                            <ColumnDefinition Width="200"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Border BorderThickness="0,0,0.5,1"  BorderBrush="Gray" Grid.Column="0">
+                            <Label Content="Saison" FontWeight="Bold"/>
+                        </Border>
+                        <Border BorderThickness="0,0,0.5,1"  BorderBrush="Gray" Grid.Column="1">
+                            <Label Content="Woche" FontWeight="Bold"/>
+                        </Border>
+                        <Border BorderThickness="0,0,0.5,1"   BorderBrush="Gray"  Grid.Column="2">
+                            <Label  Content="Spieler" HorizontalAlignment="Center" FontWeight="Bold"/>
+                        </Border>
+                        <Border BorderThickness="0,0,0.5,1"   BorderBrush="Gray"  Grid.Column="3">
+                            <Label  Content="Gewechselt von" HorizontalAlignment="Center" FontWeight="Bold"/>
+                        </Border>
+                        <Border BorderThickness="0,0,0.5,1"   BorderBrush="Gray"  Grid.Column="4">
+                            <Label  Content="&#x2794;" HorizontalAlignment="Center" FontSize="14" FontWeight="Bold"/>
+                        </Border>
+                        <Border BorderThickness="0,0,0.5,1"   BorderBrush="Gray"  Grid.Column="5">
+                            <Label  Content="Gewechselt zu" HorizontalAlignment="Center" FontWeight="Bold"/>
+                        </Border>
+                        <Border BorderThickness="0,0,0.5,1"   BorderBrush="Gray"  Grid.Column="6">
+                            <Label  Content="Preis" HorizontalAlignment="Center" FontWeight="Bold"/>
+                        </Border>
+                    </Grid>
+
+
+                    <ItemsControl  Background="White" ItemsSource="{Binding TransferHistory}" Grid.Row="1">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50"></ColumnDefinition>
+                                        <ColumnDefinition Width="50"></ColumnDefinition>
+                                        <ColumnDefinition Width="60"></ColumnDefinition>
+                                        <ColumnDefinition Width="140"></ColumnDefinition>
+                                        <ColumnDefinition Width="60"></ColumnDefinition>
+                                        <ColumnDefinition Width="140"></ColumnDefinition>
+                                        <ColumnDefinition Width="30"></ColumnDefinition>
+                                        <ColumnDefinition Width="60"></ColumnDefinition>
+                                        <ColumnDefinition Width="140"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Border BorderThickness="0,0,0.5,0.5" BorderBrush="Gray"  Grid.Column="0">
+                                        <Label Name="seasonLabel" Content="{Binding Year}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <Border BorderThickness="0,0,0.5,0.5"   BorderBrush="Gray"  Grid.Column="1">
+                                        <Label Name="weekLabel" Content="{Binding Week}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <Border BorderThickness="0,0,0,0.5"  BorderBrush="Gray"  Grid.Column="2">
+                                        <Image Source="{Binding Player.FaceImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,5"></Image>
+                                    </Border>
+                                    <Border BorderThickness="0,0,0.5,0.5"  BorderBrush="Gray"  Grid.Column="3">
+                                        <Label Name="playerLabel" Content="{Binding Player.FullName}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                                    </Border>
+                                    <Border BorderThickness="0,0,0,0.5"  BorderBrush="Gray"  Grid.Column="4">
+                                        <Image Source="{Binding From.CrestImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,5"></Image>
+                                    </Border>
+                                    <Border BorderThickness="0,0,0.5,0.5"   BorderBrush="Gray"  Grid.Column="5">
+                                        <Label Name="fromLabel" Content="{Binding From.Name}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                                    </Border>
+                                    <Border BorderThickness="0,0,0.5,0.5"   BorderBrush="Gray"  Grid.Column="6">
+                                        <Label Name="arrowLabel" Content="&#x2794;" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14px" FontWeight="Bold"/>
+                                    </Border>
+                                    <Border BorderThickness="0,0,0,0.5"   BorderBrush="Gray"  Grid.Column="7">
+                                        <Image Source="{Binding To.CrestImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,5"></Image>
+                                    </Border>
+                                    <Border BorderThickness="0,0,0.5,0.5"   BorderBrush="Gray"  Grid.Column="8">
+                                        <Label Name="toLabel" Content="{Binding To.Name}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                                    </Border>
+                                    <Border BorderThickness="0,0,0,0.5"   BorderBrush="Gray"  Grid.Column="9">
+                                        <Label Name="priceLabel" Content="{Binding Price}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>

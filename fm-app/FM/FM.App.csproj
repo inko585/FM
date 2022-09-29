@@ -60,6 +60,7 @@
     <Compile Include="Models\Season.cs" />
     <Compile Include="RichList.cs" />
     <Compile Include="ViewModels\ClubViewModel.cs" />
+    <Compile Include="ViewModels\TransferViewModel.cs" />
     <Compile Include="ViewModels\MatchDayViewModel.cs" />
     <Compile Include="ViewModels\LeagueViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
@@ -74,6 +75,9 @@
       <DependentUpon>GameForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Generator.cs" />
+    <Compile Include="Views\TransferControl.xaml.cs">
+      <DependentUpon>TransferControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MatchDayControl.xaml.cs">
       <DependentUpon>MatchDayControl.xaml</DependentUpon>
     </Compile>
@@ -141,6 +145,10 @@
     <Page Include="Views\ClubWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\TransferControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\MatchDayControl.xaml">
       <Generator>MSBuild:Compile</Generator>

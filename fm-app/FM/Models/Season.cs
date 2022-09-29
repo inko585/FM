@@ -25,7 +25,7 @@ namespace FM.Models.Season
 
         public static void InitSeasons()
         {
-            CurrentSeason = CreateSeason();
+            CurrentSeason = CreateSeason(2022);
         }
         public static Season CurrentSeason { get; private set; }
 
@@ -87,7 +87,7 @@ namespace FM.Models.Season
                 }
             }
 
-            var next = CreateSeason();
+            var next = CreateSeason(CurrentSeason.Year + 1);
 
             foreach (var c in Game.Instance.FootballUniverse.Clubs)
             {
@@ -146,9 +146,10 @@ namespace FM.Models.Season
             OnSeasonChange(next, args);
         }
 
-        public static Season CreateSeason()
+        public static Season CreateSeason(int year)
         {
             var season = new Season();
+            season.Year = year;
             var leagueAssociations = Game.Instance.FootballUniverse.LeagueAssociations;
             var weekCount = leagueAssociations.Max(la => la.Leagues.First().Clubs.Count - 1) * 2 + 2;
 
@@ -245,6 +246,7 @@ namespace FM.Models.Season
 
         }
 
+        public int Year { get; set; }
         private int CurrentWeekIndex { get; set; }
         public FootballWeek CurrentWeek
         {
