@@ -25,6 +25,7 @@ namespace FM.ViewModels
 
         public TransferViewModel()
         {
+            Filter = "";
             LeagueAssociations = new ObservableCollection<LeagueAssociation>(Game.Instance.FootballUniverse.LeagueAssociations);
             Season.CurrentSeason.OnSeasonProgress += HandleProgress;
             Season.OnSeasonChange += HandleSeasonSwitch;
@@ -45,14 +46,28 @@ namespace FM.ViewModels
             Season.CurrentSeason.OnSeasonProgress += HandleProgress;
         }
 
+        private string filter;
+
+        public string Filter
+        {
+            get { return filter; }
+            set
+            {
+                filter = value;
+                NotifyPropertyChanged("Filter");
+                NotifyPropertyChanged("TransferHistory");
+            }
+        }
+
+
         public ObservableCollection<LeagueAssociation> LeagueAssociations { get; set; }
 
-        public ObservableCollection<Transfer> TransferHistory 
+        public ObservableCollection<Transfer> TransferHistory
         {
             get
             {
-                return new ObservableCollection<Transfer>(Game.Instance.FootballUniverse.TransferList);
-            } 
+                return new ObservableCollection<Transfer>(Game.Instance.FootballUniverse.TransferList.Where(t => Filter == "" || (t.From.Name + " " + t.Player.FullName + " " + t.To.Name).Contains(Filter)));
+            }
         }
 
         private LeagueAssociation selectedLeagueAssociation;

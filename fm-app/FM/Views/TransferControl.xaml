@@ -25,13 +25,16 @@
                     <ColumnDefinition Width="10"/>
                     <ColumnDefinition Width="200"/>
                     <ColumnDefinition Width="200"/>
-                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="1"/>
                     <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="15"/>
                 </Grid.ColumnDefinitions>
                 <Label Content="Verband" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom"/>
                 <ComboBox ItemsSource="{Binding LeagueAssociations}" SelectedItem="{Binding SelectedLeagueAssociation}" DisplayMemberPath="Name" Grid.Column="1" Grid.Row="1" Margin="0,5,30,10"/>
                 <Label Content="Liga" Grid.Row="0" Grid.Column="2" VerticalAlignment="Bottom"/>
                 <ComboBox  ItemsSource="{Binding SelectedLeagueAssociation.ObservableLeagues}" SelectedItem="{Binding SelectedLeague}" DisplayMemberPath="Depth" Grid.Column="2" Grid.Row="1"  Margin="0,5,30,10"/>
+                <TextBox Template="{StaticResource TextBoxBaseControlTemplate}" Text="{Binding Filter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" Grid.Column="5"  Margin="0,5,0,10" TextWrapping="Wrap" />
             </Grid>
         </Border>
 
@@ -98,10 +101,10 @@
                                     <Border BorderThickness="0,0,0.5,0.5"   BorderBrush="Gray"  Grid.Column="1">
                                         <Label Name="weekLabel" Content="{Binding Week}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                     </Border>
-                                    <Border BorderThickness="0,0,0,0.5"  BorderBrush="Gray"  Grid.Column="2">
-                                        <Image Source="{Binding Player.FaceImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,5"></Image>
-                                    </Border>
-                                    <Border BorderThickness="0,0,0.5,0.5"  BorderBrush="Gray"  Grid.Column="3">
+                                    <!--<Border BorderThickness="0,0,0,0.5"  BorderBrush="Gray"  Grid.Column="2">
+                                        --><!--<Image Source="{Binding Player.FaceImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,5"></Image>--><!--
+                                    </Border>-->
+                                    <Border BorderThickness="0,0,0.5,0.5"  BorderBrush="Gray"  Grid.Column="2" Grid.ColumnSpan="2">
                                         <Label Name="playerLabel" Content="{Binding Player.FullName}" HorizontalAlignment="Left" VerticalAlignment="Center" />
                                     </Border>
                                     <Border BorderThickness="0,0,0,0.5"  BorderBrush="Gray"  Grid.Column="4">
