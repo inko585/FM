@@ -247,7 +247,7 @@ namespace FM.Generator
             var charisma = Math.Round(Math.Min(Util.GetGaussianRandom(15, 3), 20));
             var baseConst = (float)Math.Round(Math.Max(10, Math.Min(20, Util.GetGaussianRandom(18 - MAX_GEN_LEVEL + lvl, 2))), 0);
 
-
+            var talent = Math.Min(2.4, Math.Max(1.6, Util.GetGaussianRandom(2, 0.1)));
             var xpLevel = 0;
             var consti = (float)baseConst;
             var xpGains = new int[] { 2, 2, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0 };
@@ -255,7 +255,7 @@ namespace FM.Generator
             {
                 if (i < 30 && i > 17)
                 {
-                    xpLevel += xpGains[i - (Player.MIN_AGE+1)];
+                    xpLevel += xpGains[i - (Player.MIN_AGE + 1)];
                 }
                 //xpLevel += 2 * Math.Max(0, 30d - i) / (30d - Player.MIN_AGE);
                 if (i >= 31)
@@ -264,8 +264,8 @@ namespace FM.Generator
                 }
             }
 
-            var xp = (int)(Math.Pow(xpLevel, 2) * 100);
-
+            var xpLevel_adj = (int)Math.Round(xpLevel * Math.Pow((3 -talent), 2));
+            var xp = (int)(Math.Pow(xpLevel_adj, talent) * 100);
 
             var setplayskill = 100f;
 
@@ -282,7 +282,7 @@ namespace FM.Generator
                 Position = p,
                 Age = age,
                 SkillBase = (int)Math.Floor(baseskill),
-                XPLevel = xpLevel,
+                XPLevel = xpLevel_adj,
                 Fitness = Player.MAX_FITNESS,
                 Moral = Player.MAX_MORAL,
                 ConstitutionBase = (float)baseConst,
@@ -290,6 +290,7 @@ namespace FM.Generator
                 Charisma = (float)charisma,
                 SetPlaySkill = setplayskill,
                 XP = xp,
+                TalentFactor = talent,
                 Face = GenerateRandomFace(w.GetPlayerLookByName(pl.Text))
             };
 

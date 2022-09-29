@@ -225,6 +225,7 @@ namespace FM.Models.Generic
             TransferExpensesCurrentSeason = 0;
             TransferIncomeCurrentSeason = 0;
             Account = 0;
+            IsClimber = false;
         }
         public String Name { get; set; }
 
@@ -260,6 +261,7 @@ namespace FM.Models.Generic
         public ClubColors ClubColors { get; set; }
         public string Crest { get; set; }
         public string Dress { get; set; }
+        public bool IsClimber { get; set; }
         public int IncomeEstimationCurrentSeason
         {
             get
@@ -317,10 +319,13 @@ namespace FM.Models.Generic
         public int YouthWorkLevel { get; set; }
         public int TrainingGroundLevel { get; set; }
 
-        public double TalentGenerationLevel { get
+        public double TalentGenerationLevel
+        {
+            get
             {
                 return YouthWorkLevel * 0.5;
-            } }
+            }
+        }
 
         public int StadiumCapacity
         {
@@ -334,7 +339,7 @@ namespace FM.Models.Generic
         {
             get
             {
-                return 2+TrainingGroundLevel;
+                return 2 + TrainingGroundLevel;
             }
         }
 
@@ -355,7 +360,7 @@ namespace FM.Models.Generic
         {
             get
             {
-                return (int)(Math.Round(Math.Pow(Attraction, 2.8) / 1000000) * 1400);
+                return (int)(Math.Round(Math.Pow(Attraction, 2.7) / 1000000) * 1400);
             }
         }
 
@@ -390,8 +395,7 @@ namespace FM.Models.Generic
         {
             get
             {
-
-                return (int)((IncomeEstimationCurrentSeason - ExpenseEstimationCurrentSeason) * 0.8);
+                return (int)((IncomeEstimationCurrentSeason - ExpenseEstimationCurrentSeason) * (IsClimber ? 1 : 0.75));
             }
         }
 
@@ -399,7 +403,7 @@ namespace FM.Models.Generic
         {
             get
             {
-                return (int)((IncomeEstimationNextSeason - ExpenseEstimationNextSeason) * 0.8);
+                return (int)((IncomeEstimationNextSeason - ExpenseEstimationNextSeason) * 0.75);
             }
         }
 
@@ -435,7 +439,7 @@ namespace FM.Models.Generic
 
             var youthPlayers = new List<Player>();
             var newPlayers = new List<Player>();
-            foreach(var p in positions)
+            foreach (var p in positions)
             {
                 var playersForPos = new List<Player>();
                 lineUpCountPos[p].Times(() => playersForPos.Add(Generator.WorldGenerator.GenerateRandomPlayer(Game.Instance.FootballUniverse.World, Nation, p, TalentGenerationLevel, 17, 17)));
@@ -445,7 +449,7 @@ namespace FM.Models.Generic
 
             newPlayers.AddRange(youthPlayers.OrderByDescending(pl => pl.ValueOnField).Take(Math.Max(0, 4 - newPlayers.Count)));
 
-            foreach(var pl in newPlayers)
+            foreach (var pl in newPlayers)
             {
                 pl.ContractCurrent = new Contract()
                 {
@@ -894,6 +898,7 @@ namespace FM.Models.Generic
             }
         }
 
+        public double TalentFactor { get; set; }
         public float Fitness { get; set; }
         public float Constitution { get; set; }
         public int ConstitutionDisplayed
@@ -1014,7 +1019,7 @@ namespace FM.Models.Generic
                 return 0;
             }
 
-            return (int)Math.Pow(XPLevel, 2) * 100;
+            return (int)Math.Pow(XPLevel, TalentFactor) * 100;
         }
 
         public void AccountXP(int xp)
@@ -1110,17 +1115,13 @@ namespace FM.Models.Generic
                 var contractFactor = 1d;
                 var s = SalaryStandard * 24d;
 
-                if (this.ContractCurrent.RunTime > 2)
+
+                if (this.ContractCurrent.RunTime == 1 && Club.IncomeEstimationCurrentSeason < s)
                 {
-                    contractFactor = 1.1 * (ContractCurrent.RunTime - 2);
+                    contractFactor = Club.IncomeEstimationCurrentSeason / s;
                 }
-                else
-                {
-                    if (Club.IncomeEstimationCurrentSeason < s)
-                    {
-                        contractFactor = Club.IncomeEstimationCurrentSeason / s;
-                    }
-                }
+
+                var startingLineUpFactor = Club.StartingLineUp.Players.Contains(this) ? (1.15 * ContractCurrent.RunTime) : 0.85;
 
                 var budgetFactor = Club.IncomeEstimationCurrentSeason / Club.ExpenseEstimationCurrentSeason;
 

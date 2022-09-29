@@ -33,7 +33,10 @@ namespace FM.Models.Season
         {
             
 
-
+            foreach(var c in Game.Instance.FootballUniverse.Clubs)
+            {
+                c.IsClimber = false;
+            }
             foreach (var la in Game.Instance.FootballUniverse.LeagueAssociations)
             {
 
@@ -50,7 +53,7 @@ namespace FM.Models.Season
 
                     foreach (var c in downwards)
                     {
-                        c.Elo -= 250;
+                        c.Elo -= 50;
                         la.Leagues[i].Clubs.Remove(c);
                     }
 
@@ -70,7 +73,8 @@ namespace FM.Models.Season
 
                     foreach (var c in upwards)
                     {
-                        c.Elo += 250;
+                        c.Elo += 50;
+                        c.IsClimber = true;
                         la.Leagues[i].Clubs.Remove(c);
                     }
 
@@ -90,13 +94,16 @@ namespace FM.Models.Season
                 c.SponsorMoneyCurrentSeason = c.SponsorMoneyPotential;
             }
 
-            CurrentSeason = next;
+            
 
             var leavingPlayers = new List<Player>();
             foreach (var p in Game.Instance.FootballUniverse.Players)
             {
                 p.Age++;
-                p.Constitution -=  p.Constitution * 0.01f * (p.Age - 30);
+                if (p.Age > 30)
+                {
+                    p.Constitution -= p.ConstitutionBase * 0.01f * (p.Age - 30);
+                }
                 p.ContractCurrent.RunTime--;
                 if (p.ContractCurrent.RunTime == 0)
                 {
@@ -127,6 +134,8 @@ namespace FM.Models.Season
                 c.TransferExpensesCurrentSeason = 0;
                 c.TalentPromotion();
             }
+
+            CurrentSeason = next;
 
             if (OnSeasonChange == null)
             {

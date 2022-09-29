@@ -68,7 +68,7 @@
                     <Label Content="Marktwert:"  VerticalAlignment="Center" Grid.Row="4"/>
                     <Label Content="Vertragslaufzeit:" VerticalAlignment="Center" Grid.Row="5"/>
                     <Label Content="Spielstärke:" VerticalAlignment="Center" Grid.Row="7"/>
-                    <Label Content="{Binding Player.MaxSkill}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="7" Grid.Column="1"/>
+                    <Label Content="{Binding Player.TalentFactor}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="7" Grid.Column="1"/>
 
                     <Label Content="Konstitution:" VerticalAlignment="Center" Grid.Row="8"/>
                     <Label Content="{Binding Player.Constitution}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="8" Grid.Column="1"/>
