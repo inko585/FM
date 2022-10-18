@@ -31,6 +31,12 @@ namespace FM.Models.Season
                 c.Account += c.SponsorMoneyCurrentSeason;
                 c.Account += c.Leagues.Sum(l => l.ClubSupport);
             }
+
+            foreach (var p in Game.Instance.FootballUniverse.Players)
+            {
+                p.PlayerStatistics.Add(new PlayerStatistics(p, (int)p.SkillMax, CurrentSeason.Year));
+            }
+
             AllSeasons = new List<Season>();
             AllSeasons.Add(CurrentSeason);
         }
@@ -156,7 +162,7 @@ namespace FM.Models.Season
                 if (p.Age > 30)
                 {
                     p.Constitution -= p.ConstitutionBase * 0.02f * (p.Age - 30);
-                }                
+                }
                 p.ContractCurrent.RunTime--;
                 if (p.ContractCurrent.RunTime == 0)
                 {
@@ -173,6 +179,7 @@ namespace FM.Models.Season
                         {
                             p.Club.NewPlayersWithoutFee.Add(p);
                         }
+                        p.PlayerStatistics.Add(new PlayerStatistics(p, (int)p.SkillMax, next.Year));
                     }
                     else
                     {

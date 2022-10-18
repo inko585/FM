@@ -63,6 +63,7 @@ namespace FM
             Game.Instance.FootballUniverse.TransferList.Add(new Transfer(p, sellingClub, c, s.Year, s.CurrentWeek.Number, p.Price, p.MarketValueStandard));
             c.NewPlayersWithFee.Add(p);
             p.ClubHistory.Add(c);
+            p.PlayerStatistics.Last().Club = c;
 
             p.ContractCurrent = new Contract()
             {

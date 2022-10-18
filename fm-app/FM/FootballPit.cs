@@ -82,7 +82,7 @@ namespace FootballPit
             var tension = silent ? 0 : TENSION;
             var tension_goalshot = silent ? 0 : TENSION_GOAL_SHOT;
             var res = new MatchResult();
-            res.Viewer = HomeClub.ViewerAttraction;
+            res.Viewer = Math.Min(HomeClub.ViewerAttraction, HomeClub.StadiumCapacity);
             res.HomeLineUp = HomeClub.StartingLineUp;
             res.AwayLineUp = AwayClub.StartingLineUp;
             res.HomeBench = HomeClub.Bench;
@@ -198,11 +198,13 @@ namespace FootballPit
             {
                 p.AccountXP(Game.XP_MATCH);
                 xpPlayers.Add(p);
+                p.PlayerStatistics.Last().Matches++;
             }
             foreach (var p in res.AwayLineUp.Players)
             {
                 p.AccountXP(Game.XP_MATCH);
                 xpPlayers.Add(p);
+                p.PlayerStatistics.Last().Matches++;
             }
 
             foreach(var sub in res.Substitutions)
@@ -211,6 +213,7 @@ namespace FootballPit
                 {
                     sub.In.AccountXP(Game.XP_MATCH_SUB);
                     xpPlayers.Add(sub.In);
+                    sub.In.PlayerStatistics.Last().Matches++;
                 }
             }
             return res;
@@ -317,6 +320,7 @@ namespace FootballPit
                 mr.AwayGoals = mr.AwayGoals + 1;
             }
 
+            scorer.PlayerStatistics.Last().Goals++;
             mr.Scorers.Add(new ScoreEvent() { Scorer = scorer, Club = c, CurrentScore = mr.ResultString, Minute = minute });
 
         }
@@ -441,7 +445,7 @@ namespace FootballPit
         public int AwayGoals { get; set; }
 
         public int Viewer { get; set; }
-
+        
         public Club HomeClub
         {
             get

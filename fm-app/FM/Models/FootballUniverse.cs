@@ -1093,6 +1093,15 @@ namespace FM.Models.Generic
             SignedOn = Season.Season.CurrentSeason;
         }
         public int RunTime { get; set; }
+        public string RunTimeString
+        {
+
+            get
+            {
+                return RunTime.ToString() + (RunTime > 1 ? " Jahre" : " Jahr");
+            }
+        }
+
         public int Salary { get; set; }
         public Player Player { get; set; }
         public Club Club { get; set; }
@@ -1103,6 +1112,28 @@ namespace FM.Models.Generic
     {
 
     }
+
+    public class PlayerStatistics
+    {
+        public PlayerStatistics(Player player, int skill, int year)
+        {
+            Player = player ?? throw new ArgumentNullException(nameof(player));
+            Skill = skill;
+            Year = year;
+            Goals = 0;
+            Matches = 0;
+            Club = Player.Club;
+        }
+
+        public Player Player { get; set; }
+        public Club Club { get; set; }
+        public int Goals { get; set; }
+        public int Matches { get; set; }
+        public int Skill { get; set; }
+        public int Year { get; set; }
+    }
+
+
 
     public class Player : Human
     {
@@ -1123,9 +1154,11 @@ namespace FM.Models.Generic
         public static float CONSTITUTION_DECLINE_RATE = 0.4f;
 
 
+
         public Player()
         {
             ClubHistory = new List<Club>();
+            PlayerStatistics = new List<PlayerStatistics>();
         }
 
         public bool WillSignContract
@@ -1145,6 +1178,7 @@ namespace FM.Models.Generic
         }
 
         public List<Club> ClubHistory { get; set; }
+        public List<PlayerStatistics> PlayerStatistics { get; set; }
 
         public Face Face { get; set; }
         public Contract ContractCurrent { get; set; }

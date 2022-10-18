@@ -53,7 +53,11 @@
                         <Label Content="{Binding MatchResult.HomeGoals}" FontWeight="Bold" FontSize="18" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             
             </Grid>
-                    <Label Content="Zuschauer: 10000" FontStyle="Italic" Grid.Row="1" Margin="5"/>
+                    <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="5">
+                        <Label Content="Zuschauer:" FontStyle="Italic" />
+                        <Label Content="{Binding MatchResult.Viewer}" FontStyle="Italic"/>
+                    </StackPanel>
+                    
                     <Grid Grid.Column="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="33*"/>
