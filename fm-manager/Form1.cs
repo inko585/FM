@@ -285,6 +285,7 @@ namespace fm_manager
                 c.MainEthnie = (Ethnie)mainEthnieSelection.SelectedItem;
                 c.SubEthnies = LoadFromEthnieGridView(ethnieGrid).Where(subet => !subet.Text.Equals(c.MainEthnie.Name)).ToList();
                 c.Short = nationShortTextBox.Text;
+                c.CombineSuffixAndPrefix = suffixPrefixCombo.Checked;
 
                 if (SelectedNation == null)
                 {
@@ -402,6 +403,7 @@ namespace fm_manager
                 nationTextBox.Text = n.Name;
                 nationShortTextBox.Text = n.Short;
                 nationDeleteButton.Enabled = true;
+                suffixPrefixCombo.Checked = n.CombineSuffixAndPrefix;
                 SelectedNation = n;
                 var bList = new BindingList<Nation>();
                 subnationBindingSource.DataSource = bList;
@@ -482,7 +484,7 @@ namespace fm_manager
                 associationDeleteBtn.Enabled = true;
                 SelectedAssociation = a;
                 SetUpDropDownOccurrenceGridView(nationGrid, "Nation", "Häufigkeit", typeof(Nation), nationBindingSource, a.Nations);
-                associatonLevel.Value = a.Power;
+                associatonLevel.Value = (decimal)a.Power;
                 associatonDepth.Value = a.Depth;
             }
         }
@@ -552,7 +554,7 @@ namespace fm_manager
                     } else
                     {
                         a.Name = associationTextBox.Text;
-                        a.Power = (int)associatonLevel.Value;
+                        a.Power = (double)associatonLevel.Value;
                         a.Depth = (int)associatonDepth.Value;
                         a.Nations = LoadFromGridView(nationGrid);
 

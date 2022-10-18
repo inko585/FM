@@ -32,7 +32,7 @@ namespace FM.Generator
         public static int ROOSTER_MIDFIELD_MAX = 6;
         public static int ROOSTER_STRIKER_MIN = 4;
         public static int ROOSTER_STRIKER_MAX = 6;
-        public static int MAX_GEN_LEVEL = 7;
+        public static int MAX_GEN_LEVEL = 9;
         //public static int LEAGUE_SIZE = 12;
 
         public static int GEN_MIN_AGE = 17;
@@ -70,17 +70,61 @@ namespace FM.Generator
         }
 
         private static List<string> TakenNames = new List<string>();
-        public static Club GenerateRandomClub(World w, Association a, AssociationLook al, Nation n, int lvl)
+        public static Club GenerateRandomClub(World w, Association a, AssociationLook al, Nation n, double lvl)
         {
             var c = new Club();
-            string name = CreateRandomClubName(n);
+            string name = CreateRandomClubName(n, n.CombineSuffixAndPrefix);
             while (TakenNames.Contains(name))
             {
-                name = CreateRandomClubName(n);
+                name = CreateRandomClubName(n, n.CombineSuffixAndPrefix);
             }
             c.Name = name;
             c.Nation = n;
-            c.ClubColors = GenerateRandomClubColors(al);
+            if (name.Contains("Rot/Weiß") || name.Contains("Rouge") || name.Contains("Ferrari") || name.Contains("Red Star") || name.Contains("Red Sox"))
+            {
+                c.ClubColors = new ClubColors()
+                {
+                    MainColor = GetColorFromText("Red"),
+                    SecondColor = GetColorFromText("White")
+                };
+            }
+            else if (name.Contains("Blau/Weiß"))
+            {
+                c.ClubColors = new ClubColors()
+                {
+                    MainColor = GetColorFromText("RoyalBlue"),
+                    SecondColor = GetColorFromText("White")
+                };
+            }
+            else if (name.Contains("Schwarz/Weiß"))
+            {
+                c.ClubColors = new ClubColors()
+                {
+                    MainColor = GetColorFromText("#2d2e2e"),
+                    SecondColor = GetColorFromText("White")
+                };
+            }
+            else if (name.Contains("SAP") || name.Contains("Sanofi"))
+            {
+                c.ClubColors = new ClubColors()
+                {
+                    MainColor = GetColorFromText("SteelBlue"),
+                    SecondColor = GetColorFromText("White")
+                };
+            }
+            else if (name.Contains("Total") || name.Contains("Red Bull") || name.Contains("Tesco"))
+            {
+                c.ClubColors = new ClubColors()
+                {
+                    MainColor = GetColorFromText("Red"),
+                    SecondColor = GetColorFromText("SteelBlue")
+                };
+            }
+            else
+            {
+                c.ClubColors = GenerateRandomClubColors(al);
+            }
+
             c.Crest = GenerateRandomCrest(al);
             c.Dress = GenerateRandomDress(al);
             TakenNames.Add(name);
@@ -88,21 +132,23 @@ namespace FM.Generator
             c.Coach = GenerateRandomCoach(w, n);
             c.Coach.Club = c;
 
-            var trueLvl = lvl - 0.5 + rnd.NextDouble();
-            c.StadiumLevel = Math.Max(1, (int)Util.GetGaussianRandom(trueLvl * 1.5, 1));
-            c.OfficeLevel = Math.Max(1, (int)Util.GetGaussianRandom(trueLvl * 1.5, 1));
-            c.YouthWorkLevel = Math.Max(1, Math.Max(1, (int)Util.GetGaussianRandom(trueLvl * 1.8, 1)));
-            c.TrainingGroundLevel = Math.Max(1, (int)Util.GetGaussianRandom(trueLvl * 1.5, 1));
+            var trueLvl = Util.GetGaussianRandom(lvl, 0.3);
+            c.ClubAssetLevel[ClubAsset.Stadium] = Math.Max(1, (int)Util.GetGaussianRandom(trueLvl * 1.5, 1));
+            c.ClubAssetLevel[ClubAsset.Office] = Math.Max(1, (int)Util.GetGaussianRandom(trueLvl * 1.5, 1));
+            c.ClubAssetLevel[ClubAsset.YouthWork] = Math.Max(1, Math.Max(1, (int)Util.GetGaussianRandom(trueLvl * 1.8, 1)));
+            c.ClubAssetLevel[ClubAsset.TrainingGrounds] = Math.Max(1, (int)Util.GetGaussianRandom(trueLvl * 1.5, 1));
 
             var relativeLevel = trueLvl / MAX_GEN_LEVEL;
             c.Elo = (int)Math.Round(relativeLevel * MAX_ELO);
             c.SponsorMoneyCurrentSeason = c.SponsorMoneyPotential;
             c.ViewerAttractionEstimation = c.ViewerAttraction;
 
-            GeneratePlayersForPositionAndClub(w, n, lvl, c, Position.Goalie, ROOSTER_GOALIE_MIN, ROOSTER_GOALIE_MAX);
-            GeneratePlayersForPositionAndClub(w, n, lvl, c, Position.Defender, ROOSTER_DEFENDER_MIN, ROOSTER_DEFENDER_MAX);
-            GeneratePlayersForPositionAndClub(w, n, lvl, c, Position.Midfielder, ROOSTER_MIDFIELD_MIN, ROOSTER_MIDFIELD_MAX);
-            GeneratePlayersForPositionAndClub(w, n, lvl, c, Position.Striker, ROOSTER_STRIKER_MIN, ROOSTER_STRIKER_MAX);
+            var posN = c.GetLineUpCountForPosition();
+
+            GeneratePlayersForPositionAndClub(w, n, trueLvl, c, Position.Goalie, (int) Math.Ceiling(posN[Position.Goalie]*2.5));
+            GeneratePlayersForPositionAndClub(w, n, trueLvl, c, Position.Defender, (int)Math.Ceiling(posN[Position.Defender]*2.5));
+            GeneratePlayersForPositionAndClub(w, n, trueLvl, c, Position.Midfielder, (int)Math.Ceiling(posN[Position.Midfielder]*2.5));
+            GeneratePlayersForPositionAndClub(w, n, trueLvl, c, Position.Striker, (int)Math.Ceiling(posN[Position.Striker]*2.5));
 
             return c;
         }
@@ -160,40 +206,104 @@ namespace FM.Generator
             }
         }
 
-        private static string CreateRandomClubName(Nation n)
+        private static List<string> suffixCache = new List<string>();
+        private static List<string> prefixCache = new List<string>();
+
+        private static string CreateRandomClubName(Nation n, bool combineSuffixAndPrefix)
         {
             var city = GetRandomOccurrence(n.Cities, STANDARD_DEV).Text;
-            var prefix = GetRandomOccurrence(n.FirstPrefixes, STANDARD_DEV).Text;
+            var prefix = "";
             var prefix2 = "";
             var suffix = "";
             var name = "";
-            var secondPrefixDice = rnd.NextDouble();
-            if (secondPrefixDice <= 0.2)
+            if (combineSuffixAndPrefix)
             {
-                prefix2 = GetRandomOccurrence(n.SecondPrefixes, STANDARD_DEV).Text;
-                name = prefix + " " + prefix2 + " " + city;
-            }
-            else if (secondPrefixDice >= 0.8)
-            {
-                suffix = GetRandomOccurrence(n.Suffixes, STANDARD_DEV).Text;
-                name = prefix + " " + city + " " + suffix;
+                prefix = GetRandomOccurrence(n.FirstPrefixes, STANDARD_DEV).Text;
+                var secondPrefixDice = rnd.NextDouble();
+                if (secondPrefixDice <= 0.2 && n.SecondPrefixes.Any())
+                {
+                    prefix2 = GetPrefix2(n);
+                    name = prefix + " " + prefix2 + " " + city;
+                }
+                else if (secondPrefixDice >= 0.8 && n.Suffixes.Any())
+                {
+                    suffix = GetSuffix(n);
+                    name = prefix + " " + city + " " + suffix;
+                }
+                else
+                {
+                    name = prefix + " " + city;
+                }
             }
             else
             {
-                name = prefix + " " + city;
+                var prefixDice = rnd.NextDouble();
+                if (prefixDice > 0.3)
+                {
+                    prefix = GetRandomOccurrence(n.FirstPrefixes, STANDARD_DEV).Text;
+                    if (prefixDice > 0.8 && n.SecondPrefixes.Any())
+                    {
+                        prefix2 = " " + GetPrefix2(n);
+
+                    }
+
+                    name = prefix + prefix2 + " " + city;
+                }
+                else
+                {
+                    if (n.Suffixes.Any())
+                    {
+                        suffix = " " + GetSuffix(n);
+                    }
+                    name = prefix + " " + city + suffix;
+                }
             }
 
             return name;
         }
 
-        private static void GeneratePlayersForPositionAndClub(World w, Nation n, double lvl, Club c, Position p, int min, int max)
+        private static string GetPrefix2(Nation n)
         {
-            var dice = rnd.Next(min, max);
-            for (var i = 0; i < dice; i++)
+            string prefix2;
+            var prefix2Occ = GetRandomOccurrence(n.SecondPrefixes, STANDARD_DEV);
+            while (prefixCache.Contains(n.Short + "_" + prefix2Occ.Text) && prefixCache.Where(c => c.StartsWith(n.Short + "_")).Count() < n.SecondPrefixes.Count)
+            {
+                prefix2Occ = GetRandomOccurrence(n.SecondPrefixes, STANDARD_DEV);
+            }
+
+            if (prefix2Occ.ScaleValue == 1)
+            {
+                prefixCache.Add(n.Short + "_" + prefix2Occ.Text);
+            }
+
+            prefix2 = prefix2Occ.Text;
+            return prefix2;
+        }
+
+        private static string GetSuffix(Nation n)
+        {
+            string suffix;
+            var suffixOcc = GetRandomOccurrence(n.Suffixes, STANDARD_DEV);
+            while (suffixCache.Contains(n.Short + "_" + suffixOcc.Text) && suffixCache.Where(c => c.StartsWith(n.Short + "_")).Count() < n.Suffixes.Count)
+            {
+                suffixOcc = GetRandomOccurrence(n.Suffixes, STANDARD_DEV);
+            }
+            if (suffixOcc.ScaleValue == 1)
+            {
+                suffixCache.Add(n.Short + "_" + suffixOcc.Text);
+            }
+            suffix = suffixOcc.Text;
+            return suffix;
+        }
+
+        private static void GeneratePlayersForPositionAndClub(World w, Nation n, double lvl, Club c, Position p, int number)
+        {
+            for (var i = 0; i < number; i++)
             {
                 var player = GenerateRandomPlayer(w, n, p, lvl, GEN_MIN_AGE, GEN_MAX_AGE);
                 player.ContractCurrent = new Contract() { Club = c, Player = player, RunTime = rnd.Next(1, 4), Salary = player.SalaryStandard };
                 player.ContractCurrent.SignedOn = null;
+                player.ClubHistory.Add(c);
                 c.Rooster.Add(player);
             }
         }
@@ -221,9 +331,15 @@ namespace FM.Generator
             Nation origin;
             //if (otherLeagues.Count == 0 || nationDice <= 0.7)
             //{
-
-            var key = GetRandomValue(n.SubNations.Concat(new List<Occurrence> { new Occurrence() { Text = n.Name, ScaleValue = 10 } }).ToList(), 5);
-            origin = w.GetNationByName(key);
+            if (nationDice <= 0.3)
+            {
+                var key = GetRandomValue(n.SubNations, 5);
+                origin = w.GetNationByName(key);
+            }
+            else
+            {
+                origin = n;
+            }
             //}
             //else
             //{
@@ -237,9 +353,9 @@ namespace FM.Generator
 
             string firstName;
             string lastName;
-            var playerEtOcc = GetRandomOccurrence(n.SubEthnies.Concat(new List<Occurrence>() { new Occurrence() { Text = n.MainEthnie.Name, ScaleValue = 10 } }).ToList(), 5);
+            var playerEtOcc = GetRandomOccurrence(origin.SubEthnies.Concat(new List<Occurrence>() { new Occurrence() { Text = origin.MainEthnie.Name, ScaleValue = 12 } }).ToList(), 5);
             var eth = w.GetEthnieByName(playerEtOcc.Text);
-            GetRandomName(w, n, playerEtOcc, out firstName, out lastName);
+            GetRandomName(w, origin, playerEtOcc, out firstName, out lastName);
 
             var pl = GetRandomOccurrence(eth.Appearences, STANDARD_DEV);
             var age = rnd.Next(fromAge, toAge);
@@ -247,10 +363,10 @@ namespace FM.Generator
             var charisma = Math.Round(Math.Min(Util.GetGaussianRandom(15, 3), 20));
             var baseConst = (float)Math.Round(Math.Max(10, Math.Min(20, Util.GetGaussianRandom(18 - MAX_GEN_LEVEL + lvl, 2))), 0);
 
-            var talent = Math.Min(2.4, Math.Max(1.6, Util.GetGaussianRandom(2, 0.1)));
+            var talent = Math.Min(2.6, Math.Max(1.2, Util.GetGaussianRandom(1.6, 0.1)));
             var xpLevel = 0;
             var consti = (float)baseConst;
-            var xpGains = new int[] { 2, 2, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0 };
+            var xpGains = new int[] { 2, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0 };
             for (int i = Player.MIN_AGE; i <= age; i++)
             {
                 if (i < 30 && i > 17)
@@ -260,11 +376,11 @@ namespace FM.Generator
                 //xpLevel += 2 * Math.Max(0, 30d - i) / (30d - Player.MIN_AGE);
                 if (i >= 31)
                 {
-                    consti -= consti * 0.01f * (i - 30);
+                    consti -= consti * 0.015f * (i - 30);
                 }
             }
 
-            var xpLevel_adj = (int)Math.Round(xpLevel * Math.Pow((3 -talent), 2));
+            var xpLevel_adj = (int)Math.Round(xpLevel * Math.Pow((3 - talent), 2));
             var xp = (int)(Math.Pow(xpLevel_adj, talent) * 100);
 
             var setplayskill = 100f;

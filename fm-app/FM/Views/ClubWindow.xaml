@@ -27,9 +27,9 @@
                 </Grid.ColumnDefinitions>
                 <Image Source="{Binding Club.CrestImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" Margin="5,0,5,0"></Image>
                 <Label Content="{Binding Club.Name}" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Grid.Column="1"></Label>
-                <Label Content="{Binding Club.SeasonIncomeEstimation}" VerticalAlignment="Center" Grid.Column="2"/>
-                <Label Content="{Binding Club.PlayerExpenseEstimation}" VerticalAlignment="Center" Grid.Column="3"/>
-                <Label Content="{Binding Club.StadiumIncomeEstimation}" VerticalAlignment="Center" Grid.Column="4"/>
+                <!--<Label Content="{Binding Club.SeasonIncomeEstimation}" VerticalAlignment="Center" Grid.Column="2"/>
+                <Label Content="{Binding Club.PlayerExpenseEstimation}" VerticalAlignment="Center" Grid.Column="3"/>-->
+                <Label Content="{Binding Club.Account}" VerticalAlignment="Center" Grid.Column="4"/>
             </Grid>
 
         </Border>

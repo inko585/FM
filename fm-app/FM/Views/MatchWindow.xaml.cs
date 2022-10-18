@@ -61,5 +61,22 @@ namespace FM.Views
             var pView = new PlayerWindow(sc.Scorer);
             pView.ShowDialog();
         }
+
+        private void Sub_PreviewMouseDown(Object sender, MouseButtonEventArgs e)
+        {
+            var lbl = sender as Label;
+            var su = lbl.DataContext as Substitution;
+
+            PlayerWindow pView;
+            if (lbl.Content.ToString() == su.In.FullName)
+            {
+                pView = new PlayerWindow(su.In);
+            } else
+            {
+                pView = new PlayerWindow(su.Out);
+            }
+
+            pView.ShowDialog();
+        }
     }
 }

@@ -25,16 +25,19 @@
                     <ColumnDefinition Width="10"/>
                     <ColumnDefinition Width="200"/>
                     <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="200"/>
                     <ColumnDefinition Width="1"/>
                     <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="200"/>
                     <ColumnDefinition Width="15"/>
                 </Grid.ColumnDefinitions>
-                <Label Content="Verband" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom"/>
-                <ComboBox ItemsSource="{Binding LeagueAssociations}" SelectedItem="{Binding SelectedLeagueAssociation}" DisplayMemberPath="Name" Grid.Column="1" Grid.Row="1" Margin="0,5,30,10"/>
-                <Label Content="Liga" Grid.Row="0" Grid.Column="2" VerticalAlignment="Bottom"/>
-                <ComboBox  ItemsSource="{Binding SelectedLeagueAssociation.ObservableLeagues}" SelectedItem="{Binding SelectedLeague}" DisplayMemberPath="Depth" Grid.Column="2" Grid.Row="1"  Margin="0,5,30,10"/>
-                <TextBox Template="{StaticResource TextBoxBaseControlTemplate}" Text="{Binding Filter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" Grid.Column="5"  Margin="0,5,0,10" TextWrapping="Wrap" />
+                <Label Content="Saison" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom"/>
+                <ComboBox  ItemsSource="{Binding Seasons}" SelectedItem="{Binding SelectedSeason}" DisplayMemberPath="Year" Grid.Column="1" Grid.Row="1"  Margin="0,5,30,10"/>
+                <Label Content="Verband" Grid.Row="0" Grid.Column="2" VerticalAlignment="Bottom"/>
+                <ComboBox ItemsSource="{Binding LeagueAssociations}" SelectedItem="{Binding SelectedLeagueAssociation}" DisplayMemberPath="Name" Grid.Column="2" Grid.Row="1" Margin="0,5,30,10"/>
+                <Label Content="Liga" Grid.Row="0" Grid.Column="3" VerticalAlignment="Bottom"/>
+                <ComboBox  ItemsSource="{Binding SelectedLeagueAssociation.ObservableLeagues}" SelectedItem="{Binding SelectedLeague}" DisplayMemberPath="Depth" Grid.Column="3" Grid.Row="1"  Margin="0,5,30,10"/>
+                <TextBox Template="{StaticResource TextBoxBaseControlTemplate}" Text="{Binding Filter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="1" Grid.Column="6"  Margin="0,5,0,10" TextWrapping="Wrap" />
             </Grid>
         </Border>
 
@@ -49,11 +52,12 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50"></ColumnDefinition>
                             <ColumnDefinition Width="50"></ColumnDefinition>
-                            <ColumnDefinition Width="200"></ColumnDefinition>
-                            <ColumnDefinition Width="200"></ColumnDefinition>
+                            <ColumnDefinition Width="*" MinWidth="200"></ColumnDefinition>
+                            <ColumnDefinition Width="240"></ColumnDefinition>
                             <ColumnDefinition Width="30"></ColumnDefinition>
-                            <ColumnDefinition Width="200"></ColumnDefinition>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="240"></ColumnDefinition>
+                            <ColumnDefinition Width="100"></ColumnDefinition>
+                            <ColumnDefinition Width="100"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <Border BorderThickness="0,0,0.5,1"  BorderBrush="Gray" Grid.Column="0">
                             <Label Content="Saison" FontWeight="Bold"/>
@@ -74,7 +78,10 @@
                             <Label  Content="Gewechselt zu" HorizontalAlignment="Center" FontWeight="Bold"/>
                         </Border>
                         <Border BorderThickness="0,0,0.5,1"   BorderBrush="Gray"  Grid.Column="6">
-                            <Label  Content="Preis" HorizontalAlignment="Center" FontWeight="Bold"/>
+                            <Label  Content="Marktwert" HorizontalAlignment="Center" FontWeight="Bold"/>
+                        </Border>
+                        <Border BorderThickness="0,0,0.5,1"   BorderBrush="Gray"  Grid.Column="7">
+                            <Label  Content="Ablöse" HorizontalAlignment="Center" FontWeight="Bold"/>
                         </Border>
                     </Grid>
 
@@ -87,13 +94,14 @@
                                         <ColumnDefinition Width="50"></ColumnDefinition>
                                         <ColumnDefinition Width="50"></ColumnDefinition>
                                         <ColumnDefinition Width="60"></ColumnDefinition>
-                                        <ColumnDefinition Width="140"></ColumnDefinition>
+                                        <ColumnDefinition Width="*" MinWidth="200"></ColumnDefinition>
                                         <ColumnDefinition Width="60"></ColumnDefinition>
-                                        <ColumnDefinition Width="140"></ColumnDefinition>
+                                        <ColumnDefinition Width="180"></ColumnDefinition>
                                         <ColumnDefinition Width="30"></ColumnDefinition>
                                         <ColumnDefinition Width="60"></ColumnDefinition>
-                                        <ColumnDefinition Width="140"></ColumnDefinition>
-                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition Width="180"></ColumnDefinition>
+                                        <ColumnDefinition Width="100"></ColumnDefinition>
+                                        <ColumnDefinition Width="100"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
                                     <Border BorderThickness="0,0,0.5,0.5" BorderBrush="Gray"  Grid.Column="0">
                                         <Label Name="seasonLabel" Content="{Binding Year}" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -101,17 +109,17 @@
                                     <Border BorderThickness="0,0,0.5,0.5"   BorderBrush="Gray"  Grid.Column="1">
                                         <Label Name="weekLabel" Content="{Binding Week}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                     </Border>
-                                    <!--<Border BorderThickness="0,0,0,0.5"  BorderBrush="Gray"  Grid.Column="2">
-                                        --><!--<Image Source="{Binding Player.FaceImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,5"></Image>--><!--
-                                    </Border>-->
-                                    <Border BorderThickness="0,0,0.5,0.5"  BorderBrush="Gray"  Grid.Column="2" Grid.ColumnSpan="2">
-                                        <Label Name="playerLabel" Content="{Binding Player.FullName}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                                    <Border BorderThickness="0,0,0,0.5"  BorderBrush="Gray"  Grid.Column="2">
+                                        <Image Source="{Binding Player.PlayerImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,5"></Image>
+                                    </Border>
+                                    <Border BorderThickness="0,0,0.5,0.5"  BorderBrush="Gray"  Grid.Column="3">
+                                        <Label Name="playerLabel" PreviewMouseDown="Player_PreviewMouseDown" Content="{Binding Player.FullName}" HorizontalAlignment="Left" VerticalAlignment="Center" />
                                     </Border>
                                     <Border BorderThickness="0,0,0,0.5"  BorderBrush="Gray"  Grid.Column="4">
                                         <Image Source="{Binding From.CrestImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,5"></Image>
                                     </Border>
                                     <Border BorderThickness="0,0,0.5,0.5"   BorderBrush="Gray"  Grid.Column="5">
-                                        <Label Name="fromLabel" Content="{Binding From.Name}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                                        <Label Name="fromLabel" PreviewMouseDown="From_PreviewMouseDown" Content="{Binding From.Name}" HorizontalAlignment="Left" VerticalAlignment="Center" />
                                     </Border>
                                     <Border BorderThickness="0,0,0.5,0.5"   BorderBrush="Gray"  Grid.Column="6">
                                         <Label Name="arrowLabel" Content="&#x2794;" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14px" FontWeight="Bold"/>
@@ -120,9 +128,12 @@
                                         <Image Source="{Binding To.CrestImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,5"></Image>
                                     </Border>
                                     <Border BorderThickness="0,0,0.5,0.5"   BorderBrush="Gray"  Grid.Column="8">
-                                        <Label Name="toLabel" Content="{Binding To.Name}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                                        <Label Name="toLabel" PreviewMouseDown="To_PreviewMouseDown" Content="{Binding To.Name}" HorizontalAlignment="Left" VerticalAlignment="Center" />
                                     </Border>
-                                    <Border BorderThickness="0,0,0,0.5"   BorderBrush="Gray"  Grid.Column="9">
+                                    <Border BorderThickness="0,0,0.5,0.5"   BorderBrush="Gray"  Grid.Column="9">
+                                        <Label Name="priceStandardLabel" Content="{Binding MarketValue}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <Border BorderThickness="0,0,0,0.5"   BorderBrush="Gray"  Grid.Column="10">
                                         <Label Name="priceLabel" Content="{Binding Price}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                     </Border>
                                 </Grid>

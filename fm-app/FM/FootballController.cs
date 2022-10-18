@@ -13,10 +13,13 @@ namespace FM
     public class FootballHelper
     {
 
-        public static void SignContract(Player p, Club c, int contractRunTime, int salary)
+        public static void SignContract(Player p, Club c, int contractRunTime, int salary, bool currentSeason)
         {
-
-            p.ContractComing = new Contract()
+            if (p.Club != c)
+            {
+                p.ClubHistory.Add(c);
+            }
+            var contract = new Contract()
             {
                 Club = c,
                 Player = p,
@@ -24,8 +27,21 @@ namespace FM
                 Salary = salary
             };
 
+            if (currentSeason)
+            {
+                p.ContractCurrent = contract;
+                c.Rooster.Add(p);
+                p.ResetDress();
+            }
+            else
+            {
+                p.ContractComing = contract;
+                c.JoiningPlayers.Add(p);
+            }
+
+
             Console.WriteLine("New Contract " + p.FullName + ": " + p.Club.Name + " => " + c.Name);
-            c.JoiningPlayers.Add(p);
+
         }
 
         public static void TransferPlayer(Player p, Club c, Season s, int contractRunTime, int salary)
@@ -38,9 +54,15 @@ namespace FM
             sellingClub.TransferIncomeCurrentSeason += p.Price;
             c.TransferExpensesCurrentSeason += p.Price;
 
-            Console.WriteLine("Transfer " + p.FullName + ": " + sellingClub.Name + " => " + c.Name + " (" + p.Price + ")");
+            //Console.WriteLine("Transfer " + p.FullName + ": " + sellingClub.Name + " => " + c.Name + " (" + p.Price + ")");
+            if (c.StartingLineUp.Players.Contains(p))
+            {
+                c.PlayersSoldFromStartingLineUp++;
+            }
 
-            Game.Instance.FootballUniverse.TransferList.Add(new Transfer(p, sellingClub, c, s.Year, s.CurrentWeek.Number, p.Price));
+            Game.Instance.FootballUniverse.TransferList.Add(new Transfer(p, sellingClub, c, s.Year, s.CurrentWeek.Number, p.Price, p.MarketValueStandard));
+            c.NewPlayersWithFee.Add(p);
+            p.ClubHistory.Add(c);
 
             p.ContractCurrent = new Contract()
             {
@@ -51,7 +73,7 @@ namespace FM
             };
             c.Rooster.Add(p);
             sellingClub.Rooster.Remove(p);
-            
+            p.ResetDress();
         }
 
 

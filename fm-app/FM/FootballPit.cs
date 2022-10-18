@@ -35,6 +35,8 @@ namespace FootballPit
             }
         }
 
+
+
         public bool IsPlayed { get; set; }
 
 
@@ -80,10 +82,15 @@ namespace FootballPit
             var tension = silent ? 0 : TENSION;
             var tension_goalshot = silent ? 0 : TENSION_GOAL_SHOT;
             var res = new MatchResult();
+            res.Viewer = HomeClub.ViewerAttraction;
             res.HomeLineUp = HomeClub.StartingLineUp;
             res.AwayLineUp = AwayClub.StartingLineUp;
+            res.HomeBench = HomeClub.Bench;
+            res.AwayBench = AwayClub.Bench;
             var currentHomeLU = HomeClub.StartingLineUp;
             var currentAwayLU = AwayClub.StartingLineUp;
+            var currentHomeBench = HomeClub.Bench;
+            var currentAwayBench = AwayClub.Bench;
             var offClub = HomeClub;
             var defClub = AwayClub;
             var offLineUp = currentHomeLU;
@@ -101,6 +108,12 @@ namespace FootballPit
                     gform.UpdateHomeLineup(currentHomeLU);
                     gform.UpdateAwayLineUp(currentAwayLU);
                     gform.SetArea(area, offClub);
+                }
+
+                if (i > 5)
+                {
+                    MakeSubstitutions(res, i, HomeClub, currentHomeLU, currentHomeBench);
+                    MakeSubstitutions(res, i, AwayClub, currentAwayLU, currentAwayBench);
                 }
                 Thread.Sleep(tension);
                 if (IsGoalShotFired(offLineUp, area))
@@ -180,15 +193,46 @@ namespace FootballPit
             MatchResult = res;
             IsPlayed = true;
 
-            foreach(var p in currentHomeLU.Players)
+            var xpPlayers = new List<Player>();
+            foreach (var p in res.HomeLineUp.Players)
             {
                 p.AccountXP(Game.XP_MATCH);
+                xpPlayers.Add(p);
             }
-            foreach(var p in currentAwayLU.Players)
+            foreach (var p in res.AwayLineUp.Players)
             {
                 p.AccountXP(Game.XP_MATCH);
+                xpPlayers.Add(p);
+            }
+
+            foreach(var sub in res.Substitutions)
+            {
+                if (!xpPlayers.Contains(sub.In))
+                {
+                    sub.In.AccountXP(Game.XP_MATCH_SUB);
+                    xpPlayers.Add(sub.In);
+                }
             }
             return res;
+        }
+
+        public void MakeSubstitutions(MatchResult mr, int min, Club c, LineUp lineUp, List<Player> bench)
+        {
+            var playersOrdered = lineUp.Players.OrderBy(pl => pl.ValueForCoachCurrent).ToList();
+
+            foreach (var po in playersOrdered)
+            {
+                var newPlayer = bench.FirstOrDefault(bp => bp.Position == po.Position && bp.ValueForCoachCurrent > (po.ValueForCoachCurrent * 1.1));
+                if (newPlayer != null)
+                {
+                    lineUp.Players.Remove(po);
+                    lineUp.Players.Add(newPlayer);
+                    bench.Remove(newPlayer);
+                    bench.Add(po);
+                    mr.Substitutions.Add(new Substitution(c, newPlayer, po, min));
+                }
+
+            }
         }
 
         private void ResetFitness()
@@ -377,7 +421,7 @@ namespace FootballPit
 
         internal double RollSkill(double singleSkill, double avgSkill)
         {
-            return Util.GetGaussianRandom(singleSkill, Player.MAX_SKILL / 3) * 0.5 + Util.GetGaussianRandom(avgSkill, Player.MAX_SKILL / 3) * 0.5;
+            return Util.GetGaussianRandom(singleSkill, Player.MAX_SKILL / 3.05) * 0.5 + Util.GetGaussianRandom(avgSkill, Player.MAX_SKILL / 3.05) * 0.5;
         }
 
         //internal double RollSkill(double singleSkill, double singleSkill2, double avgSkill)
@@ -395,6 +439,9 @@ namespace FootballPit
         public List<ScoreEvent> Scorers { get; set; }
         public int HomeGoals { get; set; }
         public int AwayGoals { get; set; }
+
+        public int Viewer { get; set; }
+
         public Club HomeClub
         {
             get
@@ -411,6 +458,8 @@ namespace FootballPit
         }
         public LineUp HomeLineUp { get; set; }
         public LineUp AwayLineUp { get; set; }
+        public List<Player> HomeBench { get; set; }
+        public List<Player> AwayBench { get; set; }
         public List<Substitution> Substitutions { get; set; }
 
 
@@ -441,11 +490,13 @@ namespace FootballPit
         public Club Club { get; set; }
         public Player In { get; set; }
         public Player Out { get; set; }
-        public Substitution(Club c, Player inP, Player outP)
+        public int Minute { get; set; }
+        public Substitution(Club c, Player inP, Player outP, int minute)
         {
             Club = c;
             In = inP;
             Out = outP;
+            Minute = minute;
         }
     }
 

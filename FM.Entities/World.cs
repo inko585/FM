@@ -64,7 +64,7 @@ namespace FM.Entities.Base
     {
         public string Name { get; set; }
         public int Depth { get; set; }
-        public int Power { get; set; }
+        public double Power { get; set; }
         public List<Occurrence> Nations { get; set; }
     }
 
@@ -73,6 +73,8 @@ namespace FM.Entities.Base
         public string Name { get; set; }
         public string Short { get; set; }
         public int LeagueLevel { get; set; }
+
+        public bool CombineSuffixAndPrefix { get; set; }
 
         public List<Occurrence> Cities { get; set; }
 

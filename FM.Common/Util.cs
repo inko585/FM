@@ -38,7 +38,7 @@ namespace FM.Common
         }
 
     }
-    public class Util 
+    public class Util
     {
 
         public static Random rnd = new Random();
@@ -49,6 +49,33 @@ namespace FM.Common
             double u2 = rnd.NextDouble();
             double rndStdNorm = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2);
             return mean + stdDev * rndStdNorm;
+        }
+
+        public static int GetRandomInt(int from, int to)
+        {
+            return rnd.Next(from, to + 1);
+        }
+
+        public static int GetNiceValue(int raw)
+        {
+            if (raw <= 10000)
+            {
+                return CleanValue(raw, 1000, 1000);
+            } else if (raw <= 100000)
+            {
+                return CleanValue(raw, 25000, 10000);
+            } else/* if (raw <= 1000000)*/
+            {
+                return CleanValue(raw, 250000, 100000);
+                //} else
+                //{
+                //    return CleanValue(raw, 1000000, 1000000);
+            }
+        }
+
+        public static int CleanValue(int raw, int potency, int minValue)
+        {
+            return Math.Max(minValue, (int)Math.Round(raw / (double)potency) * potency);
         }
 
         public static Boolean TryGetXMLOpenPath(out string path)

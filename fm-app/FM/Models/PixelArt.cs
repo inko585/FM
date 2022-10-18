@@ -1,4 +1,5 @@
-﻿using FM.Models.Generic;
+﻿using FM.Common;
+using FM.Models.Generic;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -11,11 +12,11 @@ namespace FM.Models
     {
         public static BitmapImage GetCrestImage(ClubColors cc, string template)
         {
-            return BitmapToImageSource(DoubleSize(MakeIntransparent(GetCrest(cc, template))));
+            return BitmapToImageSource(DoubleSize(MakeIntransparent(GetCrest(cc, template))).Bitmap);
         }
-        public static Bitmap GetCrest(ClubColors cc, string template)
+        public static LockBitmap GetCrest(ClubColors cc, string template)
         {
-            var crest = new Bitmap(GetBitmapFromText(BitmapType.Crests, template));
+            var crest = new LockBitmap(GetBitmapFromText(BitmapType.Crests, template));
 
             crest = RecolorBitmap(crest, Color.Red, cc.MainColor);
             crest = RecolorBitmap(crest, Color.Yellow, cc.SecondColor);
@@ -25,12 +26,12 @@ namespace FM.Models
 
         public static BitmapImage GetDressImage(ClubColors cc, string template)
         {
-            return BitmapToImageSource(DoubleSize(MakeIntransparent(GetDress(cc, template))));
+            return BitmapToImageSource(DoubleSize(MakeIntransparent(GetDress(cc, template))).Bitmap);
         }
 
-        public static Bitmap GetDress(ClubColors cc, string template)
+        public static LockBitmap GetDress(ClubColors cc, string template)
         {
-            var dress = new Bitmap(GetBitmapFromText(BitmapType.Dresses, template));
+            var dress = new LockBitmap(GetBitmapFromText(BitmapType.Dresses, template));
 
             dress = RecolorBitmap(dress, Color.Red, cc.MainColor);
             dress = RecolorBitmap(dress, Color.Yellow, cc.SecondColor);
@@ -40,22 +41,140 @@ namespace FM.Models
 
         public static BitmapImage GetFaceImage(Face f)
         {
-            return BitmapToImageSource(DoubleSize(MakeIntransparent(GetFace(f))));
+            return BitmapToImageSource(DoubleSize(MakeIntransparent(GetFace(f))).Bitmap);
         }
 
-        public static Bitmap GetFace(Face f)
-        {
-            var head = new Bitmap(GetBitmapFromText(BitmapType.Heads, f.Head));
-            var hair = new Bitmap(GetBitmapFromText(BitmapType.Heads, f.Head));
+        private static Dictionary<Tuple<BitmapType, string>, Color[,]> PixelMapCache = new Dictionary<Tuple<BitmapType, string>, Color[,]>();
 
-            var mouth = new Bitmap(GetBitmapFromText(BitmapType.Mouths, f.Mouth));
-            
-            var eye = new Bitmap(GetBitmapFromText(BitmapType.Eyes, f.Eye));
+        private static Color[,] GetPixelMap(BitmapType bmt, string pattern)
+        {
+            var key = Tuple.Create(bmt, pattern);
+            if (!PixelMapCache.TryGetValue(key, out Color[,] map))
+            {
+                var bitmap = new Bitmap(GetBitmapFromText(bmt, pattern));
+                map = new Color[bitmap.Height, bitmap.Width];
+                for (int y = 0; y < bitmap.Height; y++)
+                {
+                    for (int x = 0; x < bitmap.Width; x++)
+                    {
+                        map[y, x] = bitmap.GetPixel(x, y);
+                    }
+                }
+            }
+            return map;
+        }
+
+        private static Color[,] RecolorPixelMap(Color[,] map, Color? firstColor, Color? secondColor)
+        {
+            var mapNew = new Color[map.GetLength(0), map.GetLength(1)];
+            for (int y = 0; y < map.GetLength(0); y++)
+            {
+                for (int x = 0; x < map.GetLength(1); x++)
+                {
+                    if (firstColor.HasValue && map[y, x] == Color.Red)
+                    {
+                        mapNew[y, x] = firstColor.Value;
+                    }
+                    else if (secondColor.HasValue && map[y, x] == Color.Yellow)
+                    {
+                        mapNew[y, x] = secondColor.Value;
+                    }
+                }
+            }
+            return mapNew;
+        }
+
+        private static Color[,] CombinePixelMaps(Color[,] over, Color[,] under, int xOffset = 0, int yOffset = 0)
+        {
+            var mapNew = new Color[under.GetLength(0), under.GetLength(1)];
+            under.CopyTo(mapNew, 0);
+
+            for (int y = 0; y < over.GetLength(0); y++)
+            {
+                for (int x = 0; x < over.GetLength(1); x++)
+                {
+                    var overColor = over[y, x];
+                    if (!IsTransparent(overColor))
+                    {
+                        mapNew[y + yOffset, x + xOffset] = overColor;
+                    }
+                }
+            }
+
+            return mapNew;
+        }
+
+        private static Color[,] CutPixelmap(Color[,] oldMap, int xSize, int ySize)
+        {
+            var newMap = new Color[ySize, xSize];
+
+            for (int x = 0; x < xSize; x++)
+            {
+                for (int y = 0; y < ySize; y++)
+                {
+                    newMap[y, x] = oldMap[y, x];
+                }
+            }
+
+            return newMap;
+        }
+
+        private static Color[,] DoubleSize(Color[,] map)
+        {
+            var newMap = new Color[map.GetLength(0) * 2, map.GetLength(1) * 2];
+
+            for (int y = 0; y < map.GetLength(0); y++)
+            {
+                for (int x = 0; x < map.GetLength(1); x++)
+                {
+                    var pixel = map[y, x];
+                    newMap[y * 2, x * 2] = pixel;
+                    newMap[y * 2 + 1, x * 2] = pixel;
+                    newMap[y * 2, x * 2 + 1] = pixel;
+                    newMap[y * 2 + 1, x * 2 + 1] = pixel;
+                }
+            }
+
+            return newMap;
+        }
+
+        private static Color[,] MakeIntransparent(Color[,] map)
+        {
+            var newMap = new Color[map.GetLength(0), map.GetLength(1)];
+            for (int y = 0; y < map.GetLength(0); y++)
+            {
+                for (int x = 0; x < map.GetLength(1); x++)
+                {
+                    var color = map[y, x];
+                    if (IsTransparent(color))
+                    {
+                        newMap[y, x] = Color.White;
+                        //mapNew[y, x] = Color.White);
+                    }
+                    else
+                    {
+                        newMap[y, x] = color;
+                    }
+                }
+            }
+
+
+            return newMap;
+        }
+
+        public static LockBitmap GetFace(Face f)
+        {
+            var head = new LockBitmap(GetBitmapFromText(BitmapType.Heads, f.Head));
+            var hair = new LockBitmap(GetBitmapFromText(BitmapType.Heads, f.Head));
+
+            var mouth = new LockBitmap(GetBitmapFromText(BitmapType.Mouths, f.Mouth));
+
+            var eye = new LockBitmap(GetBitmapFromText(BitmapType.Eyes, f.Eye));
 
             head = RecolorBitmap(head, Color.Red, f.SkinColor);
             head = RecolorBitmap(head, Color.Yellow, f.HairColor);
             mouth = RecolorBitmap(mouth, Color.Yellow, f.HairColor);
-            
+
             eye = RecolorBitmap(eye, Color.Yellow, f.HairColor);
             eye = RecolorBitmap(eye, Color.Red, f.EyeColor);
 
@@ -67,10 +186,10 @@ namespace FM.Models
 
         public static BitmapImage GetPlayerImage(Face face, ClubColors cc, string dress)
         {
-            return BitmapToImageSource(DoubleSize(MakeIntransparent(GetPlayer(face, cc, dress))));
+            return BitmapToImageSource(DoubleSize(MakeIntransparent(GetPlayer(face, cc, dress))).Bitmap);
         }
 
-        public static Bitmap GetPlayer(Face f, ClubColors cc, string d)
+        public static LockBitmap GetPlayer(Face f, ClubColors cc, string d)
         {
             var face = GetFace(f);
             var dress = GetDress(cc, d);
@@ -84,10 +203,10 @@ namespace FM.Models
 
         public static BitmapImage GetProfileImage(Face face, ClubColors cc, string dress, int capacity)
         {
-            return BitmapToImageSource(DoubleSize(DoubleSize(MakeIntransparent(GetProfile(face, cc, dress, capacity)))));
+            return BitmapToImageSource(DoubleSize(DoubleSize(MakeIntransparent(GetProfile(face, cc, dress, capacity)))).Bitmap);
         }
 
-        public static Bitmap GetProfile(Face f, ClubColors cc, string d, int capacity)
+        public static LockBitmap GetProfile(Face f, ClubColors cc, string d, int capacity)
         {
             var player = GetPlayer(f, cc, d);
 
@@ -98,19 +217,19 @@ namespace FM.Models
             return player;
         }
 
-        public static Bitmap GetStadium(int capacity)
+        public static LockBitmap GetStadium(int capacity)
         {
-            if(capacity >= 12000)
+            if (capacity >= 12000)
             {
-                return GetBitmapFromText(BitmapType.Stadium, "Big");
+                return new LockBitmap(GetBitmapFromText(BitmapType.Stadium, "Big"));
             }
-            else if(capacity >= 4500)
+            else if (capacity >= 4500)
             {
-                return GetBitmapFromText(BitmapType.Stadium, "Medium");
+                return new LockBitmap(GetBitmapFromText(BitmapType.Stadium, "Medium"));
             }
             else
             {
-                return GetBitmapFromText(BitmapType.Stadium, "Small");
+                return new LockBitmap(GetBitmapFromText(BitmapType.Stadium, "Small"));
             }
         }
 
@@ -118,7 +237,7 @@ namespace FM.Models
         {
             var path = "../../Images/" + type.ToString() + "/" + text + ".png";
 
-            if(File.Exists(path))
+            if (File.Exists(path))
             {
                 return new Bitmap(path);
             }
@@ -128,20 +247,21 @@ namespace FM.Models
             }
         }
 
-        private static Bitmap RecolorBitmap(Bitmap bitmap, Color oldColor, Color newColor)
+        private static LockBitmap RecolorBitmap(LockBitmap bitmap, Color oldColor, Color newColor)
         {
+            bitmap.LockBits();
             for (int x = 0; x < bitmap.Width; x++)
             {
                 for (int y = 0; y < bitmap.Height; y++)
                 {
                     if (CompareColor(bitmap.GetPixel(x, y), oldColor))
                     {
-                        
+
                         bitmap.SetPixel(x, y, newColor);
                     }
                 }
             }
-
+            bitmap.UnlockBits();
             return bitmap;
         }
 
@@ -165,8 +285,10 @@ namespace FM.Models
                 return bitmapimage;
             }
         }
-        private static Bitmap CombineBitmaps(Bitmap under, Bitmap over, int xOffset = 0, int yOffset = 0)
+        private static LockBitmap CombineBitmaps(LockBitmap under, LockBitmap over, int xOffset = 0, int yOffset = 0)
         {
+            under.LockBits();
+            over.LockBits();
             for (int x = 0; x < over.Width; x++)
             {
                 for (int y = 0; y < over.Height; y++)
@@ -178,13 +300,18 @@ namespace FM.Models
                     }
                 }
             }
+            under.UnlockBits();
+            over.UnlockBits();
 
             return under;
         }
 
-        private static Bitmap CutBitmap(Bitmap oldBitmap, int xSize, int ySize)
+        private static LockBitmap CutBitmap(LockBitmap oldBitmap, int xSize, int ySize)
         {
-            var newBitmap = new Bitmap(xSize, ySize);
+            var newBitmap = new LockBitmap(new Bitmap(xSize, ySize));
+
+            newBitmap.LockBits();
+            oldBitmap.LockBits();
 
             for (int x = 0; x < xSize; x++)
             {
@@ -195,12 +322,18 @@ namespace FM.Models
                 }
             }
 
+            newBitmap.UnlockBits();
+            oldBitmap.UnlockBits();
+
             return newBitmap;
         }
 
-        private static Bitmap DoubleSize(Bitmap bitmap)
+        private static LockBitmap DoubleSize(LockBitmap bitmap)
         {
-            var newBitmap = new Bitmap(bitmap.Width*2, bitmap.Height*2);
+            var newBitmap = new LockBitmap(new Bitmap(bitmap.Width * 2, bitmap.Height * 2));
+
+            newBitmap.LockBits();
+            bitmap.LockBits();
 
             for (int x = 0; x < bitmap.Width; x++)
             {
@@ -214,12 +347,14 @@ namespace FM.Models
                     newBitmap.SetPixel(x * 2 + 1, y * 2 + 1, pixel);
                 }
             }
-
+            newBitmap.UnlockBits();
+            bitmap.UnlockBits();
             return newBitmap;
         }
 
-        private static Bitmap MakeIntransparent(Bitmap bitmap)
+        private static LockBitmap MakeIntransparent(LockBitmap bitmap)
         {
+            bitmap.LockBits();
             for (int x = 0; x < bitmap.Width; x++)
             {
                 for (int y = 0; y < bitmap.Height; y++)
@@ -231,18 +366,18 @@ namespace FM.Models
                     }
                 }
             }
-
+            bitmap.UnlockBits();
             return bitmap;
         }
         private static bool IsTransparent(Color c)
         {
             return c.A == 0;
         }
-       
+
 
         private enum BitmapType
         {
-            Crests,Eyes,Heads,Mouths,Dresses, Stadium
+            Crests, Eyes, Heads, Mouths, Dresses, Stadium
         }
     }
 }

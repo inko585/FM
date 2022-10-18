@@ -29,6 +29,7 @@ namespace FM.ViewModels
             LeagueAssociations = new ObservableCollection<LeagueAssociation>(Game.Instance.FootballUniverse.LeagueAssociations);
             Season.CurrentSeason.OnSeasonProgress += HandleProgress;
             Season.OnSeasonChange += HandleSeasonSwitch;
+            SelectedSeason = Season.CurrentSeason;
             SelectedLeagueAssociation = Game.Instance.PlayerLeagueAssociation;
             SelectedLeague = Game.Instance.PlayerLeague;
             //NotifyPropertyChanged("LeagueAssociations");
@@ -43,6 +44,8 @@ namespace FM.ViewModels
         public void HandleSeasonSwitch(object o, EventArgs e)
         {
             NotifyPropertyChanged("SelectedLeague");
+            NotifyPropertyChanged("Seasons");
+            SelectedSeason = Season.CurrentSeason;
             Season.CurrentSeason.OnSeasonProgress += HandleProgress;
         }
 
@@ -62,11 +65,19 @@ namespace FM.ViewModels
 
         public ObservableCollection<LeagueAssociation> LeagueAssociations { get; set; }
 
+        public ObservableCollection<Season> Seasons
+        {
+            get
+            {
+                return new ObservableCollection<Season>(Season.AllSeasons);
+            }
+        }
+
         public ObservableCollection<Transfer> TransferHistory
         {
             get
             {
-                return new ObservableCollection<Transfer>(Game.Instance.FootballUniverse.TransferList.Where(t => Filter == "" || (t.From.Name + " " + t.Player.FullName + " " + t.To.Name).Contains(Filter)));
+                return new ObservableCollection<Transfer>(Game.Instance.FootballUniverse.TransferList.Where(t => t.Year == SelectedSeason.Year && (t.From.Leagues.Contains(SelectedLeague) || t.To.Leagues.Contains(SelectedLeague)) && (Filter == "" || (t.From.Name + " " + t.Player.FullName + " " + t.To.Name).Contains(Filter))));
             }
         }
 
@@ -81,9 +92,24 @@ namespace FM.ViewModels
             set
             {
                 selectedLeagueAssociation = value;
+                SelectedLeague = selectedLeagueAssociation.Leagues.First();
                 NotifyPropertyChanged("SelectedLeagueAssociation");
             }
         }
+
+        private Season selectedSeason;
+
+        public Season SelectedSeason
+        {
+            get { return selectedSeason; }
+            set
+            {
+                selectedSeason = value;
+                NotifyPropertyChanged("SelectedSeason");
+                NotifyPropertyChanged("TranferHistory");
+            }
+        }
+
 
         private League league;
 
@@ -94,6 +120,7 @@ namespace FM.ViewModels
             {
                 league = value;
                 NotifyPropertyChanged("SelectedLeague");
+                NotifyPropertyChanged("TransferHistory");
             }
         }
 

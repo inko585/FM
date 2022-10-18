@@ -28,5 +28,32 @@ namespace FM.Views
             InitializeComponent();
         }
 
+        private void Player_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var t = (sender as Label).DataContext as Transfer;
+
+            var pView = new PlayerWindow(t.Player);
+            pView.ShowDialog();
+        }
+
+        private void From_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var t = (sender as Label).DataContext as Transfer;
+            if (t != null)
+            {
+                var cView = new ClubWindow(t.From);
+                cView.ShowDialog();
+            }
+        }
+
+        private void To_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var t = (sender as Label).DataContext as Transfer;
+            if (t != null)
+            {
+                var cView = new ClubWindow(t.To);
+                cView.ShowDialog();
+            }
+        }
     }
 }

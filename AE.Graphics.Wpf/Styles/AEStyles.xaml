@@ -13,10 +13,10 @@
     <SolidColorBrush x:Key="SecondaryButtonClickColor" Color="Orange"/>
     <SolidColorBrush x:Key="MainButtonHoverColor" Color="Orange"/>
     <SolidColorBrush x:Key="MainButtonClickColor" Color="Orange"/>
-    <SolidColorBrush x:Key="NavAreaColor" Color="#2f4050"/>
+    <SolidColorBrush x:Key="NavAreaColor" Color="#14782f"/>
     <SolidColorBrush x:Key="NavAreaSelectColor" Color="White"/>
     <SolidColorBrush x:Key="NavAreaHighlightColor" Color="White"/>
-    <SolidColorBrush x:Key="NavAreaFontColor" Color="#8095a8"/>
+    <SolidColorBrush x:Key="NavAreaFontColor" Color="#adc7b4"/>
     <SolidColorBrush x:Key="NavAreaBorderColor" Color="Black"/>
     <SolidColorBrush x:Key="ListColor" Color="White"/>
     <SolidColorBrush x:Key="ListSelectColor" Color="#FF3E94D3"/>
@@ -179,7 +179,7 @@
                                 <!-- Nexans Logo -->
                                 <!--<Image Source="pack://application:,,,/AE.Graphics.Wpf;component/nexans_cut.svg" Height="20" Width="20" Margin="8,0,4,2" VerticalAlignment="Center" />-->
 
-                                <Viewbox x:Name="IconViewBox" Width="24" Height="18"  Margin="8,0,2,4" VerticalAlignment="Center">
+                                <!--<Viewbox x:Name="IconViewBox" Width="24" Height="18"  Margin="8,0,2,4" VerticalAlignment="Center">
 
                                     <ContentControl>
                                         <ContentPresenter x:Name="AppIcon" Content="{DynamicResource Nexans}">
@@ -187,7 +187,7 @@
                                         </ContentPresenter>
 
                                     </ContentControl>
-                                </Viewbox>
+                                </Viewbox>-->
 
                                 <!-- Title -->
                                 <TextBlock Margin="4,0,0,4" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="White" TextWrapping="NoWrap" Text="{TemplateBinding Title}" FontSize="12" />
