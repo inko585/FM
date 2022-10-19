@@ -125,6 +125,8 @@ namespace FM.Generator
                 c.ClubColors = GenerateRandomClubColors(al);
             }
 
+            c.SecondClubColors = GenerateRandomClubColors(al, c.ClubColors.MainColorString);
+
             c.Crest = GenerateRandomCrest(al);
             c.Dress = GenerateRandomDress(al);
             TakenNames.Add(name);
@@ -163,13 +165,16 @@ namespace FM.Generator
             return GetRandomOccurrence(al.Dresses, STANDARD_DEV).Text;
         }
 
-        public static ClubColors GenerateRandomClubColors(AssociationLook al)
+        public static ClubColors GenerateRandomClubColors(AssociationLook al, string excludedColor = null)
         {
-            var colors = GetRandomOccurrence(al.ColorPairs.Select(cp => (Occurrence)cp).ToList(), STANDARD_DEV) as ColorPairOccurrence;
+            var validColorPairs = excludedColor == null ? al.ColorPairs : al.ColorPairs.Where(cp => cp.Text != excludedColor && cp.Text2 != excludedColor);
+            var colors = GetRandomOccurrence(validColorPairs.Select(cp => (Occurrence)cp).ToList(), STANDARD_DEV) as ColorPairOccurrence;
             return new ClubColors()
             {
                 MainColor = GetColorFromText(colors.Text),
-                SecondColor = GetColorFromText(colors.Text2)
+                SecondColor = GetColorFromText(colors.Text2),
+                MainColorString = colors.Text,
+                SecondColorString = colors.Text2
             };
         }
 

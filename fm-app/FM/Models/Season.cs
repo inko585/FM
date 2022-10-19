@@ -362,7 +362,7 @@ namespace FM.Models.Season
                 {
                     foreach (var m in md.Matches)
                     {
-                        m.Simulate(true);
+                        m.Simulate(true, md);
                         AdjustElo(m.MatchResult);
                         if (m.MatchResult.HomeGoals > m.MatchResult.AwayGoals)
                         {

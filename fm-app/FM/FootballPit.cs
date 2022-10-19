@@ -1,11 +1,14 @@
 ﻿using FM;
 using FM.Common;
 using FM.Models.Generic;
+using FM.Models.Season;
 using FM.UI;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading;
+using System.Windows.Media.Imaging;
 
 namespace FootballPit
 {
@@ -77,12 +80,13 @@ namespace FootballPit
         public static double FREEKICK_FACTOR_INIT = 1.25;
         public static double FREEKICK_FACTOR_AREA_MULTIPLIER = 0.9;
 
-        public MatchResult Simulate(bool silent)
+        public MatchResult Simulate(bool silent, MatchDay md = null)
         {
             var tension = silent ? 0 : TENSION;
             var tension_goalshot = silent ? 0 : TENSION_GOAL_SHOT;
             var res = new MatchResult();
             res.Viewer = Math.Min(HomeClub.ViewerAttraction, HomeClub.StadiumCapacity);
+            res.MatchDayString = md == null ? "-" : "# " + md.Number;
             res.HomeLineUp = HomeClub.StartingLineUp;
             res.AwayLineUp = AwayClub.StartingLineUp;
             res.HomeBench = HomeClub.Bench;
@@ -207,7 +211,7 @@ namespace FootballPit
                 p.PlayerStatistics.Last().Matches++;
             }
 
-            foreach(var sub in res.Substitutions)
+            foreach (var sub in res.Substitutions)
             {
                 if (!xpPlayers.Contains(sub.In))
                 {
@@ -445,7 +449,8 @@ namespace FootballPit
         public int AwayGoals { get; set; }
 
         public int Viewer { get; set; }
-        
+        public string MatchDayString { get; set; }
+
         public Club HomeClub
         {
             get
@@ -458,6 +463,21 @@ namespace FootballPit
             get
             {
                 return AwayLineUp.Club;
+            }
+        }
+        public BitmapImage HomeDress
+        {
+            get
+            {
+                return HomeClub.DressImage;
+            }
+        }
+
+        public BitmapImage AwayDress
+        {
+            get
+            {
+                return HomeClub.ClubColors.MainColorString == AwayClub.ClubColors.MainColorString || HomeClub.ClubColors.SecondColorString == AwayClub.ClubColors.MainColorString ? AwayClub.AwayDressImage : AwayClub.DressImage;
             }
         }
         public LineUp HomeLineUp { get; set; }

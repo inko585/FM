@@ -15,7 +15,7 @@ namespace FM
 {
     public class Test
     {
-        World w = World.ReadWorld(@"C:\Users\marshall\Documents\gendata12_2.xml");
+        World w = World.ReadWorld(@"C:\Users\marshall\Documents\gendata12.xml");
         public void Run()
         {
             //var c = new Club();

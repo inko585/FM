@@ -278,6 +278,41 @@ namespace FM.Models.Generic
             return -1;
         }
 
+        public string LeagueDepthString
+        {
+            get
+            {
+                return Leagues.First().Association.Name + " " + Leagues.First().Depth;
+            }
+        }
+
+        public string BudgetSizeString
+        {
+            get
+            {
+                if (BudgetCurrentSeason < 250000)
+                {
+                    return "Sehr niedrig";
+                }
+                else if (BudgetCurrentSeason < 1000000)
+                {
+                    return "Niedrig";
+                }
+                else if (BudgetCurrentSeason < 2000000)
+                {
+                    return "Mittel";
+                }
+                else if (BudgetCurrentSeason < 4000000)
+                {
+                    return "Hoch";
+                }
+                else
+                {
+                    return "Sehr Hoch";
+                }
+            }
+        }
+
         public int AssetCost(ClubAsset ca)
         {
             var lvl = ClubAssetLevel[ca];
@@ -390,6 +425,7 @@ namespace FM.Models.Generic
 
         public Coach Coach { get; set; }
         public ClubColors ClubColors { get; set; }
+        public ClubColors SecondClubColors { get; set; }
         public string Crest { get; set; }
         public string Dress { get; set; }
         public bool IsClimber { get; set; }
@@ -479,6 +515,14 @@ namespace FM.Models.Generic
             }
         }
 
+        public string StadiumCapacityString
+        {
+            get
+            {
+                return StadiumCapacity + " Plätze";
+            }
+        }
+
         public int TrainingXP
         {
             get
@@ -540,6 +584,14 @@ namespace FM.Models.Generic
             }
         }
 
+        public BitmapImage AwayDressImage
+        {
+            get
+            {
+                return PixelArt.GetDressImage(this.SecondClubColors, this.Dress);
+            }
+        }
+
         public int BudgetCurrentSeason
         {
             get
@@ -574,6 +626,30 @@ namespace FM.Models.Generic
             }
         }
 
+
+        public string OfficeLevelString
+        {
+            get
+            {
+                return "Stufe " + ClubAssetLevel[ClubAsset.Office];
+            }
+        }
+
+        public string YouthWorkLevelString
+        {
+            get
+            {
+                return "Stufe " + ClubAssetLevel[ClubAsset.YouthWork];
+            }
+        }
+
+        public string TrainingGroundsLevelString
+        {
+            get
+            {
+                return "Stufe " + ClubAssetLevel[ClubAsset.TrainingGrounds];
+            }
+        }
         //public double GetInterestFor(Player p)
         //{
 
@@ -849,6 +925,9 @@ namespace FM.Models.Generic
     {
         public System.Drawing.Color MainColor { get; set; }
         public System.Drawing.Color SecondColor { get; set; }
+
+        public string MainColorString { get; set; }
+        public string SecondColorString { get; set; }
     }
 
 
