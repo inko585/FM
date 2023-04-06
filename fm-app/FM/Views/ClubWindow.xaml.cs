@@ -1,5 +1,5 @@
 ﻿using AE.Graphics.Wpf;
-using FM.Models.Generic;
+using FM.Common.Generic;
 using FM.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -29,9 +29,13 @@ namespace FM.Views
             InitializeComponent();
         }
 
-        private void ListBox_Selected(object sender, RoutedEventArgs e)
+
+        private void TransferNameLabel_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            playerListBox.UnselectAll();
+            var t = (sender as Label).DataContext as Transfer;
+
+            var pView = new PlayerWindow(t.Player);
+            pView.ShowDialog();
         }
 
         private void NameLabel_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -41,5 +45,22 @@ namespace FM.Views
             var pView = new PlayerWindow(p);
             pView.ShowDialog();
         }
+
+        private void From_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var t = (sender as Label).DataContext as Transfer;
+
+            var cView = new ClubWindow(t.From);
+            cView.ShowDialog();
+        }
+        private void To_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var t = (sender as Label).DataContext as Transfer;
+
+            var cView = new ClubWindow(t.To);
+            cView.ShowDialog();
+        }
+
+
     }
 }

@@ -131,10 +131,10 @@
                                         <Label Name="toLabel" PreviewMouseDown="To_PreviewMouseDown" Content="{Binding To.Name}" HorizontalAlignment="Left" VerticalAlignment="Center" />
                                     </Border>
                                     <Border BorderThickness="0,0,0.5,0.5"   BorderBrush="Gray"  Grid.Column="9">
-                                        <Label Name="priceStandardLabel" Content="{Binding MarketValue}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        <Label Name="priceStandardLabel" Content="{Binding MarketValueString}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                     </Border>
                                     <Border BorderThickness="0,0,0,0.5"   BorderBrush="Gray"  Grid.Column="10">
-                                        <Label Name="priceLabel" Content="{Binding Price}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        <Label Name="priceLabel" Content="{Binding PriceString}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                     </Border>
                                 </Grid>
                             </DataTemplate>

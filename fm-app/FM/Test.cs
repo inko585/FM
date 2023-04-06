@@ -8,16 +8,19 @@ using System.Text;
 using System.Threading.Tasks;
 using FM.Generator;
 using FM.Common;
-using FM.Models.Generic;
-using FM.Models.Season;
+using FM.Common.Generic;
+using FM.Common.Season;
+using AE.Logging;
 
 namespace FM
 {
     public class Test
     {
-        World w = World.ReadWorld(@"C:\Users\marshall\Documents\gendata12.xml");
+        World w = World.ReadWorld(@"C:\Users\marshall\Documents\gendata12_8.xml");
         public void Run()
         {
+            var logger = Logger.GetLogger("Results");
+            logger.AddAppender(new RollingFileAppender("RFA", Logger.LOG_ALL, "results.log"));
             //var c = new Club();
             //c.Name = "Verein 1";
             //var c2 = new Club();
@@ -43,24 +46,24 @@ namespace FM
             10.Times(() => { Season.CurrentSeason.Simulate(); });
 
 
-            foreach (var l in Game.Instance.PlayerLeagueAssociation.Leagues)
-            {
-                Console.WriteLine("Average Value League " + l.Depth);
-                foreach(var av in l.AverageValues)
-                {
-                    Console.WriteLine(av);
-                }
-                Console.WriteLine("Average Attraction League " + l.Depth);
-                foreach (var av in l.AverageAttractions)
-                {
-                    Console.WriteLine(av);
-                }
-                Console.WriteLine("Average New Players League " + l.Depth);
-                foreach (var av in l.AverageNewPlayers)
-                {
-                    Console.WriteLine(av);
-                }
-            }
+            //foreach (var l in Game.Instance.PlayerLeagueAssociation.Leagues)
+            //{
+            //    Console.WriteLine("Average Value League " + l.Depth);
+            //    foreach (var av in l.AverageValues)
+            //    {
+            //        Console.WriteLine(av);
+            //    }
+            //    Console.WriteLine("Average Attraction League " + l.Depth);
+            //    foreach (var av in l.AverageAttractions)
+            //    {
+            //        Console.WriteLine(av);
+            //    }
+            //    Console.WriteLine("Average New Players League " + l.Depth);
+            //    foreach (var av in l.AverageNewPlayers)
+            //    {
+            //        Console.WriteLine(av);
+            //    }
+            //}
 
 
             var totalCount = new Dictionary<string, int>();
@@ -217,47 +220,49 @@ namespace FM
 
         public static void PrintLeagueResults()
         {
+            var logger = Logger.GetLogger("Results");
             var leagues = Game.Instance.FootballUniverse.LeagueAssociations.First().Leagues;
+
+            logger.Info("Basis " + Season.CurrentSeason.Year.ToString());
+            logger.Info("------------------------------------------------------------------------------");
 
             foreach (var l in leagues)
             {
-                Console.WriteLine("League " + l.Depth);
-                Console.WriteLine("Support: " + l.ClubSupport);
-                Console.WriteLine("{0,-30} {1,-15} {2,-10} {3,-15} {4,-15} {5,-15} {6,-15} {7,-15} {8, -15}", "Club", "Attraction", "Rank", "Income", "Sponsor Money", "Expense", "Budget", "Average Val", "New Players");
-                //Console.WriteLine("Club                 Attraction/SponsorMoney/StadiumIncome/Expenses:Budget");
-                Console.WriteLine("------------------------------------------------------------------------------");
+                logger.Info("League " + l.Depth);
+                logger.Info("Support: " + l.ClubSupport);
+                
+                logger.Info("{0,-30} {1,-15} {2,-10} {3,-15} {4,-15} {5,-15} {6,-15} {7,-15} {8, -15}", "Club", "Attraction", "Rank", "Income", "Sponsor Money", "Expense", "Budget", "Average Val", "New Players");
+                logger.Info("------------------------------------------------------------------------------");
                 foreach (var c in l.Clubs.OrderByDescending(c => c.Attraction))
                 {
-                    Console.WriteLine("{0,-30} {1,-15} {2,-10} {3,-15} {4,-15} {5,-15} {6,-15} {7,-15} {8, -15}", c.Name, c.Attraction, c.GetRank(l), (c.SponsorMoneyCurrentSeason + c.StadiumIncomeEstimation + c.Leagues.First().ClubSupport), c.SponsorMoneyCurrentSeason, c.SalaryExpenseEstimationCurrentSeason, c.BudgetCurrentSeason, c.StartingLineUp.Players.Average(pl => pl.ValueWithPotential), c.StartingLineUp.Players.Count(pl => !c.LastYearLineUp.Contains(pl)));
+                    logger.Info("{0,-30} {1,-15} {2,-10} {3,-15} {4,-15} {5,-15} {6,-15} {7,-15} {8, -15}", c.Name, c.Attraction, c.GetRank(l), (c.SponsorMoneyCurrentSeason + c.StadiumIncomeEstimation + c.Leagues.First().ClubSupport), c.SponsorMoneyCurrentSeason, c.SalaryExpenseEstimationCurrentSeason, c.BudgetCurrentSeason, c.StartingLineUp.Players.Average(pl => pl.ValueWithPotential), c.StartingLineUp.Players.Count(pl => !c.LastYearLineUp.Contains(pl)));
                 }
-                Console.WriteLine("------------------------------------------------------------------------------");
+                logger.Info("------------------------------------------------------------------------------");
             }
         }
 
         public static void PrintLeaguesTransfers()
         {
             var leagues = Game.Instance.FootballUniverse.LeagueAssociations.First().Leagues;
+            var logger = Logger.GetLogger("Results");
+
+
+            logger.Info("Transfer Activity " + Season.CurrentSeason.Year.ToString());
+            logger.Info("------------------------------------------------------------------------------");
 
             foreach (var l in leagues)
             {
-                Console.WriteLine("League " + l.Depth);
-                //Console.WriteLine("Support: " + l.ClubSupport);
-                Console.WriteLine("{0,-30} {1,-15} {2,-15} {3,-10} {4,-10} {5,-10} {6,-10} {7,-15} {8, -15}", "Club", "T Incomes", "T Expenses", "T", "C", "Y", "B", "Salary Av", "Rooster Size");
-                //Console.WriteLine("Club                 Attraction/SponsorMoney/StadiumIncome/Expenses:Budget");
-                Console.WriteLine("------------------------------------------------------------------------------");
+                logger.Info("League " + l.Depth);
+                logger.Info("{0,-30} {1,-15} {2,-15} {3,-10} {4,-10} {5,-10} {6,-10} {7,-15} {8, -15}", "Club", "T Incomes", "T Expenses", "T", "C", "Y", "B", "Salary Av", "Rooster Size");             
+                logger.Info("------------------------------------------------------------------------------");
                 foreach (var c in l.Clubs.OrderByDescending(c => c.Attraction))
                 {
-                    Console.WriteLine("{0,-30} {1,-15} {2,-15} {3,-10} {4,-10} {5,-10} {6,-10} {7,-15} {8, -15}", c.Name, c.TransferIncomeCurrentSeason, c.TransferExpensesCurrentSeason, c.NewPlayersWithFee_LU.Count, c.NewPlayersWithoutFee_LU.Count, c.NewPlayersFromYouth_LU.Count, c.NewPlayersFromBench_LU.Count, Math.Round(c.StartingLineUp.Players.Average(pl => pl.ContractCurrent.Salary),0), c.Rooster.Count);
+                    logger.Info("{0,-30} {1,-15} {2,-15} {3,-10} {4,-10} {5,-10} {6,-10} {7,-15} {8, -15}", c.Name, c.TransferIncomeCurrentSeason, c.TransferExpensesCurrentSeason, c.NewPlayersWithFee_LU.Count, c.NewPlayersWithoutFee_LU.Count, c.NewPlayersFromYouth_LU.Count, c.NewPlayersFromBench_LU.Count, Math.Round(c.StartingLineUp.Players.Average(pl => pl.ContractCurrent.Salary), 0), c.Rooster.Count);
                 }
-                Console.WriteLine("------------------------------------------------------------------------------");
+                logger.Info("------------------------------------------------------------------------------");
             }
         }
 
-        //int lvl = 6;
-        //private Player NewPlayer(Position p)
-        //{
-        //    return WorldGenerator.GenerateRandomPlayer(w, null, w.Nations[0], p, lvl, 17, 37);
-        //}
 
     }
 }

@@ -1,12 +1,17 @@
-﻿using FM.Entities.Base;
+﻿using FM.Common;
+using FM.Entities.Base;
+using FM.Common;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 using System.Xml.Serialization;
+using FM.Common.Pixels;
 
 namespace FM.Entities.Base
 {
@@ -56,7 +61,7 @@ namespace FM.Entities.Base
             return PlayerLooks.FirstOrDefault(pl => pl.Name.Equals(name));
         }
 
-       
+
 
     }
 
@@ -74,6 +79,20 @@ namespace FM.Entities.Base
         public string Short { get; set; }
         public int LeagueLevel { get; set; }
 
+        private BitmapImage flag;
+        public BitmapImage Flag
+        {
+            get
+            {
+                if (flag == null)
+                {
+                    flag = PixelArt.GetFlagImage(Short);
+                }
+
+                return flag;
+            }
+        }
+
         public bool CombineSuffixAndPrefix { get; set; }
 
         public List<Occurrence> Cities { get; set; }
@@ -84,11 +103,11 @@ namespace FM.Entities.Base
 
         public List<Occurrence> Suffixes { get; set; }
 
-        public List<Occurrence> Sponsors { get; set; }
+        public List<SponsorOccurrence> Sponsors { get; set; }
 
         public List<Occurrence> SubNations { get; set; }
 
-        public Ethnie MainEthnie { get; set; }
+        public string MainEthnie { get; set; }
         public List<SubEthnieOccurrence> SubEthnies { get; set; }
 
         public override string ToString()
@@ -185,6 +204,11 @@ namespace FM.Entities.Base
     public class ColorPairOccurrence : Occurrence
     {
         public string Text2 { get; set; }
+    }
+
+    public class SponsorOccurrence : Occurrence
+    {
+        public int Size { get; set; }
     }
 
     public class SubEthnieOccurrence : Occurrence

@@ -50,7 +50,7 @@ namespace fm_manager
             ethnieSelection.DataSource = ethnieBindingSource.DataSource;
             associationSelection.DataSource = associationBindingSource.DataSource;
             mainEthnieSelection.DataSource = ethnieBindingSource.DataSource;
-            associationLookSelection.DataSource =lookAssociationBindingSource.DataSource;
+            associationLookSelection.DataSource = lookAssociationBindingSource.DataSource;
             playerLookSelection.DataSource = lookPlayerBindingSource.DataSource;
             nationSelection.DisplayMember = "Name";
             nationSelection.ValueMember = "Name";
@@ -161,6 +161,23 @@ namespace fm_manager
 
         }
 
+        private List<SponsorOccurrence> LoadFromSponsorGridView(DataGridView gridView)
+        {
+            var ret = new List<SponsorOccurrence>();
+            foreach (DataGridViewRow r in gridView.Rows)
+            {
+                if (r.Cells[0].Value != null && !r.Cells[0].Value.Equals(""))
+                    ret.Add(new SponsorOccurrence()
+                    {
+                        Text = (string)r.Cells[0].Value,
+                        ScaleValue = (int)r.Cells[2].Value,
+                        Size = (int)r.Cells[1].Value,
+                    });
+            }
+
+            return ret;
+        }
+
         private List<SubEthnieOccurrence> LoadFromEthnieGridView(DataGridView gridView)
         {
             var ret = new List<SubEthnieOccurrence>();
@@ -233,6 +250,21 @@ namespace fm_manager
 
         }
 
+        private void SetUpSponsorOccurenceGridView(DataGridView gridView, string textName, string sizeName, string scaleName, IEnumerable<SponsorOccurrence> occurrences)
+        {
+            gridView.Rows.Clear();
+            gridView.Columns.Clear();
+            gridView.Columns.Add(textName, textName);
+            AddNumberDropDown(gridView, sizeName, 1, 1, 3);
+            AddNumberDropDown(gridView, scaleName, 1, 1, 10);
+            gridView.DefaultValuesNeeded += new DataGridViewRowEventHandler(dataGridView_DefaultValuesNeeded);
+
+            foreach (var o in occurrences)
+            {
+                gridView.Rows.Add(o.Text, o.Size, o.ScaleValue);
+            }
+        }
+
         private void SetUpColorPairOccurrenceGridView(DataGridView gridView, string textName, string text2Name, string scaleName, IEnumerable<ColorPairOccurrence> occurrences)
         {
             gridView.Rows.Clear();
@@ -279,11 +311,11 @@ namespace fm_manager
                 c.FirstPrefixes = LoadFromGridView(prefix1Grid);
                 c.SecondPrefixes = LoadFromGridView(prefix2Grid);
                 c.Suffixes = LoadFromGridView(suffixGrid);
-                c.Sponsors = LoadFromGridView(sponsorGrid);
+                c.Sponsors = LoadFromSponsorGridView(sponsorGrid);
                 c.Name = nationTextBox.Text;
                 c.SubNations = LoadFromGridView(subnationGrid);
-                c.MainEthnie = (Ethnie)mainEthnieSelection.SelectedItem;
-                c.SubEthnies = LoadFromEthnieGridView(ethnieGrid).Where(subet => !subet.Text.Equals(c.MainEthnie.Name)).ToList();
+                c.MainEthnie = ((Ethnie)mainEthnieSelection.SelectedItem).Name;
+                c.SubEthnies = LoadFromEthnieGridView(ethnieGrid).Where(subet => !subet.Text.Equals(c.MainEthnie)).ToList();
                 c.Short = nationShortTextBox.Text;
                 c.CombineSuffixAndPrefix = suffixPrefixCombo.Checked;
 
@@ -310,7 +342,7 @@ namespace fm_manager
             SetUpOccurrenceGridView(prefix1Grid, "Vereins Präfix I", "Häufigkeit", new List<Occurrence>());
             SetUpOccurrenceGridView(prefix2Grid, "Vereins Präfix II", "Häufigkeit", new List<Occurrence>());
             SetUpOccurrenceGridView(suffixGrid, "Vereins Suffix", "Häufigkeit", new List<Occurrence>());
-            SetUpOccurrenceGridView(sponsorGrid, "Sponsor", "Größe", new List<Occurrence>());
+            SetUpSponsorOccurenceGridView(sponsorGrid, "Sponsor", "Größe", "Häufigkeit", new List<SponsorOccurrence>());
             SetUpDropDownOccurrenceGridView(subnationGrid, "Ausländer", "Häufigkeit", typeof(Nation), subnationBindingSource, new List<Occurrence>());
         }
 
@@ -323,7 +355,7 @@ namespace fm_manager
 
         private void ResetAssociationGrids()
         {
-            SetUpDropDownOccurrenceGridView(nationGrid, "Nation", "Häufigkeit", typeof(Nation), nationBindingSource, new List<Occurrence>());            
+            SetUpDropDownOccurrenceGridView(nationGrid, "Nation", "Häufigkeit", typeof(Nation), nationBindingSource, new List<Occurrence>());
         }
 
         private void ResetAssociationLookGrids()
@@ -418,18 +450,18 @@ namespace fm_manager
                 subethnieBindingSource.DataSource = bList2;
                 foreach (var et in Program.Ethnies)
                 {
-                    if (et != n.MainEthnie)
+                    if (et.Name != n.MainEthnie)
                     {
                         bList2.Add(et);
                     }
                 }
-                mainEthnieSelection.SelectedItem = n.MainEthnie;
+                mainEthnieSelection.SelectedItem = Program.Ethnies.FirstOrDefault(et => et.Name == n.MainEthnie);
                 SetUpEthnieOccurrenceGridView(ethnieGrid, n.SubEthnies);
                 SetUpOccurrenceGridView(cityGrid, "Stadt", "Häufigkeit", n.Cities);
                 SetUpOccurrenceGridView(prefix1Grid, "Vereins Präfix I", "Häufigkeit", n.FirstPrefixes);
                 SetUpOccurrenceGridView(prefix2Grid, "Vereins Präfix II", "Häufigkeit", n.SecondPrefixes);
                 SetUpOccurrenceGridView(suffixGrid, "Vereins Suffix", "Häufigkeit", n.Suffixes);
-                SetUpOccurrenceGridView(sponsorGrid, "Sponsor", "Größe", n.Sponsors);
+                SetUpSponsorOccurenceGridView(sponsorGrid, "Sponsor", "Größe", "Häufigkeit", n.Sponsors);
                 SetUpDropDownOccurrenceGridView(subnationGrid, "Ausländer", "Häufigkeit", typeof(Nation), subnationBindingSource, n.SubNations);
             }
         }
@@ -528,7 +560,7 @@ namespace fm_manager
                 {
                     Program.Ethnies.Add(et);
                 }
-
+                
                 ResetEthnieEditor();
             }
 
@@ -541,17 +573,20 @@ namespace fm_manager
             if (associationTextBox.Text.Trim().Equals(""))
             {
                 MessageBox.Show("Der Verband braucht einen Namen");
-            } else
+            }
+            else
             {
                 if (associatonLevel.Value < 1 || associatonLevel.Value > 10)
                 {
                     MessageBox.Show("Der Verband braucht ein Level > 0");
-                } else
+                }
+                else
                 {
                     if (associatonDepth.Value < 1 || associatonLevel.Value > 10)
                     {
                         MessageBox.Show("Der Verband braucht eine Ligen Zahl > 0");
-                    } else
+                    }
+                    else
                     {
                         a.Name = associationTextBox.Text;
                         a.Power = (double)associatonLevel.Value;
@@ -569,7 +604,7 @@ namespace fm_manager
             }
 
 
-            
+
         }
 
         private void DeleteNation()

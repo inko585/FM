@@ -5,14 +5,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FM.Views"
              xmlns:ae="clr-namespace:AE.Graphics.Wpf;assembly=AE.Graphics.Wpf"
-             mc:Ignorable="d" Width="800" Height="800" WindowStartupLocation="CenterScreen">
+             mc:Ignorable="d" Width="800" Height="840" WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
-        <ResourceDictionary Source="pack://application:,,,/AE.Graphics.Wpf;component/Styles/AEStyles.xaml"/>
+        <!--<ResourceDictionary Source="pack://application:,,,/AE.Graphics.Wpf;component/Styles/AEStyles.xaml"/>-->
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="60"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="1*"></RowDefinition>
         </Grid.RowDefinitions>
@@ -25,12 +26,14 @@
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="70"/>
                 </Grid.ColumnDefinitions>
                 <Image Source="{Binding Club.CrestImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" Margin="10,0,10,0"></Image>
+               
                 <Label Content="{Binding Club.Name}" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Grid.Column="1"></Label>
                 <!--<Label Content="{Binding Club.SeasonIncomeEstimation}" VerticalAlignment="Center" Grid.Column="2"/>
                 <Label Content="{Binding Club.PlayerExpenseEstimation}" VerticalAlignment="Center" Grid.Column="3"/>-->
-                <Label Content="{Binding Club.Account}" VerticalAlignment="Center" Grid.Column="4"/>
+                <!--<Label Content="{Binding Club.Account}" VerticalAlignment="Center" Grid.Column="4"/>-->
             </Grid>
 
         </Border>
@@ -47,6 +50,7 @@
                     <RowDefinition Height="30"></RowDefinition>
                     <RowDefinition Height="30"></RowDefinition>
                     <RowDefinition Height="30"></RowDefinition>
+                    
                 </Grid.RowDefinitions>
 
                 <Border BorderThickness="1,1,1,0"  BorderBrush="Gray" Grid.Row="0" Grid.Column="0" Background="LightGray">
@@ -60,11 +64,11 @@
                     <Label Content="Budget" Grid.Row="1" VerticalAlignment="Center"/>
                 </Border>
                 <Border BorderThickness="0,1,0,0"  BorderBrush="Gray" Grid.Row="1" Grid.Column="1" >
-                    <Label Content="{Binding Club.BudgetSizeString}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1"/>
+                    <Label Content="{Binding Club.BudgetCurrentSeason}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1"/>
                 </Border>
 
                 <Border BorderThickness="1,1,1,1"  BorderBrush="Gray" Grid.Row="2" Grid.Column="0" Background="LightGray">
-                    <Label Content="Stadium" VerticalAlignment="Center" Grid.Row="2"/>
+                    <Label Content="Stadion" VerticalAlignment="Center" Grid.Row="2"/>
                 </Border>
                 <Border BorderThickness="0,1,0,1"  BorderBrush="Gray" Grid.Row="2" Grid.Column="1" >
                     <Label Content="{Binding Club.StadiumCapacityString}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="2" Grid.Column="1"/>
@@ -90,35 +94,343 @@
                 <Border BorderThickness="0,1,1,1"  BorderBrush="Gray" Grid.Row="2" Grid.Column="3" >
                     <Label Content="{Binding Club.YouthWorkLevelString}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" />
                 </Border>
+
+                <!--<Border BorderThickness="1,1,1,1"  BorderBrush="Gray" Grid.Row="3" Grid.Column="0" Background="LightGray">
+                    <Label Content="Sponsor" VerticalAlignment="Center" Grid.Row="2"/>
+                </Border>
+                <Border BorderThickness="0,1,1,1"  BorderBrush="Gray" Grid.Row="3" Grid.Column="1" >
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="{Binding Club.CurrentSponsor.Name}"/>
+                    </StackPanel>
+                    
+                </Border>-->
             </Grid>
         </Border>
-        <ListBox Name="playerListBox" Margin="5,5,5,5" ItemsSource="{Binding Club.ObservableRooster}" Style="{StaticResource DefaultAEList}" ItemContainerStyle="{StaticResource UnselectableAEItemBox}" Grid.Row="2">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Grid>
+        <Grid Grid.Row="2" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="1" Margin="0,0,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Border  Background="{StaticResource ListColor}" Grid.Column="0" Margin="0" BorderBrush="Gray" BorderThickness="1,1,0,1">
+                    <Image Source="{Binding Club.CurrentSponsor.Image}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,5"></Image>
+                </Border>
+                <Border  Background="{StaticResource ListColor}" Grid.Column="1" Margin="0" BorderBrush="Gray" BorderThickness="1,1,0,1">
+                    <Image Source="{Binding Club.DressImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1" Margin="0,5,0,5"></Image>
+                </Border>
+                <Border  Background="{StaticResource ListColor}" Grid.Column="2" Margin="0" BorderBrush="Gray" BorderThickness="1">
+                    <Image Source="{Binding Club.AwayDressImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1" Margin="0,5,0,5"></Image>
+                </Border>
+            </Grid>
+        </Grid>
+        <TabControl Grid.Row="32" Margin="5">
+            <TabItem Header="Kader" >
+                <ScrollViewer>
+                    <Grid Margin="5">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
+                            <ColumnDefinition Width="12*"/>
+                            <ColumnDefinition Width="113*"/>
                         </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="1*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Background="LightGray" Grid.ColumnSpan="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="80"></ColumnDefinition>
+                                <ColumnDefinition Width="80"></ColumnDefinition>
 
-                        <Label Name="posLabel" Content="{Binding Position}"/>
-                        <Label Name="nameLabel" PreviewMouseLeftButtonDown="NameLabel_PreviewMouseLeftButtonDown"  Content="{Binding FullName}" Grid.Column="1" Style="{StaticResource LinkLabelStyle}"/>
-                        <Label Name="nationLabel" Content="{Binding Nation.Short}" Grid.Column="2"/>
-                        <Label Name="ageLabel" Content="{Binding Age}" Grid.Column="3"/>
-                        <Label Name="skillLabel" Content="{Binding SkillMax}" Grid.Column="4"/>
-                        <Label Content="{Binding SalaryStandard}" Grid.Column="5"/>
-                        <Label Content="{Binding ExampleContractP}" Grid.Column="6"/>
-                        <Label Content="{Binding Price}" Grid.Column="7"/>
+                                <ColumnDefinition Width="80"></ColumnDefinition>
+                                <ColumnDefinition Width="120"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Border BorderThickness="1,1,1,1" BorderBrush="Gray">
+                                <Label  HorizontalAlignment="Center" Content="Position" />
+                            </Border>
+                            <Border BorderThickness="0,1,1,1"  BorderBrush="Gray" Grid.Column="1">
+                                <Label Content="Spieler" />
+                            </Border>
+                            <Border BorderThickness="0,1,1,1"   BorderBrush="Gray"  Grid.Column="2">
+                                <Label  Content="Nation" HorizontalAlignment="Center" />
+                            </Border>
+                            <Border BorderThickness="0,1,1,1"   BorderBrush="Gray"  Grid.Column="3">
+                                <Label  HorizontalAlignment="Center"  Content="Alter"/>
+                            </Border>
+                            <Border BorderThickness="0,1,1,1"   BorderBrush="Gray"  Grid.Column="4">
+                                <Label HorizontalAlignment="Center" Content="Stärke"/>
+                            </Border>
+                            <Border BorderThickness="0,1,1,1"   BorderBrush="Gray"  Grid.Column="5">
+                                <Label HorizontalAlignment="Center" Content="Marktwert"/>
+                            </Border>
+                        </Grid>
 
+                        <ItemsControl  Background="White" ItemsSource="{Binding Club.ObservableRooster}" Grid.Row="1" Grid.ColumnSpan="2">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="80"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                            <ColumnDefinition Width="80"></ColumnDefinition>
+                                            <ColumnDefinition Width="80"></ColumnDefinition>
+                                            <ColumnDefinition Width="80"></ColumnDefinition>
+                                            <ColumnDefinition Width="120"></ColumnDefinition>
+
+                                        </Grid.ColumnDefinitions>
+                                        <Border BorderThickness="1,0,1,1" BorderBrush="Gray">
+                                            <Label HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding PositionStringShort}"/>
+                                        </Border>
+                                        <Border BorderThickness="0,0,1,1"  BorderBrush="Gray"   Grid.Column="1">
+
+                                            <Label Name="nameLabel" HorizontalAlignment="Left" PreviewMouseLeftButtonDown="NameLabel_PreviewMouseLeftButtonDown" Content="{Binding FullName}" Grid.Column="1"  VerticalAlignment="Center" FontSize="14" Style="{StaticResource LinkLabelStyle}"/>
+
+                                        </Border>
+                                        <Border BorderThickness="0,0,1,1"   BorderBrush="Gray"  Grid.Column="2">
+                                            <Image Source="{Binding Nation.Flag}" Height="24" Width="24" HorizontalAlignment="Center" VerticalAlignment="Center" ></Image>
+                                        </Border>
+                                        <Border BorderThickness="0,0,1,1"   BorderBrush="Gray"  Grid.Column="3">
+                                            <Label HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding Age}"/>
+                                        </Border>
+                                        <Border BorderThickness="0,0,1,1"   BorderBrush="Gray"  Grid.Column="4">
+                                            <Label HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding SkillMax}"/>
+                                        </Border>
+                                        <Border BorderThickness="0,0,1,1"   BorderBrush="Gray"  Grid.Column="5">
+                                            <Label HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding MarketValueStandardString}"/>
+                                        </Border>
+                                    </Grid>
+
+
+                                </DataTemplate>
+
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!--<ListBox Name="playerListBox" Margin="5,5,5,5" ItemsSource="{Binding Club.ObservableRooster}" Style="{StaticResource DefaultAEList}" ItemContainerStyle="{StaticResource UnselectableAEItemBox}" Grid.Row="2">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Label Name="posLabel" Content="{Binding Position}"/>
+                                    <Label Name="nameLabel" PreviewMouseLeftButtonDown="NameLabel_PreviewMouseLeftButtonDown"  Content="{Binding FullName}" Grid.Column="1" Style="{StaticResource LinkLabelStyle}"/>
+                                    <Label Name="nationLabel" Content="{Binding Nation.Short}" Grid.Column="2"/>
+                                    <Label Name="ageLabel" Content="{Binding Age}" Grid.Column="3"/>
+                                    <Label Name="skillLabel" Content="{Binding SkillMax}" Grid.Column="4"/>
+                                    <Label Content="{Binding SalaryStandard}" Grid.Column="5"/>
+                                    <Label Content="{Binding ExampleContractP}" Grid.Column="6"/>
+                                    <Label Content="{Binding Price}" Grid.Column="7"/>
+
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+
+                    </ListBox>-->
                     </Grid>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Zugänge">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="80"/>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="200"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="10*"/>
+                            <RowDefinition Height="12*"/>
+                        </Grid.RowDefinitions>
+                        <Label Content="Jahr" VerticalAlignment="Bottom"/>
+                        <ComboBox  ItemsSource="{Binding Seasons}" SelectedItem="{Binding SelectedJoiningSeason}" DisplayMemberPath="Year" Grid.Column="0" Grid.Row="1"  Margin="0,5,10,10"/>
+                    </Grid>
+
+                    <ScrollViewer Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,5">
+                        <Grid Margin="0,0,10,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="1*"/>
+                            </Grid.RowDefinitions>
+                            <Grid Background="LightGray">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="80"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="240"></ColumnDefinition>
+                                    <ColumnDefinition Width="100"></ColumnDefinition>
+                                    <ColumnDefinition Width="100"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Border BorderThickness="1,1,1,1"  BorderBrush="Gray" >
+                                    <Label Content="Position" HorizontalAlignment="Center"/>
+                                </Border>
+                                <Border BorderThickness="0,1,1,1"  BorderBrush="Gray"  Grid.Column="1">
+                                    <Label Content="Spieler" />
+                                </Border>
+                                <Border BorderThickness="0,1,1,1"   BorderBrush="Gray"  Grid.Column="2">
+                                    <Label  Content="Alter Verein" HorizontalAlignment="Left" />
+                                </Border>
+                                <Border BorderThickness="0,1,1,1"   BorderBrush="Gray"  Grid.Column="3">
+                                    <Label  HorizontalAlignment="Center"  Content="MarktWert"/>
+                                </Border>
+                                <Border BorderThickness="0,1,1,1"   BorderBrush="Gray"  Grid.Column="4">
+                                    <Label HorizontalAlignment="Center" Content="Ablöse"/>
+                                </Border>
+                            </Grid>
+
+                            <ItemsControl  Background="White" ItemsSource="{Binding JoiningHistory}" Grid.Row="1">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="80"></ColumnDefinition>
+                                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                                <ColumnDefinition Width="240"></ColumnDefinition>
+                                                <ColumnDefinition Width="100"></ColumnDefinition>
+                                                <ColumnDefinition Width="100"></ColumnDefinition>
+
+                                            </Grid.ColumnDefinitions>
+                                            <Border BorderThickness="1,0,1,1"  BorderBrush="Gray"  Grid.Column="0">
+                                                <Label Content="{Binding Player.PositionStringShort}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                            <Border BorderThickness="0,0,1,1"  BorderBrush="Gray"  Grid.Column="1">
+                                                <Label PreviewMouseDown="TransferNameLabel_PreviewMouseLeftButtonDown" Content="{Binding Player.FullName}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="14"/>
+                                            </Border>
+                                            <Border BorderThickness="0,0,1,1"  BorderBrush="Gray"  Grid.Column="2">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Source="{Binding From.CrestImage}" Height="25" Width="25" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" Margin="6,0,5,0"></Image>
+                                                    <Label PreviewMouseDown="From_PreviewMouseDown" Content="{Binding From.Name}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                                </StackPanel>
+                                            </Border>
+
+                                            <Border BorderThickness="0,0,1,1"   BorderBrush="Gray"  Grid.Column="3">
+                                                <Label  Content="{Binding MarketValueString}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                            <Border BorderThickness="0,0,1,1"   BorderBrush="Gray"  Grid.Column="4">
+                                                <Label  Content="{Binding PriceString}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                        </Grid>
+
+
+                                    </DataTemplate>
+
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Abgänge">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="80"/>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="200"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="10*"/>
+                            <RowDefinition Height="12*"/>
+                        </Grid.RowDefinitions>
+                        <Label Content="Jahr" VerticalAlignment="Bottom"/>
+                        <ComboBox  ItemsSource="{Binding Seasons}" SelectedItem="{Binding SelectedLeavingSeason}" DisplayMemberPath="Year" Grid.Column="0" Grid.Row="1"  Margin="0,5,10,10"/>
+                    </Grid>
+
+                    <ScrollViewer Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,5">
+                        <Grid Margin="0,0,10,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="1*"/>
+                            </Grid.RowDefinitions>
+                            <Grid Background="LightGray">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="80"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="240"></ColumnDefinition>
+                                    <ColumnDefinition Width="100"></ColumnDefinition>
+                                    <ColumnDefinition Width="100"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Border BorderThickness="1,1,1,1"  BorderBrush="Gray" >
+                                    <Label Content="Position" HorizontalAlignment="Center"/>
+                                </Border>
+                                <Border BorderThickness="0,1,1,1"  BorderBrush="Gray"  Grid.Column="1">
+                                    <Label Content="Spieler" />
+                                </Border>
+                                <Border BorderThickness="0,1,1,1"   BorderBrush="Gray"  Grid.Column="2">
+                                    <Label  Content="Neuer Verein" HorizontalAlignment="Left" />
+                                </Border>
+                                <Border BorderThickness="0,1,1,1"   BorderBrush="Gray"  Grid.Column="3">
+                                    <Label  HorizontalAlignment="Center"  Content="Marktwert"/>
+                                </Border>
+                                <Border BorderThickness="0,1,1,1"   BorderBrush="Gray"  Grid.Column="4">
+                                    <Label HorizontalAlignment="Center" Content="Ablöse"/>
+                                </Border>
+                            </Grid>
+
+                            <ItemsControl  Background="White" ItemsSource="{Binding LeavingHistory}" Grid.Row="1">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="80"></ColumnDefinition>
+                                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                                <ColumnDefinition Width="240"></ColumnDefinition>
+                                                <ColumnDefinition Width="100"></ColumnDefinition>
+                                                <ColumnDefinition Width="100"></ColumnDefinition>
+
+                                            </Grid.ColumnDefinitions>
+                                            <Border BorderThickness="1,0,1,1"  BorderBrush="Gray"  Grid.Column="0">
+                                                <Label Content="{Binding Player.PositionStringShort}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                            <Border BorderThickness="0,0,1,1"  BorderBrush="Gray"  Grid.Column="1">
+                                                <Label PreviewMouseDown="TransferNameLabel_PreviewMouseLeftButtonDown" Content="{Binding Player.FullName}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="14"/>
+                                            </Border>
+                                            <Border BorderThickness="0,0,1,1"  BorderBrush="Gray"  Grid.Column="2">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Source="{Binding To.CrestImage}" Height="25" Width="25" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" Margin="6,0,5,0"></Image>
+                                                    <Label PreviewMouseDown="To_PreviewMouseDown" Content="{Binding To.Name}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                                </StackPanel>
+                                            </Border>
+
+                                            <Border BorderThickness="0,0,1,1"   BorderBrush="Gray"  Grid.Column="3">
+                                                <Label  Content="{Binding MarketValueString}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                            <Border BorderThickness="0,0,1,1"   BorderBrush="Gray"  Grid.Column="4">
+                                                <Label  Content="{Binding PriceString}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                        </Grid>
+
+
+                                    </DataTemplate>
+
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </ae:AEWindow>

@@ -1,5 +1,5 @@
 ﻿using AE.Graphics.Wpf;
-using FM.Models.Generic;
+using FM.Common.Generic;
 using FootballPit;
 using System;
 using System.Collections.Generic;
@@ -32,9 +32,9 @@ namespace FM.Views
 
         private void Player_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            var p = (sender as Label).DataContext as Player;
+            var p = (sender as Label).DataContext as MatchPlayer;
 
-            var pView = new PlayerWindow(p);
+            var pView = new PlayerWindow(p.Player);
             pView.ShowDialog();
         }
 
@@ -58,7 +58,7 @@ namespace FM.Views
         {
             var sc = (sender as Label).DataContext as ScoreEvent;
 
-            var pView = new PlayerWindow(sc.Scorer);
+            var pView = new PlayerWindow(sc.Scorer.Player);
             pView.ShowDialog();
         }
 
@@ -68,12 +68,12 @@ namespace FM.Views
             var su = lbl.DataContext as Substitution;
 
             PlayerWindow pView;
-            if (lbl.Content.ToString() == su.In.FullName)
+            if (lbl.Content.ToString() == su.In.Player.FullName)
             {
-                pView = new PlayerWindow(su.In);
+                pView = new PlayerWindow(su.In.Player);
             } else
             {
-                pView = new PlayerWindow(su.Out);
+                pView = new PlayerWindow(su.Out.Player);
             }
 
             pView.ShowDialog();

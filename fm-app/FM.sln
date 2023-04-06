@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AE.Graphics", "..\AE.Graphi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AE.Graphics.Wpf", "..\AE.Graphics.Wpf\AE.Graphics.Wpf.csproj", "{10CA2D3A-E09E-4BE1-ADB7-820F8AD5F8CE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FM.Save", "FM.Save\FM.Save.csproj", "{D7D5451F-8F61-4BC7-924D-7EFE914C294F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AE.Logging", "..\AE.Logging\AE.Logging.csproj", "{EC214AA3-80FB-4337-B774-780EE1C39182}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +65,22 @@ Global
 		{10CA2D3A-E09E-4BE1-ADB7-820F8AD5F8CE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{10CA2D3A-E09E-4BE1-ADB7-820F8AD5F8CE}.Release|x86.ActiveCfg = Release|Any CPU
 		{10CA2D3A-E09E-4BE1-ADB7-820F8AD5F8CE}.Release|x86.Build.0 = Release|Any CPU
+		{D7D5451F-8F61-4BC7-924D-7EFE914C294F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7D5451F-8F61-4BC7-924D-7EFE914C294F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7D5451F-8F61-4BC7-924D-7EFE914C294F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D7D5451F-8F61-4BC7-924D-7EFE914C294F}.Debug|x86.Build.0 = Debug|Any CPU
+		{D7D5451F-8F61-4BC7-924D-7EFE914C294F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7D5451F-8F61-4BC7-924D-7EFE914C294F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7D5451F-8F61-4BC7-924D-7EFE914C294F}.Release|x86.ActiveCfg = Release|Any CPU
+		{D7D5451F-8F61-4BC7-924D-7EFE914C294F}.Release|x86.Build.0 = Release|Any CPU
+		{EC214AA3-80FB-4337-B774-780EE1C39182}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC214AA3-80FB-4337-B774-780EE1C39182}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC214AA3-80FB-4337-B774-780EE1C39182}.Debug|x86.ActiveCfg = Debug|x86
+		{EC214AA3-80FB-4337-B774-780EE1C39182}.Debug|x86.Build.0 = Debug|x86
+		{EC214AA3-80FB-4337-B774-780EE1C39182}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC214AA3-80FB-4337-B774-780EE1C39182}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC214AA3-80FB-4337-B774-780EE1C39182}.Release|x86.ActiveCfg = Release|x86
+		{EC214AA3-80FB-4337-B774-780EE1C39182}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

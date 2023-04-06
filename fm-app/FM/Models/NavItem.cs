@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace FM.Models
+namespace FM.Common
 {
     public class NavItem : INotifyPropertyChanged
     {

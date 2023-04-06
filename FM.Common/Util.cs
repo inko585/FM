@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Media.Imaging;
+using System.Xml.Serialization;
 
 namespace FM.Common
 {
@@ -38,8 +42,16 @@ namespace FM.Common
         }
 
     }
+
+    public enum BitmapType
+    {
+        Crests, Eyes, Heads, Mouths, Dresses, Stadium, Flags, Sponsors
+    }
+
     public class Util
     {
+
+
 
         public static Random rnd = new Random();
         public static double GetGaussianRandom(double mean, double stdDev)
@@ -61,17 +73,51 @@ namespace FM.Common
             if (raw <= 10000)
             {
                 return CleanValue(raw, 1000, 1000);
-            } else if (raw <= 100000)
+            }
+            else if (raw <= 100000)
             {
                 return CleanValue(raw, 25000, 10000);
-            } else/* if (raw <= 1000000)*/
+            } else if (raw <= 1000000)
+            {
+                return CleanValue(raw, 50000, 100000);
+            }
+            else
             {
                 return CleanValue(raw, 250000, 100000);
-                //} else
-                //{
-                //    return CleanValue(raw, 1000000, 1000000);
             }
         }
+
+        public static BitmapImage BitmapToImageSource(Bitmap bitmap)
+        {
+            using (MemoryStream memory = new MemoryStream())
+            {
+                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
+                memory.Position = 0;
+                BitmapImage bitmapimage = new BitmapImage();
+                bitmapimage.BeginInit();
+                bitmapimage.StreamSource = memory;
+                bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapimage.EndInit();
+
+                return bitmapimage;
+            }
+        }
+
+        public static Bitmap GetBitmapFromText(BitmapType type, string text)
+        {
+            var path = "../../Images/" + type.ToString() + "/" + text + ".png";
+
+            if (File.Exists(path))
+            {
+                return new Bitmap(path);
+            }
+            else
+            {
+                return new Bitmap("../../Images/FileNotFound.png");
+            }
+        }
+
+
 
         public static int CleanValue(int raw, int potency, int minValue)
         {

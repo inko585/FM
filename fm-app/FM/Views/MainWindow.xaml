@@ -20,7 +20,7 @@
     </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="&#xf0c7; Speichern" FontFamily="{StaticResource FontAwesome}" Margin="5"/>
+            <MenuItem Command="{Binding SaveCommand}" Header="&#xf0c7; Speichern" FontFamily="{StaticResource FontAwesome}" Margin="5"/>
         </Menu>
         <StatusBar DockPanel.Dock="Bottom" >
             <TextBlock Text="Version 1.0.0"/>

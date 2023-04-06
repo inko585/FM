@@ -1,13 +1,16 @@
 ﻿using FM;
 using FM.Common;
-using FM.Models.Generic;
-using FM.Models.Season;
+using FM.Common;
+using FM.Common.Generic;
+using FM.Common.Season;
 using FM.UI;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
+using System.Windows.Data;
 using System.Windows.Media.Imaging;
 
 namespace FootballPit
@@ -38,7 +41,13 @@ namespace FootballPit
             }
         }
 
-
+        public bool AwayDressSwitch
+        {
+            get
+            {
+                return HomeClub.ClubColors.MainColorString == AwayClub.ClubColors.MainColorString /*|| HomeClub.ClubColors.MainColorString == AwayClub.ClubColors.SecondColorString*/;
+            }
+        }
 
         public bool IsPlayed { get; set; }
 
@@ -87,10 +96,14 @@ namespace FootballPit
             var res = new MatchResult();
             res.Viewer = Math.Min(HomeClub.ViewerAttraction, HomeClub.StadiumCapacity);
             res.MatchDayString = md == null ? "-" : "# " + md.Number;
-            res.HomeLineUp = HomeClub.StartingLineUp;
-            res.AwayLineUp = AwayClub.StartingLineUp;
-            res.HomeBench = HomeClub.Bench;
-            res.AwayBench = AwayClub.Bench;
+            res.ObservableHomeStarters = new ObservableCollection<MatchPlayer>(HomeClub.StartingLineUp.Players.Select(pl => MatchPlayer(pl)));
+            res.ObservableAwayStarters = new ObservableCollection<MatchPlayer>(AwayClub.StartingLineUp.Players.Select(pl => MatchPlayer(pl)));
+            //res.HomeLineUp = HomeClub.StartingLineUp;
+            //res.AwayLineUp = AwayClub.StartingLineUp;
+            //res.HomeBench = HomeClub.Bench;
+            //res.AwayBench = AwayClub.Bench;
+            res.HomeClub = HomeClub;
+            res.AwayClub = AwayClub;
             var currentHomeLU = HomeClub.StartingLineUp;
             var currentAwayLU = AwayClub.StartingLineUp;
             var currentHomeBench = HomeClub.Bench;
@@ -127,7 +140,7 @@ namespace FootballPit
                     Thread.Sleep(tension_goalshot);
                     if (isGoal)
                     {
-                        AddGoal(res, offClub, p, i);
+                        AddGoal(res, offClub, MatchPlayer(p), i);
                         area = FIELD_AREAS / 2;
                         gform.Log("Tor von " + p.LastName + " (" + offClub.Name + ")", i);
                     }
@@ -168,7 +181,7 @@ namespace FootballPit
                                 Thread.Sleep(tension_goalshot);
                                 if (FreeKickOrPenalty(offLineUp, defLineUp, area))
                                 {
-                                    AddGoal(res, offClub, offLineUp.KickTaker, i);
+                                    AddGoal(res, offClub, MatchPlayer(offLineUp.KickTaker), i);
                                     area = FIELD_AREAS / 2;
                                     gform.Log("Tor!", i);
                                 }
@@ -197,14 +210,16 @@ namespace FootballPit
             MatchResult = res;
             IsPlayed = true;
 
+            HomeClub.ResetLineup();
+            AwayClub.ResetLineup();
             var xpPlayers = new List<Player>();
-            foreach (var p in res.HomeLineUp.Players)
+            foreach (var p in HomeClub.StartingLineUp.Players)
             {
                 p.AccountXP(Game.XP_MATCH);
                 xpPlayers.Add(p);
                 p.PlayerStatistics.Last().Matches++;
             }
-            foreach (var p in res.AwayLineUp.Players)
+            foreach (var p in AwayClub.StartingLineUp.Players)
             {
                 p.AccountXP(Game.XP_MATCH);
                 xpPlayers.Add(p);
@@ -213,11 +228,11 @@ namespace FootballPit
 
             foreach (var sub in res.Substitutions)
             {
-                if (!xpPlayers.Contains(sub.In))
+                if (!xpPlayers.Contains(sub.In.Player))
                 {
-                    sub.In.AccountXP(Game.XP_MATCH_SUB);
-                    xpPlayers.Add(sub.In);
-                    sub.In.PlayerStatistics.Last().Matches++;
+                    sub.In.Player.AccountXP(Game.XP_MATCH_SUB);
+                    xpPlayers.Add(sub.In.Player);
+                    sub.In.Player.PlayerStatistics.Last().Matches++;
                 }
             }
             return res;
@@ -236,10 +251,28 @@ namespace FootballPit
                     lineUp.Players.Add(newPlayer);
                     bench.Remove(newPlayer);
                     bench.Add(po);
-                    mr.Substitutions.Add(new Substitution(c, newPlayer, po, min));
+                    mr.Substitutions.Add(new Substitution(c, MatchPlayer(newPlayer), MatchPlayer(po), min));
                 }
 
             }
+        }
+
+        public MatchPlayer MatchPlayer(Player p)
+        {
+            BitmapImage image;
+            if (HomeClub.Rooster.Contains(p) || !AwayDressSwitch)
+            {
+                image = p.PlayerImage;
+            } else
+            {
+                image = p.PlayerImage_Away;
+            }
+
+            return new MatchPlayer()
+            {
+                Player = p,
+                MatchPlayerImage = image
+            };
         }
 
         private void ResetFitness()
@@ -313,7 +346,7 @@ namespace FootballPit
 
 
 
-        internal void AddGoal(MatchResult mr, Club c, Player scorer, int minute)
+        internal void AddGoal(MatchResult mr, Club c, MatchPlayer scorer, int minute)
         {
             if (c.Equals(HomeClub))
             {
@@ -324,7 +357,7 @@ namespace FootballPit
                 mr.AwayGoals = mr.AwayGoals + 1;
             }
 
-            scorer.PlayerStatistics.Last().Goals++;
+            scorer.Player.PlayerStatistics.Last().Goals++;
             mr.Scorers.Add(new ScoreEvent() { Scorer = scorer, Club = c, CurrentScore = mr.ResultString, Minute = minute });
 
         }
@@ -429,7 +462,7 @@ namespace FootballPit
 
         internal double RollSkill(double singleSkill, double avgSkill)
         {
-            return Util.GetGaussianRandom(singleSkill, Player.MAX_SKILL / 3.05) * 0.5 + Util.GetGaussianRandom(avgSkill, Player.MAX_SKILL / 3.05) * 0.5;
+            return Util.GetGaussianRandom(singleSkill, Player.MAX_SKILL / 3.08) * 0.5 + Util.GetGaussianRandom(avgSkill, Player.MAX_SKILL / 3.08) * 0.5;
         }
 
         //internal double RollSkill(double singleSkill, double singleSkill2, double avgSkill)
@@ -451,20 +484,10 @@ namespace FootballPit
         public int Viewer { get; set; }
         public string MatchDayString { get; set; }
 
-        public Club HomeClub
-        {
-            get
-            {
-                return HomeLineUp.Club;
-            }
-        }
-        public Club AwayClub
-        {
-            get
-            {
-                return AwayLineUp.Club;
-            }
-        }
+        public Club HomeClub { get; set; }
+
+        public Club AwayClub { get; set; }
+
         public BitmapImage HomeDress
         {
             get
@@ -477,13 +500,21 @@ namespace FootballPit
         {
             get
             {
-                return HomeClub.ClubColors.MainColorString == AwayClub.ClubColors.MainColorString || HomeClub.ClubColors.SecondColorString == AwayClub.ClubColors.MainColorString ? AwayClub.AwayDressImage : AwayClub.DressImage;
+                return AwayDressSwitch ? AwayClub.AwayDressImage : AwayClub.DressImage;
             }
         }
-        public LineUp HomeLineUp { get; set; }
-        public LineUp AwayLineUp { get; set; }
-        public List<Player> HomeBench { get; set; }
-        public List<Player> AwayBench { get; set; }
+
+        public bool AwayDressSwitch
+        {
+            get
+            {
+                return HomeClub.ClubColors.MainColorString == AwayClub.ClubColors.MainColorString /*|| HomeClub.ClubColors.MainColorString == AwayClub.ClubColors.SecondColorString*/;
+            }
+        }
+
+        public ObservableCollection<MatchPlayer> ObservableHomeStarters { get; set; }
+        public ObservableCollection<MatchPlayer> ObservableAwayStarters { get; set; }
+
         public List<Substitution> Substitutions { get; set; }
 
 
@@ -501,10 +532,10 @@ namespace FootballPit
             }
         }
 
-        public override string ToString()
-        {
-            return HomeClub.Name + " (" + HomeLineUp.Players.Average(p => p.SkillMax) + ") - " + AwayClub.Name + " (" + AwayLineUp.Players.Average(p => p.SkillMax) + ") " + ResultString;
-        }
+        //public override string ToString()
+        //{
+        //    return HomeClub.Name + " (" + HomeLineUp.Players.Average(p => p.SkillMax) + ") - " + AwayClub.Name + " (" + AwayLineUp.Players.Average(p => p.SkillMax) + ") " + ResultString;
+        //}
 
 
     }
@@ -512,10 +543,10 @@ namespace FootballPit
     public class Substitution
     {
         public Club Club { get; set; }
-        public Player In { get; set; }
-        public Player Out { get; set; }
+        public MatchPlayer In { get; set; }
+        public MatchPlayer Out { get; set; }
         public int Minute { get; set; }
-        public Substitution(Club c, Player inP, Player outP, int minute)
+        public Substitution(Club c, MatchPlayer inP, MatchPlayer outP, int minute)
         {
             Club = c;
             In = inP;
@@ -526,7 +557,7 @@ namespace FootballPit
 
     public class ScoreEvent
     {
-        public Player Scorer { get; set; }
+        public MatchPlayer Scorer { get; set; }
         public Club Club { get; set; }
         public string CurrentScore { get; set; }
         public int Minute { get; set; }

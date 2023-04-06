@@ -19,6 +19,7 @@
     <SolidColorBrush x:Key="NavAreaFontColor" Color="#adc7b4"/>
     <SolidColorBrush x:Key="NavAreaBorderColor" Color="Black"/>
     <SolidColorBrush x:Key="ListColor" Color="White"/>
+    <SolidColorBrush x:Key="BoxColor" Color="#5beb82"/>
     <SolidColorBrush x:Key="ListSelectColor" Color="#FF3E94D3"/>
     <SolidColorBrush x:Key="ListHighlightColor" Color="#FF3E94D3"/>
     <SolidColorBrush x:Key="ListFontColor" Color="#333"/>

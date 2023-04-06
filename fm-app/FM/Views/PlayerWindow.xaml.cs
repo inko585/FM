@@ -1,5 +1,5 @@
 ﻿using AE.Graphics.Wpf;
-using FM.Models.Generic;
+using FM.Common.Generic;
 using FM.ViewModels;
 using System;
 using System.Collections.Generic;

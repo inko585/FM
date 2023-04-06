@@ -1,7 +1,9 @@
-﻿using FM.Models.Generic;
+﻿using FM.Common.Generic;
+using FM.Common.Season;
 using FM.Views;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -22,22 +24,51 @@ namespace FM.ViewModels
         public ClubViewModel(Club c)
         {
             Club = c;
+            SelectedJoiningSeason = Season.CurrentSeason;
+            SelectedLeavingSeason = Season.CurrentSeason;
         }
         public Club Club { get; set; }
-        public Player SelectedPlayer
+
+        private Season selectedJoiningSeason;
+
+        public Season SelectedJoiningSeason
         {
-            set
-            {
-                if (value != null)
-                {
-                    var pw = new PlayerWindow(value);
-                    pw.ShowDialog();
-                }
-            }
+            get { return selectedJoiningSeason; }
+            set { selectedJoiningSeason = value; NotifyPropertyChanged(nameof(JoiningHistory)); }
+        }
+
+        private Season selectedLeavingSeason;
+
+        public Season SelectedLeavingSeason
+        {
+            get { return selectedLeavingSeason; }
+            set { selectedLeavingSeason = value; NotifyPropertyChanged(nameof(LeavingHistory)); }
+        }
+
+        public ObservableCollection<Season> Seasons
+        {
             get
             {
-                return null;
+                return new ObservableCollection<Season>(Season.AllSeasons);
             }
         }
+
+
+        public ObservableCollection<Transfer> JoiningHistory
+        {
+            get
+            {
+                return new ObservableCollection<Transfer>(Game.Instance.FootballUniverse.TransferList.Where(t => t.Year == SelectedJoiningSeason.Year && t.To == Club));
+            }
+        }
+
+        public ObservableCollection<Transfer> LeavingHistory
+        {
+            get
+            {
+                return new ObservableCollection<Transfer>(Game.Instance.FootballUniverse.TransferList.Where(t => t.Year == SelectedLeavingSeason.Year && t.From == Club));
+            }
+        }
+
     }
 }

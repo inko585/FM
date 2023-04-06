@@ -1,0 +1,7 @@
+C:\dev\csharp\FM2\AE.Logging\bin\Debug\AE.Logging.dll
+C:\dev\csharp\FM2\AE.Logging\bin\Debug\AE.Logging.pdb
+C:\dev\csharp\FM2\AE.Logging\obj\Debug\GitInfo.cache
+C:\dev\csharp\FM2\AE.Logging\obj\Debug\AE.Logging.csproj.CoreCompileInputs.cache
+C:\dev\csharp\FM2\AE.Logging\obj\Debug\AE.Logging.dll
+C:\dev\csharp\FM2\AE.Logging\obj\Debug\AE.Logging.pdb
+C:\dev\csharp\FM2\AE.Logging\obj\Debug\AE.Logging.csproj.AssemblyReference.cache

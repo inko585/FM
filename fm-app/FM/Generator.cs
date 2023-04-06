@@ -1,10 +1,11 @@
 ﻿using FM.Common;
 using FM.Entities.Base;
-using FM.Models.Generic;
+using FM.Common.Generic;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using FM.Common.Pixels;
 
 namespace FM.Generator
 {
@@ -41,6 +42,29 @@ namespace FM.Generator
         //public static int MAX_PLAYER_GEN_LEVEL = 10;
 
         public static int MAX_ELO = 3000;
+
+        public static Sponsor GetNewSponsorForClub(Club c)
+        {
+            var potentialSponsors = new List<Occurrence>();
+            potentialSponsors.AddRange(c.Nation.Sponsors.Where(s => s.Size == 2));
+            if (c.SponsorMoneyPotential > 10000000)
+            {
+                potentialSponsors.AddRange(c.Nation.Sponsors.Where(s => s.Size == 3));
+            }
+            else
+            {
+                potentialSponsors.AddRange(c.Nation.Sponsors.Where(s => s.Size == 1));
+            }
+
+            var sponsorOcc = GetRandomOccurrence(potentialSponsors, STANDARD_DEV) as SponsorOccurrence;
+            return new Sponsor()
+            {
+                Name = sponsorOcc.Text,
+                InvestRate = Util.GetGaussianRandom(1d, 0.1),
+                YearsInClub = 0
+            };
+
+        }
 
         public static LeagueAssociation GenerateRandomLeagueAssociation(World w, Association a, AssociationLook al)
         {
@@ -85,7 +109,9 @@ namespace FM.Generator
                 c.ClubColors = new ClubColors()
                 {
                     MainColor = GetColorFromText("Red"),
-                    SecondColor = GetColorFromText("White")
+                    SecondColor = GetColorFromText("White"),
+                    MainColorString = "Red",
+                    SecondColorString = "White"
                 };
             }
             else if (name.Contains("Blau/Weiß"))
@@ -93,7 +119,9 @@ namespace FM.Generator
                 c.ClubColors = new ClubColors()
                 {
                     MainColor = GetColorFromText("RoyalBlue"),
-                    SecondColor = GetColorFromText("White")
+                    SecondColor = GetColorFromText("White"),
+                    MainColorString = "RoyalBlue",
+                    SecondColorString = "White"
                 };
             }
             else if (name.Contains("Schwarz/Weiß"))
@@ -101,7 +129,9 @@ namespace FM.Generator
                 c.ClubColors = new ClubColors()
                 {
                     MainColor = GetColorFromText("#2d2e2e"),
-                    SecondColor = GetColorFromText("White")
+                    SecondColor = GetColorFromText("White"),
+                    MainColorString = "#2d2e2e",
+                    SecondColorString = "White"
                 };
             }
             else if (name.Contains("SAP") || name.Contains("Sanofi"))
@@ -109,7 +139,9 @@ namespace FM.Generator
                 c.ClubColors = new ClubColors()
                 {
                     MainColor = GetColorFromText("SteelBlue"),
-                    SecondColor = GetColorFromText("White")
+                    SecondColor = GetColorFromText("White"),
+                    MainColorString = "SteelBlue",
+                    SecondColorString = "White"
                 };
             }
             else if (name.Contains("Total") || name.Contains("Red Bull") || name.Contains("Tesco"))
@@ -117,7 +149,9 @@ namespace FM.Generator
                 c.ClubColors = new ClubColors()
                 {
                     MainColor = GetColorFromText("Red"),
-                    SecondColor = GetColorFromText("SteelBlue")
+                    SecondColor = GetColorFromText("SteelBlue"),
+                    MainColorString = "Red",
+                    SecondColorString = "SteelBlue"
                 };
             }
             else
@@ -125,7 +159,7 @@ namespace FM.Generator
                 c.ClubColors = GenerateRandomClubColors(al);
             }
 
-            c.SecondClubColors = GenerateRandomClubColors(al, c.ClubColors.MainColorString);
+            c.SecondClubColors = GenerateRandomClubColors(al, c.ClubColors.MainColorString, obligatoryColorSecond: c.ClubColors.SecondColorString);
 
             c.Crest = GenerateRandomCrest(al);
             c.Dress = GenerateRandomDress(al);
@@ -134,23 +168,24 @@ namespace FM.Generator
             c.Coach = GenerateRandomCoach(w, n);
             c.Coach.Club = c;
 
-            var trueLvl = Util.GetGaussianRandom(lvl, 0.3);
+            var trueLvl = Util.GetGaussianRandom(lvl, 0.4);
             c.ClubAssetLevel[ClubAsset.Stadium] = Math.Max(1, (int)Util.GetGaussianRandom(trueLvl * 1.5, 1));
             c.ClubAssetLevel[ClubAsset.Office] = Math.Max(1, (int)Util.GetGaussianRandom(trueLvl * 1.5, 1));
-            c.ClubAssetLevel[ClubAsset.YouthWork] = Math.Max(1, Math.Max(1, (int)Util.GetGaussianRandom(trueLvl * 1.8, 1)));
+            c.ClubAssetLevel[ClubAsset.YouthWork] = Math.Max(1, Math.Max(1, (int)Util.GetGaussianRandom(trueLvl * 1.5, 1)));
             c.ClubAssetLevel[ClubAsset.TrainingGrounds] = Math.Max(1, (int)Util.GetGaussianRandom(trueLvl * 1.5, 1));
 
             var relativeLevel = trueLvl / MAX_GEN_LEVEL;
             c.Elo = (int)Math.Round(relativeLevel * MAX_ELO);
-            c.SponsorMoneyCurrentSeason = c.SponsorMoneyPotential;
+            c.LookForSponsor();
+            c.SponsorMoneyCurrentSeason = Util.GetNiceValue((int)(c.SponsorMoneyPotential * c.CurrentSponsor.ActualSponsoringRate));
             c.ViewerAttractionEstimation = c.ViewerAttraction;
 
             var posN = c.GetLineUpCountForPosition();
 
-            GeneratePlayersForPositionAndClub(w, n, trueLvl, c, Position.Goalie, (int) Math.Ceiling(posN[Position.Goalie]*2.5));
-            GeneratePlayersForPositionAndClub(w, n, trueLvl, c, Position.Defender, (int)Math.Ceiling(posN[Position.Defender]*2.5));
-            GeneratePlayersForPositionAndClub(w, n, trueLvl, c, Position.Midfielder, (int)Math.Ceiling(posN[Position.Midfielder]*2.5));
-            GeneratePlayersForPositionAndClub(w, n, trueLvl, c, Position.Striker, (int)Math.Ceiling(posN[Position.Striker]*2.5));
+            GeneratePlayersForPositionAndClub(w, n, trueLvl, c, Position.Goalie, posN[Position.Goalie] * 2);
+            GeneratePlayersForPositionAndClub(w, n, trueLvl, c, Position.Defender, posN[Position.Defender] * 2);
+            GeneratePlayersForPositionAndClub(w, n, trueLvl, c, Position.Midfielder, posN[Position.Midfielder] * 2);
+            GeneratePlayersForPositionAndClub(w, n, trueLvl, c, Position.Striker, posN[Position.Striker] * 2);
 
             return c;
         }
@@ -165,9 +200,39 @@ namespace FM.Generator
             return GetRandomOccurrence(al.Dresses, STANDARD_DEV).Text;
         }
 
-        public static ClubColors GenerateRandomClubColors(AssociationLook al, string excludedColor = null)
+        public static ClubColors GenerateRandomClubColors(AssociationLook al, string excludedColor = null, string obligatoryColorMain = null, string obligatoryColorSecond = null)
         {
-            var validColorPairs = excludedColor == null ? al.ColorPairs : al.ColorPairs.Where(cp => cp.Text != excludedColor && cp.Text2 != excludedColor);
+            var validColorPairs = al.ColorPairs.ToList();
+            if (excludedColor != null)
+            {
+                var excludedColors = new List<string>() { excludedColor };
+
+                var blueColors = new List<string>() { "RoyalBlue", "SteelBlue", "SkyBlue" };
+                var redColors = new List<string>() { "Red", "FireBrick" };
+
+                if (blueColors.Contains(excludedColor))
+                {
+                    excludedColors.AddRange(blueColors);
+                }
+                if (redColors.Contains(excludedColor))
+                {
+                    excludedColors.AddRange(redColors);
+                }
+
+                validColorPairs = validColorPairs.Where(cp => !excludedColors.Contains(cp.Text) && !excludedColors.Contains(cp.Text2)).ToList();
+
+            }
+
+            if (obligatoryColorMain != null && validColorPairs.Any(cp => cp.Text == obligatoryColorMain))
+            {
+                validColorPairs = validColorPairs.Where(cp => cp.Text == obligatoryColorMain).ToList();
+            }
+
+            if (obligatoryColorSecond != null && validColorPairs.Any(cp => cp.Text2 == obligatoryColorSecond))
+            {
+                validColorPairs = validColorPairs.Where(cp => cp.Text2 == obligatoryColorSecond).ToList();
+            }
+
             var colors = GetRandomOccurrence(validColorPairs.Select(cp => (Occurrence)cp).ToList(), STANDARD_DEV) as ColorPairOccurrence;
             return new ClubColors()
             {
@@ -214,31 +279,49 @@ namespace FM.Generator
         private static List<string> suffixCache = new List<string>();
         private static List<string> prefixCache = new List<string>();
 
+        static List<string> ExcludedCities = new List<string>();
+        static List<string> TakenPrefixCity = new List<string>();
         private static string CreateRandomClubName(Nation n, bool combineSuffixAndPrefix)
         {
-            var city = GetRandomOccurrence(n.Cities, STANDARD_DEV).Text;
+
+            var cityOcc = GetRandomOccurrence(n.Cities, STANDARD_DEV);
+            while (ExcludedCities.Contains(cityOcc.Text))
+            {
+                cityOcc = GetRandomOccurrence(n.Cities, STANDARD_DEV);
+            }
+
+            if (cityOcc.ScaleValue <= 3)
+            {
+                ExcludedCities.Add(cityOcc.Text);
+            }
+            var city = cityOcc.Text;
+            cityOcc.ScaleValue = Math.Max(1, cityOcc.ScaleValue - 2);
+            //TakenCities.Add(city);
             var prefix = "";
             var prefix2 = "";
             var suffix = "";
             var name = "";
             if (combineSuffixAndPrefix)
             {
-                prefix = GetRandomOccurrence(n.FirstPrefixes, STANDARD_DEV).Text;
-                var secondPrefixDice = rnd.NextDouble();
-                if (secondPrefixDice <= 0.2 && n.SecondPrefixes.Any())
-                {
-                    prefix2 = GetPrefix2(n);
-                    name = prefix + " " + prefix2 + " " + city;
-                }
-                else if (secondPrefixDice >= 0.8 && n.Suffixes.Any())
-                {
-                    suffix = GetSuffix(n);
-                    name = prefix + " " + city + " " + suffix;
-                }
-                else
-                {
-                    name = prefix + " " + city;
-                }
+
+                    prefix = GetRandomOccurrence(n.FirstPrefixes, STANDARD_DEV).Text;
+
+                    var secondPrefixDice = rnd.NextDouble();
+                    if (secondPrefixDice <= 0.2 && n.SecondPrefixes.Any())
+                    {
+                        prefix2 = GetPrefix2(n);
+                        name = prefix + " " + prefix2 + " " + city;
+                    }
+                    else if (secondPrefixDice >= 0.8 && n.Suffixes.Any())
+                    {
+                        suffix = GetSuffix(n);
+                        name = prefix + " " + city + " " + suffix;
+                    }
+                    else
+                    {
+                        name = prefix + " " + city;
+                    }
+                
             }
             else
             {
@@ -306,6 +389,7 @@ namespace FM.Generator
             for (var i = 0; i < number; i++)
             {
                 var player = GenerateRandomPlayer(w, n, p, lvl, GEN_MIN_AGE, GEN_MAX_AGE);
+                player.DressNumber = c.GetFreeNumber(p);
                 player.ContractCurrent = new Contract() { Club = c, Player = player, RunTime = rnd.Next(1, 4), Salary = player.SalaryStandard };
                 player.ContractCurrent.SignedOn = null;
                 player.ClubHistory.Add(c);
@@ -318,7 +402,7 @@ namespace FM.Generator
         {
             var c = new Coach();
             c.Nation = n;
-            var etOcc = GetRandomOccurrence(n.SubEthnies.Concat(new List<Occurrence>() { new Occurrence() { Text = n.MainEthnie.Name, ScaleValue = 10 } }).ToList(), 5);
+            var etOcc = GetRandomOccurrence(n.SubEthnies.Concat(new List<Occurrence>() { new Occurrence() { Text = n.MainEthnie, ScaleValue = 10 } }).ToList(), 5);
             GetRandomName(w, n, etOcc, out string fn, out string ln);
             c.FirstName = fn;
             c.LastName = ln;
@@ -358,7 +442,7 @@ namespace FM.Generator
 
             string firstName;
             string lastName;
-            var playerEtOcc = GetRandomOccurrence(origin.SubEthnies.Concat(new List<Occurrence>() { new Occurrence() { Text = origin.MainEthnie.Name, ScaleValue = 12 } }).ToList(), 5);
+            var playerEtOcc = GetRandomOccurrence(origin.SubEthnies.Concat(new List<Occurrence>() { new Occurrence() { Text = origin.MainEthnie, ScaleValue = 12 } }).ToList(), 5);
             var eth = w.GetEthnieByName(playerEtOcc.Text);
             GetRandomName(w, origin, playerEtOcc, out firstName, out lastName);
 
@@ -368,7 +452,7 @@ namespace FM.Generator
             var charisma = Math.Round(Math.Min(Util.GetGaussianRandom(15, 3), 20));
             var baseConst = (float)Math.Round(Math.Max(10, Math.Min(20, Util.GetGaussianRandom(18 - MAX_GEN_LEVEL + lvl, 2))), 0);
 
-            var talent = Math.Min(2.6, Math.Max(1.2, Util.GetGaussianRandom(1.6, 0.1)));
+            var talent = Math.Min(2.2, Math.Max(1.1, Util.GetGaussianRandom(1.6, 0.1)));
             var xpLevel = 0;
             var consti = (float)baseConst;
             var xpGains = new int[] { 2, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0 };
@@ -381,7 +465,7 @@ namespace FM.Generator
                 //xpLevel += 2 * Math.Max(0, 30d - i) / (30d - Player.MIN_AGE);
                 if (i >= 31)
                 {
-                    consti -= consti * 0.015f * (i - 30);
+                    consti -= consti * 0.03f * (i - 30);
                 }
             }
 
@@ -425,7 +509,7 @@ namespace FM.Generator
         {
 
             var playerEt = w.GetEthnieByName(etOcc.Text);
-            if (!playerEt.Equals(n.MainEthnie))
+            if (!playerEt.Equals(w.GetEthnieByName(n.MainEthnie)))
             {
                 var subEt = etOcc as SubEthnieOccurrence;
                 double divider = subEt.FirstAndLastNamesRate + subEt.FirstNameRate + subEt.LastNameRate;
@@ -440,20 +524,20 @@ namespace FM.Generator
                 {
                     if (nameCombiDice <= ((double)subEt.FirstAndLastNamesRate + (double)subEt.LastNameRate) / divider)
                     {
-                        firstName = GetRandomValue(n.MainEthnie.FirstNames, STANDARD_DEV);
+                        firstName = GetRandomValue(w.GetEthnieByName(n.MainEthnie).FirstNames, STANDARD_DEV);
                         lastName = GetRandomValue(playerEt.LastNames, 5);
                     }
                     else
                     {
                         firstName = GetRandomValue(playerEt.FirstNames, STANDARD_DEV);
-                        lastName = GetRandomValue(n.MainEthnie.LastNames, STANDARD_DEV);
+                        lastName = GetRandomValue(w.GetEthnieByName(n.MainEthnie).LastNames, STANDARD_DEV);
                     }
                 }
             }
             else
             {
-                firstName = GetRandomValue(n.MainEthnie.FirstNames, STANDARD_DEV);
-                lastName = GetRandomValue(n.MainEthnie.LastNames, STANDARD_DEV);
+                firstName = GetRandomValue(w.GetEthnieByName(n.MainEthnie).FirstNames, STANDARD_DEV);
+                lastName = GetRandomValue(w.GetEthnieByName(n.MainEthnie).LastNames, STANDARD_DEV);
             }
         }
     }

@@ -56,7 +56,6 @@
     <Compile Include="FootballController.cs" />
     <Compile Include="Models\FootballUniverse.cs" />
     <Compile Include="Models\NavItem.cs" />
-    <Compile Include="Models\PixelArt.cs" />
     <Compile Include="Models\Season.cs" />
     <Compile Include="RichList.cs" />
     <Compile Include="ViewModels\ClubViewModel.cs" />
@@ -75,6 +74,9 @@
       <DependentUpon>GameForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Generator.cs" />
+    <Compile Include="Views\ScorerControl.xaml.cs">
+      <DependentUpon>ScorerControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\TransferControl.xaml.cs">
       <DependentUpon>TransferControl.xaml</DependentUpon>
     </Compile>
@@ -132,6 +134,10 @@
       <Project>{e334e390-4e69-4f44-9e36-8bbaefba166e}</Project>
       <Name>AE.Graphics</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\AE.Logging\AE.Logging.csproj">
+      <Project>{EC214AA3-80FB-4337-B774-780EE1C39182}</Project>
+      <Name>AE.Logging</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\FM.Common\FM.Common.csproj">
       <Project>{39D28BEF-C8EF-4F6A-98E6-E1333E933448}</Project>
       <Name>FM.Common</Name>
@@ -143,6 +149,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Views\ClubWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ScorerControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

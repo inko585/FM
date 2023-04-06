@@ -1,6 +1,6 @@
-﻿using FM.Models;
-using FM.Models.Generic;
-using FM.Models.Season;
+﻿using FM.Common;
+using FM.Common.Generic;
+using FM.Common.Season;
 using FootballPit;
 using System;
 using System.Collections.Generic;
@@ -22,7 +22,7 @@ namespace FM
             var contract = new Contract()
             {
                 Club = c,
-                Player = p,
+                //Player = p,
                 RunTime = contractRunTime,
                 Salary = salary
             };
@@ -68,13 +68,14 @@ namespace FM
             p.ContractCurrent = new Contract()
             {
                 Club = c,
-                Player = p,
+                //Player = p,
                 RunTime = contractRunTime,
                 Salary = salary
             };
             c.Rooster.Add(p);
             sellingClub.Rooster.Remove(p);
             p.ResetDress();
+            p.DressNumber = c.GetFreeNumber(p.Position);
         }
 
 

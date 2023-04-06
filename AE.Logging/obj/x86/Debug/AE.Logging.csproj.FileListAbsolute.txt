@@ -1,0 +1,7 @@
+C:\dev\csharp\vestigo\commonnet\AE.Logging\bin\Debug\AE.Logging.dll
+C:\dev\csharp\vestigo\commonnet\AE.Logging\bin\Debug\AE.Logging.pdb
+C:\dev\csharp\vestigo\commonnet\AE.Logging\obj\x86\Debug\GitInfo.cache
+C:\dev\csharp\vestigo\commonnet\AE.Logging\obj\x86\Debug\AE.Logging.csproj.CoreCompileInputs.cache
+C:\dev\csharp\vestigo\commonnet\AE.Logging\obj\x86\Debug\AE.Logging.dll
+C:\dev\csharp\vestigo\commonnet\AE.Logging\obj\x86\Debug\AE.Logging.pdb
+C:\dev\csharp\vestigo\commonnet\AE.Logging\obj\x86\Debug\AE.Logging.csprojAssemblyReference.cache

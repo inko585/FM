@@ -1,6 +1,6 @@
 ﻿
-using FM.Models.Generic;
-using FM.Models.Season;
+using FM.Common.Generic;
+using FM.Common.Season;
 using FM.Views;
 using System;
 using System.Collections.Generic;

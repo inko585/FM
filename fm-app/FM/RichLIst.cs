@@ -1,4 +1,4 @@
-﻿using FM.Models.Generic;
+﻿using FM.Common.Generic;
 using System;
 using System.Collections.Generic;
 using System.Linq;

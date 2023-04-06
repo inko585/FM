@@ -1,6 +1,6 @@
 ﻿using AE.Graphics.Wpf.Basis;
-using FM.Models;
-using FM.Models.Generic;
+using FM.Common;
+using FM.Common.Generic;
 using FM.Views;
 using System;
 using System.Collections.Generic;
@@ -24,7 +24,7 @@ namespace FM.ViewModels
             CollectionView.GroupDescriptions.Add(new PropertyGroupDescription("Category"));
 
 
-            NavItems.Add(new NavItem()
+        NavItems.Add(new NavItem()
             {
                 Category = "STATISTIKEN",
                 Name = "Tabellen",
@@ -48,11 +48,13 @@ namespace FM.ViewModels
             NotifyPropertyChanged("NavItems");
 
             CollectionView.Refresh();
+            //SaveCommand = new RelayCommand();
 
         }
 
         public FootballUniverse Universe { get; set; }
 
+        public RelayCommand SaveCommand { get; set; }
 
         public ICollectionView CollectionView { get; set; }
 
