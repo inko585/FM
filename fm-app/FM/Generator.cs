@@ -295,7 +295,7 @@ namespace FM.Generator
                 ExcludedCities.Add(cityOcc.Text);
             }
             var city = cityOcc.Text;
-            cityOcc.ScaleValue = Math.Max(1, cityOcc.ScaleValue - 2);
+            cityOcc.ScaleValue = Math.Max(4, cityOcc.ScaleValue - 2);
             //TakenCities.Add(city);
             var prefix = "";
             var prefix2 = "";

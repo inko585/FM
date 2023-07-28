@@ -1,4 +1,6 @@
-﻿using FM.Common.Generic;
+﻿using AE.Graphics.Wpf.Basis;
+using AE.Logging;
+using FM.Common.Generic;
 using FM.Common.Season;
 using FM.Views;
 using System;
@@ -18,16 +20,20 @@ namespace FM.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(string propertyName)
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
         public ClubViewModel(Club c)
         {
             Club = c;
             SelectedJoiningSeason = Season.CurrentSeason;
             SelectedLeavingSeason = Season.CurrentSeason;
+            WatchClubCommand = new RelayCommand(x => { Club.Watch = !Club.Watch; });
         }
+
         public Club Club { get; set; }
+
+        public RelayCommand WatchClubCommand { get; set; } 
 
         private Season selectedJoiningSeason;
 

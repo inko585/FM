@@ -401,7 +401,7 @@ namespace FM.Common.Season
                 {
                     foreach (var club in Game.Instance.FootballUniverse.Clubs)
                     {
-                        club.LookForImprovement(true, 1.05);
+                        club.LookForImprovement(true, 1.1);
                     }
                 }
                 else if (CurrentWeek.Number >= 10)
@@ -455,8 +455,8 @@ namespace FM.Common.Season
                 var s2 = 1 - s1;
                 var tmp1 = mr.HomeClub.Elo;
                 var tmp2 = mr.AwayClub.Elo;
-                mr.HomeClub.Elo += (int)(46 * (s1 - e1));
-                mr.AwayClub.Elo += (int)(46 * (s2 - e2));
+                mr.HomeClub.Elo += (int)(80 * (s1 - e1));
+                mr.AwayClub.Elo += (int)(80 * (s2 - e2));
             }
         }
 
