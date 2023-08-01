@@ -61,6 +61,9 @@ namespace FM.Views
             cView.ShowDialog();
         }
 
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
 
+        }
     }
 }

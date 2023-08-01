@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -10,30 +12,43 @@ namespace AE.Graphics.Wpf
 {
     public class AutoScrollListView : ListView
     {
-        public bool IsItemVisible(int i)
-        {
-            if (Items.Count == 0)
-            {
-                return false;
+        private ScrollViewer _scrollViewer;
 
-            }
-            var item = ItemContainerGenerator.ContainerFromItem(Items[i]) as ListViewItem;
-            if (item == null)
-            {
-                return false;
-            }
-            var bounds = item.TransformToAncestor(this).TransformBounds(new System.Windows.Rect(0, 0, item.ActualWidth, item.ActualHeight));
-            var rect = new System.Windows.Rect(0, 0, this.ActualWidth, this.ActualHeight);
-            return rect.Contains(bounds.TopLeft) || rect.Contains(bounds.BottomRight);
+        protected override void OnItemsSourceChanged(System.Collections.IEnumerable oldValue, System.Collections.IEnumerable newValue)
+        {
+            base.OnItemsSourceChanged(oldValue, newValue);
+
+            if (oldValue as INotifyCollectionChanged != null)
+                (oldValue as INotifyCollectionChanged).CollectionChanged -= ItemsCollectionChanged;
+
+            if (newValue as INotifyCollectionChanged == null) return;
+
+            (newValue as INotifyCollectionChanged).CollectionChanged += ItemsCollectionChanged;
         }
 
-        protected override void OnSelectionChanged(SelectionChangedEventArgs e)
+        public override void OnApplyTemplate()
         {
-            base.OnSelectionChanged(e);
-            if (!IsItemVisible(SelectedIndex))
-            {
-                ScrollIntoView(SelectedItem);
-            }
+            base.OnApplyTemplate();
+
+            _scrollViewer = RecursiveVisualChildFinder<ScrollViewer>(this) as ScrollViewer;
+        }
+
+        void ItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (_scrollViewer == null) return;
+
+            if (!_scrollViewer.VerticalOffset.Equals(_scrollViewer.ScrollableHeight)) return;
+
+            UpdateLayout();
+            _scrollViewer.ScrollToBottom();
+        }
+
+        private static DependencyObject RecursiveVisualChildFinder<T>(DependencyObject rootObject)
+        {
+            var child = VisualTreeHelper.GetChild(rootObject, 0);
+            if (child == null) return null;
+
+            return child.GetType() == typeof(T) ? child : RecursiveVisualChildFinder<T>(child);
         }
     }
 }

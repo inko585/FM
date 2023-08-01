@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FM</RootNamespace>
     <AssemblyName>FMApp</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -59,6 +59,7 @@
     <Compile Include="Models\Season.cs" />
     <Compile Include="RichList.cs" />
     <Compile Include="ViewModels\ClubViewModel.cs" />
+    <Compile Include="ViewModels\LiveViewModel.cs" />
     <Compile Include="ViewModels\TransferViewModel.cs" />
     <Compile Include="ViewModels\MatchDayViewModel.cs" />
     <Compile Include="ViewModels\LeagueViewModel.cs" />
@@ -74,6 +75,9 @@
       <DependentUpon>GameForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Generator.cs" />
+    <Compile Include="Views\LiveWindow_Text.xaml.cs">
+      <DependentUpon>LiveWindow_Text.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ScorerControl.xaml.cs">
       <DependentUpon>ScorerControl.xaml</DependentUpon>
     </Compile>
@@ -149,6 +153,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Views\ClubWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\LiveWindow_Text.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -23,6 +23,19 @@ namespace FM.Common.Pixels
         public System.Drawing.Color MainColor { get; set; }
         public System.Drawing.Color SecondColor { get; set; }
 
+        public System.Drawing.Color TextColor
+        {
+            get
+            {
+                if (MainColor == Color.White)
+                {
+                    return SecondColor;
+                }
+
+                return MainColor;
+            }
+        }
+
         public string MainColorString { get; set; }
         public string SecondColorString { get; set; }
     }

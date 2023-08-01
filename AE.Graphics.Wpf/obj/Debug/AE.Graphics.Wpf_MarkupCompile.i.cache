@@ -4,16 +4,16 @@
 library
 C#
 .cs
-C:\dev\csharp\FM-master\FM-master\AE.Graphics.Wpf\obj\Debug\
+C:\Users\Jens\source\repos\FM\AE.Graphics.Wpf\obj\Debug\
 AE.Graphics.Wpf
 none
 false
 DEBUG;TRACE
 
-15-868685589
+151079642090
 
-50429725465
-24-1510435888
+47952942427
+231319841622
 Styles\AEStyles.xaml;View\AE2FileSelectionView.xaml;View\AEMultiSelectionView.xaml;View\AEWaitView.xaml;View\DragDrop\AEDragDropListView.xaml;View\AEInfoView.xaml;View\AEInputView.xaml;View\AELinkView.xaml;View\AEMessageBoxView.xaml;View\AEMultipleInputView.xaml;View\AENotificationView.xaml;View\AENumericTextBox.xaml;View\AEResultView.xaml;View\AESelectionView.xaml;View\AEFileSelectionView.xaml;
 
 True

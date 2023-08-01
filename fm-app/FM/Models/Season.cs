@@ -1,4 +1,5 @@
 ﻿using FM.Common.Generic;
+using FM.Views;
 using FootballPit;
 using System;
 using System.Collections.Generic;
@@ -369,7 +370,12 @@ namespace FM.Common.Season
                 {
                     foreach (var m in md.Matches)
                     {
-                        m.Simulate(true, md);
+                        var mr = m.Simulate(true, md);
+                        if (mr.HomeClub.Watch || mr.AwayClub.Watch)
+                        {
+                            var lw = new LiveWindow_Text(mr);
+                            lw.ShowDialog();
+                        }
                         AdjustElo(m.MatchResult);
                         if (m.MatchResult.HomeGoals > m.MatchResult.AwayGoals)
                         {

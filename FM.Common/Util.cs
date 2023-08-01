@@ -43,6 +43,34 @@ namespace FM.Common
 
     }
 
+    public static class RichString
+    {
+        public static string Left(this string val, string delimiter, bool includeDelimiter = true, string defaultValue = null)
+        {
+            if (!val.Contains(delimiter))
+            {
+                return defaultValue ?? val;
+            }
+
+            var i = val.IndexOf(delimiter);
+            i = includeDelimiter ? i + delimiter.Length : i;
+            return val.Substring(0, i);
+        }
+
+        public static string Right(this string val, string delimiter, bool includeDelimiter = false, string defaultValue = "")
+        {
+            if (!val.Contains(delimiter))
+            {
+                return defaultValue ?? val;
+            }
+
+            var i = val.LastIndexOf(delimiter);
+            i = includeDelimiter ? i : i + delimiter.Length;
+            return val.Substring(i);
+        }
+
+    }
+
     public enum BitmapType
     {
         Crests, Eyes, Heads, Mouths, Dresses, Stadium, Flags, Sponsors

@@ -10,6 +10,7 @@ using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using AE.Logging;
+using System.Windows.Forms;
 
 namespace FM.Common.Generic
 {
@@ -1325,6 +1326,14 @@ namespace FM.Common.Generic
                 return FirstName + " " + LastName;
             }
         }
+
+        public string ShortName
+        {
+            get
+            {
+                return FirstName[0] + ". " + LastName;
+            }
+        }
         public Nation Nation { get; set; }
     }
 
@@ -1428,6 +1437,15 @@ namespace FM.Common.Generic
             }
         }
 
+        //public string FieldNameString
+        //{
+        //    get
+        //    {
+        //        return DressNumberString + " " + LastName; 
+        //    }
+        //}
+
+
         public bool WillSignContract
         {
             get
@@ -1474,6 +1492,8 @@ namespace FM.Common.Generic
         public float SkillBase { get; set; }
         public float XPLevel { get; set; }
         public int XP { get; set; }
+
+        public bool IsLeftFoot { get; set; }
 
         public void ResetDress()
         {

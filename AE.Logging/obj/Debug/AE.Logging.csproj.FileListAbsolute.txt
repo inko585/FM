@@ -5,3 +5,10 @@ C:\dev\csharp\FM2\AE.Logging\obj\Debug\AE.Logging.csproj.CoreCompileInputs.cache
 C:\dev\csharp\FM2\AE.Logging\obj\Debug\AE.Logging.dll
 C:\dev\csharp\FM2\AE.Logging\obj\Debug\AE.Logging.pdb
 C:\dev\csharp\FM2\AE.Logging\obj\Debug\AE.Logging.csproj.AssemblyReference.cache
+C:\Users\Jens\source\repos\FM\AE.Logging\bin\Debug\AE.Logging.dll
+C:\Users\Jens\source\repos\FM\AE.Logging\bin\Debug\AE.Logging.pdb
+C:\Users\Jens\source\repos\FM\AE.Logging\obj\Debug\GitInfo.cache
+C:\Users\Jens\source\repos\FM\AE.Logging\obj\Debug\AE.Logging.csproj.AssemblyReference.cache
+C:\Users\Jens\source\repos\FM\AE.Logging\obj\Debug\AE.Logging.csproj.CoreCompileInputs.cache
+C:\Users\Jens\source\repos\FM\AE.Logging\obj\Debug\AE.Logging.dll
+C:\Users\Jens\source\repos\FM\AE.Logging\obj\Debug\AE.Logging.pdb

@@ -1,0 +1,6 @@
+C:\Users\Jens\source\repos\FM\fm-app\FM.Save\bin\Debug\FM.Save.dll
+C:\Users\Jens\source\repos\FM\fm-app\FM.Save\bin\Debug\FM.Save.pdb
+C:\Users\Jens\source\repos\FM\fm-app\FM.Save\obj\Debug\FM.Save.csproj.AssemblyReference.cache
+C:\Users\Jens\source\repos\FM\fm-app\FM.Save\obj\Debug\FM.Save.csproj.CoreCompileInputs.cache
+C:\Users\Jens\source\repos\FM\fm-app\FM.Save\obj\Debug\FM.Save.dll
+C:\Users\Jens\source\repos\FM\fm-app\FM.Save\obj\Debug\FM.Save.pdb

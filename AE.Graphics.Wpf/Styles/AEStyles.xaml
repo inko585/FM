@@ -1062,6 +1062,7 @@
     <Style x:Key="UnselectableAEItemBox" TargetType="ListBoxItem">
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="FontWeight" Value="Normal"/>
+        
 
         <Setter Property="Template">
             <Setter.Value>
@@ -1081,6 +1082,37 @@
                             </Separator.Style>
                         </Separator>
                         <ContentControl VerticalContentAlignment="Center" Height="58">
+                            <ContentPresenter VerticalAlignment="Center" Margin="5,0,0,0"/>
+                        </ContentControl>
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="UnselectableAEItemBox_small" TargetType="ListBoxItem">
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <StackPanel>
+                        <Separator Name="border">
+                            <Separator.Style>
+                                <Style TargetType="Separator">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource PreviousData}}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                    <Setter Property="Foreground" Value="{DynamicResource ListFontColor}"/>
+                                </Style>
+
+                            </Separator.Style>
+                        </Separator>
+                        <ContentControl VerticalContentAlignment="Center" Height="20">
                             <ContentPresenter VerticalAlignment="Center" Margin="5,0,0,0"/>
                         </ContentControl>
                     </StackPanel>
