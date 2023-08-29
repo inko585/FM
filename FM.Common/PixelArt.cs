@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Media.Imaging;
 
 namespace FM.Common.Pixels
@@ -12,6 +13,9 @@ namespace FM.Common.Pixels
         public System.Drawing.Color SkinColor { get; set; }
         public System.Drawing.Color HairColor { get; set; }
         public System.Drawing.Color EyeColor { get; set; }
+        public string SkinColorString { get; set; }
+        public string HairColorString { get; set; }
+        public string EyeColorString { get; set; }
         public string Head { get; set; }
         public string Mouth { get; set; }
         public string Eye { get; set; }
@@ -33,6 +37,14 @@ namespace FM.Common.Pixels
                 }
 
                 return MainColor;
+            }
+        }
+
+        public string ComparableString
+        {
+            get
+            {
+                return string.Join(";", new List<string> { MainColorString, SecondColorString }.OrderBy(x => x));
             }
         }
 
@@ -68,18 +80,18 @@ namespace FM.Common.Pixels
 
             for (int x = 0; x < bitmap.Width; x++)
             {
-                if (!IsTransparent(bitmap.GetPixel(x, (int)bitmap.Height/2)))
+                if (!IsTransparent(bitmap.GetPixel(x, (int)bitmap.Height / 2)))
                 {
                     x_1 = Math.Max(0, x - 1);
                     break;
                 }
             }
 
-            for (int x = bitmap.Width-1; x > 0; x--)
+            for (int x = bitmap.Width - 1; x > 0; x--)
             {
                 if (!IsTransparent(bitmap.GetPixel(x, (int)bitmap.Height / 2)))
                 {
-                    x_2 = Math.Min(bitmap.Width-1, x + 1);
+                    x_2 = Math.Min(bitmap.Width - 1, x + 1);
                     break;
                 }
             }
@@ -93,11 +105,11 @@ namespace FM.Common.Pixels
                 }
             }
 
-            for (int y = bitmap.Height-1; y > 0; y--)
+            for (int y = bitmap.Height - 1; y > 0; y--)
             {
-                if (!IsTransparent(bitmap.GetPixel((int)bitmap.Width / 2,y)))
+                if (!IsTransparent(bitmap.GetPixel((int)bitmap.Width / 2, y)))
                 {
-                    y_2 = Math.Min(bitmap.Height-1, y + 1);
+                    y_2 = Math.Min(bitmap.Height - 1, y + 1);
                     break;
                 }
             }

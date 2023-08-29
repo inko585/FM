@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using FM.Common.Pixels;
+using FM.Common.Season;
 
 namespace FM.Generator
 {
@@ -66,7 +67,7 @@ namespace FM.Generator
 
         }
 
-        public static LeagueAssociation GenerateRandomLeagueAssociation(World w, Association a, AssociationLook al)
+        public static LeagueAssociation GenerateRandomLeagueAssociation(World w, Association a, AssociationLook al, Club playerClub = null, int playerDepth = -1)
         {
             var la = new LeagueAssociation();
             la.Name = a.Name;
@@ -77,7 +78,17 @@ namespace FM.Generator
                 l.Association = la;
                 l.Depth = i + 1;
                 l.Power = a.Power - i;
-                for (var j = 0; j < Game.Instance.LeagueSize; j++)
+                var leagueSize = Game.Instance.LeagueSize;
+                if (playerClub != null && playerDepth == i + 1)
+                {
+                    playerClub.Nation = w.GetNationByName(a.Nations.First().Text);
+                    leagueSize--;
+                    GenerateRandomPlayersAndCoachForClub(w, playerClub.Nation, curLevel, playerClub);
+                    l.Clubs.Add(playerClub);
+                    playerClub.Leagues.Add(l);
+
+                }
+                for (var j = 0; j < leagueSize; j++)
                 {
                     var n = GetRandomOccurrence(a.Nations, STANDARD_DEV).Text;
                     var club = GenerateRandomClub(w, a, al, w.GetNationByName(n), curLevel);
@@ -93,7 +104,7 @@ namespace FM.Generator
             return la;
         }
 
-        private static List<string> TakenNames = new List<string>();
+        public static List<string> TakenNames = new List<string>();
         public static Club GenerateRandomClub(World w, Association a, AssociationLook al, Nation n, double lvl)
         {
             var c = new Club();
@@ -164,7 +175,13 @@ namespace FM.Generator
             c.Crest = GenerateRandomCrest(al);
             c.Dress = GenerateRandomDress(al);
             TakenNames.Add(name);
+            GenerateRandomPlayersAndCoachForClub(w, n, lvl, c);
 
+            return c;
+        }
+
+        private static void GenerateRandomPlayersAndCoachForClub(World w, Nation n, double lvl, Club c)
+        {
             c.Coach = GenerateRandomCoach(w, n);
             c.Coach.Club = c;
 
@@ -182,12 +199,10 @@ namespace FM.Generator
 
             var posN = c.GetLineUpCountForPosition();
 
-            GeneratePlayersForPositionAndClub(w, n, trueLvl, c, Position.Goalie, posN[Position.Goalie] * 2);
-            GeneratePlayersForPositionAndClub(w, n, trueLvl, c, Position.Defender, posN[Position.Defender] * 2);
-            GeneratePlayersForPositionAndClub(w, n, trueLvl, c, Position.Midfielder, posN[Position.Midfielder] * 2);
-            GeneratePlayersForPositionAndClub(w, n, trueLvl, c, Position.Striker, posN[Position.Striker] * 2);
-
-            return c;
+            GeneratePlayersForPositionAndClub(w, n, trueLvl, c, Position.Goalie, (int)Math.Ceiling(posN[Position.Goalie] * 2.5d));
+            GeneratePlayersForPositionAndClub(w, n, trueLvl, c, Position.Defender, (int)Math.Ceiling(posN[Position.Defender] * 2.5d));
+            GeneratePlayersForPositionAndClub(w, n, trueLvl, c, Position.Midfielder, (int)Math.Ceiling(posN[Position.Midfielder] * 2.5d));
+            GeneratePlayersForPositionAndClub(w, n, trueLvl, c, Position.Striker, (int)Math.Ceiling(posN[Position.Striker] * 2.5d));
         }
 
         public static string GenerateRandomCrest(AssociationLook al)
@@ -257,13 +272,16 @@ namespace FM.Generator
                 SkinColor = GetColorFromText(skinColor.Text),
                 HairColor = GetColorFromText(hairColor.Text),
                 EyeColor = GetColorFromText(eyeColor.Text),
+                SkinColorString = skinColor.Text,
+                EyeColorString = eyeColor.Text,
+                HairColorString = hairColor.Text,
                 Head = head.Text,
                 Mouth = mouth.Text,
                 Eye = eye.Text
             };
         }
 
-        private static Color GetColorFromText(string name)
+        public static Color GetColorFromText(string name)
         {
             try
             {
@@ -304,24 +322,24 @@ namespace FM.Generator
             if (combineSuffixAndPrefix)
             {
 
-                    prefix = GetRandomOccurrence(n.FirstPrefixes, STANDARD_DEV).Text;
+                prefix = GetRandomOccurrence(n.FirstPrefixes, STANDARD_DEV).Text;
 
-                    var secondPrefixDice = rnd.NextDouble();
-                    if (secondPrefixDice <= 0.2 && n.SecondPrefixes.Any())
-                    {
-                        prefix2 = GetPrefix2(n);
-                        name = prefix + " " + prefix2 + " " + city;
-                    }
-                    else if (secondPrefixDice >= 0.8 && n.Suffixes.Any())
-                    {
-                        suffix = GetSuffix(n);
-                        name = prefix + " " + city + " " + suffix;
-                    }
-                    else
-                    {
-                        name = prefix + " " + city;
-                    }
-                
+                var secondPrefixDice = rnd.NextDouble();
+                if (secondPrefixDice <= 0.2 && n.SecondPrefixes.Any())
+                {
+                    prefix2 = GetPrefix2(n);
+                    name = prefix + " " + prefix2 + " " + city;
+                }
+                else if (secondPrefixDice >= 0.8 && n.Suffixes.Any())
+                {
+                    suffix = GetSuffix(n);
+                    name = prefix + " " + city + " " + suffix;
+                }
+                else
+                {
+                    name = prefix + " " + city;
+                }
+
             }
             else
             {
@@ -391,13 +409,12 @@ namespace FM.Generator
                 var player = GenerateRandomPlayer(w, n, p, lvl, GEN_MIN_AGE, GEN_MAX_AGE);
                 player.DressNumber = c.GetFreeNumber(p);
                 player.ContractCurrent = new Contract() { Club = c, Player = player, RunTime = rnd.Next(1, 4), Salary = player.SalaryStandard };
-                player.ContractCurrent.SignedOn = null;
                 player.ClubHistory.Add(c);
                 c.Rooster.Add(player);
             }
         }
 
-        private static List<IPhilospophie> Philospophies = new List<IPhilospophie> { new DefensivePhilosophie(), new OffensivePhilopshie(), new PossessionPhilosophie(), new BalancedPhilosophie() };
+        public static List<IPhilospophie> Philospophies = new List<IPhilospophie> { new DefensivePhilosophie(), new OffensivePhilopshie(), new PossessionPhilosophie(), new BalancedPhilosophie() };
         public static Coach GenerateRandomCoach(World w, Nation n)
         {
             var c = new Coach();

@@ -15,6 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
@@ -40,6 +41,10 @@ namespace FM.ViewModels
         {
             Load(mr);
             TextBlocks = new ObservableCollection<TextBlock>();
+            var playerColor = Game.Instance.PlayerClub.ClubColors.MainColor;
+            var playerColor2 = Game.Instance.PlayerClub.ClubColors.SecondColor;
+            ButtonColor = new SolidColorBrush(System.Windows.Media.Color.FromArgb(playerColor.A, playerColor.R, playerColor.G, playerColor.B));
+            ButtonColor2 = new SolidColorBrush(System.Windows.Media.Color.FromArgb(playerColor2.A, playerColor2.R, playerColor2.G, playerColor2.B));
         }
 
         public string HomeGoals { get; set; }
@@ -75,6 +80,9 @@ namespace FM.ViewModels
         public MatchPlayer StrikerLeftAway => PositionMatchPlayersAway[3, 0]?.MatchPlayer;
         public MatchPlayer StrikerRightAway => PositionMatchPlayersAway[3, 2]?.MatchPlayer;
         public MatchPlayer StrikerCenterAway => PositionMatchPlayersAway[3, 1]?.MatchPlayer;
+
+        public SolidColorBrush ButtonColor {get; set;}
+        public SolidColorBrush ButtonColor2 { get; set; }
 
         private List<MatchEvent> MatchEvents { get; set; }
         public void Load(MatchResult mr)

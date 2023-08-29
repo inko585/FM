@@ -16,5 +16,5 @@ DEBUG;TRACE
 231319841622
 Styles\AEStyles.xaml;View\AE2FileSelectionView.xaml;View\AEMultiSelectionView.xaml;View\AEWaitView.xaml;View\DragDrop\AEDragDropListView.xaml;View\AEInfoView.xaml;View\AEInputView.xaml;View\AELinkView.xaml;View\AEMessageBoxView.xaml;View\AEMultipleInputView.xaml;View\AENotificationView.xaml;View\AENumericTextBox.xaml;View\AEResultView.xaml;View\AESelectionView.xaml;View\AEFileSelectionView.xaml;
 
-True
+False
 

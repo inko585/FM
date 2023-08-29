@@ -46,17 +46,17 @@ namespace
       /// <summary>Branch: master</summary>
       public const string Branch = @"master";
 
-      /// <summary>Commit: 3cbc538</summary>
-      public const string Commit = @"3cbc538";
+      /// <summary>Commit: d31e388</summary>
+      public const string Commit = @"d31e388";
 
-      /// <summary>Sha: 3cbc5389e73e2efbd634981fc556c15104ed8125</summary>
-      public const string Sha = @"3cbc5389e73e2efbd634981fc556c15104ed8125";
+      /// <summary>Sha: d31e3883d8445a7ffbdda48e3d2a4b3a77cbe44c</summary>
+      public const string Sha = @"d31e3883d8445a7ffbdda48e3d2a4b3a77cbe44c";
 
-      /// <summary>Commit date: 2023-07-28T08:31:16+02:00</summary>
-      public const string CommitDate = @"2023-07-28T08:31:16+02:00";
+      /// <summary>Commit date: 2023-08-01T13:20:44+02:00</summary>
+      public const string CommitDate = @"2023-08-01T13:20:44+02:00";
 
-      /// <summary>Commits on top of base version: 35</summary>
-      public const string Commits = @"35";
+      /// <summary>Commits on top of base version: 36</summary>
+      public const string Commits = @"36";
 
       /// <summary>Tag: </summary>
       public const string Tag = @"";
@@ -86,8 +86,8 @@ namespace
         /// <summary>Minor: 0</summary>
         public const string Minor = @"0";
 
-        /// <summary>Patch: 35</summary>
-        public const string Patch = @"35";
+        /// <summary>Patch: 36</summary>
+        public const string Patch = @"36";
 
         /// <summary>Label: </summary>
         public const string Label = @"";

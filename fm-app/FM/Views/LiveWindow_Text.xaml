@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FM.Views"
              mc:Ignorable="d" 
-             Height="1000" Width="1200" WindowStartupLocation="CenterScreen">
+             Height="900" Width="1100" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -39,11 +39,11 @@
 
     <Grid >
         <Grid.RowDefinitions>
-            <RowDefinition Height="40*"/>
+            <RowDefinition Height="90"/>
             <RowDefinition Height="180*"/>
             <RowDefinition Height="5"/>
             <RowDefinition Height="180*"/>
-            <RowDefinition Height="40*"/>
+            <RowDefinition Height="90"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="50*"/>
@@ -195,6 +195,7 @@
             </Grid>
         </Border>
 
-        <Button Content="&#xf1e3; Weiter"  Style="{StaticResource MainButton}" IsDefault="True" FontFamily="{StaticResource FontAwesome}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Right" Width="150" VerticalAlignment="Center" Height="40" Margin="20,10" Click="Ok_Click"/>
+        <Button Content="Schließen" FontSize="16" Click="Ok_Click"  Style="{StaticResource AEFlatButtonStyle}" BorderThickness="1" FontFamily="{StaticResource FontAwesome}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Right" Width="150" Margin="20,20" />
+        <!--<Button Content="&#xf1e3; Weiter"  Style="{StaticResource MainButton}" IsDefault="True" FontFamily="{StaticResource FontAwesome}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Right" Width="150" VerticalAlignment="Center" Height="40" Margin="20,10" />-->
     </Grid>
 </ae:AEWindow>

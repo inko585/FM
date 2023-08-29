@@ -6,14 +6,13 @@
              xmlns:local="clr-namespace:FM"  
           xmlns:ae="clr-namespace:AE.Graphics.Wpf;assembly=AE.Graphics.Wpf"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" WindowStartupLocation="CenterScreen">
+             d:DesignHeight="450" d:DesignWidth="800" WindowStartupLocation="CenterScreen" WindowState="Maximized">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/AE.Graphics.Wpf;component/Styles/AEStyles.xaml"/>
                 <ResourceDictionary>
                     <FontFamily x:Key="FontAwesome">/AE.Graphics.WPF;Component/Fonts/fontawesome-webfont.ttf#FontAwesome</FontFamily>
-                    <FontFamily x:Key="FontAwesome6">/pack://application:,,,/AE.Graphics.Wpf;component/Fonts/fa6-solid-900.ttf#Font Awesome 6 Pro Solid</FontFamily>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -21,6 +20,7 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Command="{Binding SaveCommand}" Header="&#xf0c7; Speichern" FontFamily="{StaticResource FontAwesome}" Margin="5"/>
+            <MenuItem Command="{Binding LoadCommand}" Header="&#xf07c; Laden" FontFamily="{StaticResource FontAwesome}" Margin="5"/>
         </Menu>
         <StatusBar DockPanel.Dock="Bottom" >
             <TextBlock Text="Version 1.0.0"/>
@@ -49,32 +49,56 @@
                 </Grid.RowDefinitions>
                 <Border BorderThickness="1" BorderBrush="#FFACACAC"  Margin="5,5,5,0" Grid.ColumnSpan="2">
                     <Grid Background="{StaticResource ListColor}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Image Source="{Binding PlayerClub.CrestImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" Margin="10,0,10,0"></Image>
+
+                        <Label Content="{Binding PlayerClub.Name}" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Grid.Column="1"></Label>
 
                     </Grid>
                 </Border>
-                <Border BorderThickness="1" BorderBrush="{StaticResource NavAreaBorderColor}"  Margin="5,5,5,0" Grid.Row="1" Grid.ColumnSpan="2" Background="{StaticResource NavAreaColor}">
+                <Border BorderThickness="1" BorderBrush="{StaticResource NavAreaBorderColor}"  Margin="5,5,5,0" Grid.Row="1" Grid.ColumnSpan="2" Background="{Binding FlavorColor}">
                     <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="5"/>
-                        </Grid.ColumnDefinitions>
+ 
+                        
                         <!--<Button Content="Speichern"  Style="{StaticResource RedButton}" Grid.Column="1" Margin="5,8"/>
                     <Button Content="Laden"  Style="{StaticResource RedButton}" Grid.Column="2" Margin="5,8"/>-->
                     </Grid>
                 </Border>
                 <ContentControl x:Name="ContentControl" Grid.Row="2"/>
-                <Border BorderThickness="1" BorderBrush="#FFACACAC"  Margin="5,5,5,5" Grid.Row="2" Grid.Column="1" Background="{StaticResource NavAreaColor}">
-                    <Grid  Background="{StaticResource ListColor}" >
-                        <Grid.RowDefinitions>
+
+                <Grid  Grid.Row="2" Grid.Column="1">
+                        <Grid.RowDefinitions >
                             <RowDefinition/>
-                            <RowDefinition Height="60"/>
-                            <RowDefinition Height="15"/>
+                            <RowDefinition Height="90"/>
+                            
                         </Grid.RowDefinitions>
-                        <Button Content="&#xf1e3; Weiter" Click="ContinueButtonClick" Style="{StaticResource MainButton}" FontFamily="{StaticResource FontAwesome}" Grid.Row="1" HorizontalAlignment="Right" Width="150" Margin="20,10"/>
+                    <Border BorderThickness="1" BorderBrush="#FFACACAC" Background="White"  Margin="5,5,5,0" >
+                        <Grid VerticalAlignment="Top">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition/>
+                                
+                            </Grid.RowDefinitions>
+                            <Label Content="Nächster Gegner:" Margin="10" FontWeight="Bold"/>
+                            <Grid Grid.Row="1" Margin="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition />
+       
+
+                            </Grid.ColumnDefinitions>
+                            <Label PreviewMouseDown="Club_PreviewMouseDown" Name="homeLabel" Content="{Binding NextOpponent.Name}"  VerticalAlignment="Center" Grid.Column="1" FontSize="16" HorizontalAlignment="Left"/>
+                            <Image Source="{Binding NextOpponent.CrestImage}" Height="50" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" ></Image>
+                            
+                        </Grid>
+                        </Grid>
+                        </Border>
+                    <Button Content="&#xf1e3;  Nächster Spieltag"  FontSize="16" Click="ContinueButtonClick"  Style="{StaticResource AEFlatButtonStyle}" BorderBrush="{Binding ButtonColor2}" BorderThickness="1" FontFamily="{StaticResource FontAwesome}" Grid.Row="1"  HorizontalAlignment="Right" Width="200" Margin="20,20" Background="{Binding ButtonColor}" Foreground="{Binding ButtonColor2}"/>
                     </Grid>
-                </Border>
+                
                 <!--<Border BorderThickness="1" BorderBrush="{StaticResource NavAreaBorderColor}"  Margin="5,5,5,5" Grid.Row="3" Background="{StaticResource NavAreaColor}">
 
             </Border>-->

@@ -1,4 +1,6 @@
 ﻿using FM.Common.Generic;
+using FM.Save;
+using FM.ViewModels;
 using FM.Views;
 using FootballPit;
 using System;
@@ -46,7 +48,26 @@ namespace FM.Common.Season
             AllSeasons.Add(CurrentSeason);
         }
 
-        public static Season CurrentSeason { get; private set; }
+        private Dictionary<float, int> ver = null;
+        public Dictionary<float, int> ValueEloRatio
+        {
+            get
+            {
+                if (ver == null)
+                {
+                    ver = new Dictionary<float, int>();
+                    foreach (var c in Game.Instance.FootballUniverse.Clubs)
+                    {
+                        ver[c.GetAverageValueForStartingLineUp()] = c.Elo;
+                    }
+                    
+                }
+
+                return ver;
+            }
+        }
+
+        public static Season CurrentSeason { get; set; }
         public static List<Season> AllSeasons { get; set; }
 
         public void Simulate()
@@ -162,13 +183,14 @@ namespace FM.Common.Season
 
 
             var leavingPlayers = new List<Player>();
-            foreach (var p in Game.Instance.FootballUniverse.Players)
+            foreach (var p in Game.Instance.FootballUniverse.Players.Where(x => !Game.Instance.FootballUniverse.RetiredPlayers.Contains(x)))
             {
                 p.Age++;
                 if (p.Age > 30)
                 {
                     p.Constitution -= p.ConstitutionBase * 0.03f * (p.Age - 30);
                 }
+
                 p.ContractCurrent.RunTime--;
                 if (p.ContractCurrent.RunTime == 0)
                 {
@@ -184,6 +206,7 @@ namespace FM.Common.Season
                         if (p.Club != clubCurrent)
                         {
                             p.Club.NewPlayersWithoutFee.Add(p);
+                            p.PlayerPriceAdjustment = 1;
                         }
                         p.DressNumber = p.Club.GetFreeNumber(p.Position);
                         p.PlayerStatistics.Add(new PlayerStatistics(p, (int)p.SkillMax, next.Year, p.Club.Leagues.First().Depth));
@@ -191,8 +214,10 @@ namespace FM.Common.Season
                     else
                     {
                         var bm = p.PlayerImage;
+                        Game.Instance.FootballUniverse.RetiredPlayers.Add(p);
+                        Game.Instance.FootballUniverse.TransferList.Add(new Transfer(p, p.Club, null, CurrentSeason.Year, 0, 0, p.MarketValueStandard));
                         p.ContractCurrent = null;
-                        leavingPlayers.Add(p);
+
                     }
                 }
                 else
@@ -201,12 +226,6 @@ namespace FM.Common.Season
                 }
             }
 
-            foreach (var p in leavingPlayers)
-            {
-                //Console.WriteLine(p.FullName + " " + p.Age + " " + p.SkillMax);
-                //Game.Instance.FootballUniverse.PlayersWithoutContract.Add(p);
-
-            }
 
             foreach (var c in Game.Instance.FootballUniverse.Clubs)
             {
@@ -329,7 +348,7 @@ namespace FM.Common.Season
         }
 
         public int Year { get; set; }
-        private int CurrentWeekIndex { get; set; }
+        public int CurrentWeekIndex { get; set; }
         public FootballWeek CurrentWeek
         {
             get
@@ -340,6 +359,24 @@ namespace FM.Common.Season
 
         public void Progress()
         {
+
+            if (CurrentWeek.Number <= 3)
+            {
+                foreach (var club in Game.Instance.FootballUniverse.Clubs.Where(c => c != Game.Instance.PlayerClub))
+                {
+                    club.LookForImprovement(1.1);
+                }
+            }
+            
+            else if (CurrentWeek.Number >= Game.CONTRACT_BORDER_WEEK)
+            {
+                foreach (var club in Game.Instance.FootballUniverse.Clubs.Where(c => c != Game.Instance.PlayerClub))
+                {
+                    club.PlanNextYearRooster();
+                }
+            }
+
+            //IO.Save(Game.Instance.FootballUniverse);
             if (CurrentWeek.Number == FootballWeeks.Count)
             {
                 NextSeason();
@@ -361,11 +398,11 @@ namespace FM.Common.Season
                     p.Train();
                 }
 
-                foreach(var c in Game.Instance.FootballUniverse.Clubs)
+                foreach (var c in Game.Instance.FootballUniverse.Clubs)
                 {
                     c.ResetLineup();
                 }
-               
+
                 foreach (var md in CurrentWeek.MatchDays)
                 {
                     foreach (var m in md.Matches)
@@ -403,20 +440,6 @@ namespace FM.Common.Season
                     }
                 }
 
-                if (CurrentWeek.Number <= 3)
-                {
-                    foreach (var club in Game.Instance.FootballUniverse.Clubs)
-                    {
-                        club.LookForImprovement(true, 1.1);
-                    }
-                }
-                else if (CurrentWeek.Number >= 10)
-                {
-                    foreach (var club in Game.Instance.FootballUniverse.Clubs)
-                    {
-                        club.PlanNextYearRooster();
-                    }
-                }
 
 
                 CurrentWeekIndex++;
@@ -430,6 +453,7 @@ namespace FM.Common.Season
 
                 EventArgs args = new EventArgs();
                 OnSeasonProgress(this, args);
+
             }
         }
 

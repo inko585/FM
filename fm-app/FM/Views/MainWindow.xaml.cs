@@ -2,6 +2,7 @@
 using FM.Common.Generic;
 using FM.Common.Season;
 using FM.ViewModels;
+using FootballPit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,15 +27,27 @@ namespace FM.Views
     {
         public MainWindow()
         {
+            
+        }
+
+        public void Init()
+        {
             ViewModel = new MainViewModel();
             DataContext = ViewModel;
             ViewModel.View = this;
             InitializeComponent();
+            ((MainViewModel)ViewModel).SelectedNavItem = ((MainViewModel)ViewModel).NavItems.First();
         }
 
         private void ContinueButtonClick(object sender, RoutedEventArgs e)
         {
             Season.CurrentSeason.Progress();
+        }
+
+        private void Club_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var cView = new ClubWindow((ViewModel as MainViewModel).NextOpponent);
+            cView.ShowDialog();
         }
     }
 }

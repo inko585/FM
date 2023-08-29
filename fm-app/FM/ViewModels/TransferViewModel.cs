@@ -22,17 +22,22 @@ namespace FM.ViewModels
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-
+        public static TransferViewModel Instance { get; private set; }
         public TransferViewModel()
         {
             Filter = "";
-            LeagueAssociations = new ObservableCollection<LeagueAssociation>(Game.Instance.FootballUniverse.LeagueAssociations);
-            Season.CurrentSeason.OnSeasonProgress += HandleProgress;
-            Season.OnSeasonChange += HandleSeasonSwitch;
+            Instance = this;
+            Subscribe();
             SelectedSeason = Season.CurrentSeason;
             SelectedLeagueAssociation = Game.Instance.PlayerLeagueAssociation;
             SelectedLeague = Game.Instance.PlayerLeague;
             //NotifyPropertyChanged("LeagueAssociations");
+        }
+
+        public void Subscribe()
+        {
+            Season.CurrentSeason.OnSeasonProgress += HandleProgress;
+            Season.OnSeasonChange += HandleSeasonSwitch;
         }
 
         public void HandleProgress(object o, EventArgs e)
@@ -63,8 +68,13 @@ namespace FM.ViewModels
         }
 
 
-        public ObservableCollection<LeagueAssociation> LeagueAssociations { get; set; }
-
+        public ObservableCollection<LeagueAssociation> LeagueAssociations
+        {
+            get
+            {
+                return new ObservableCollection<LeagueAssociation>(Game.Instance.FootballUniverse.LeagueAssociations);
+            }
+        }
         public ObservableCollection<Season> Seasons
         {
             get
@@ -77,7 +87,7 @@ namespace FM.ViewModels
         {
             get
             {
-                return new ObservableCollection<Transfer>(Game.Instance.FootballUniverse.TransferList.Where(t => t.Year == SelectedSeason.Year && (t.From.Leagues.Contains(SelectedLeague) || t.To.Leagues.Contains(SelectedLeague)) && (Filter == "" || (t.From.Name + " " + t.Player.FullName + " " + t.To.Name).Contains(Filter))));
+                return new ObservableCollection<Transfer>(Game.Instance.FootballUniverse.TransferList.Where(t => t.Year == SelectedSeason.Year && (t.From.Leagues.Contains(SelectedLeague) || (t.To?.Leagues?.Contains(SelectedLeague) ?? false)) && (Filter == "" || (t.From.Name + " " + t.Player.FullName + " " + t.To?.Name ?? "").Contains(Filter))));
             }
         }
 
@@ -92,7 +102,10 @@ namespace FM.ViewModels
             set
             {
                 selectedLeagueAssociation = value;
-                SelectedLeague = selectedLeagueAssociation.Leagues.First();
+                if (selectedLeagueAssociation != null)
+                {
+                    SelectedLeague = selectedLeagueAssociation.Leagues.First();
+                }
                 NotifyPropertyChanged("SelectedLeagueAssociation");
             }
         }

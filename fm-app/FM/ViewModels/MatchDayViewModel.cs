@@ -19,19 +19,25 @@ namespace FM.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(string propertyName)
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        public static MatchDayViewModel Instance { get; private set; }
         public MatchDayViewModel()
         {
-            LeagueAssociations = new ObservableCollection<LeagueAssociation>(Game.Instance.FootballUniverse.LeagueAssociations);
             SelectedLeagueAssociation = Game.Instance.PlayerLeagueAssociation;
             SelectedLeague = Game.Instance.PlayerLeague;
             SelectedMatchDay = SelectedLeague.LatestMatchDay;
+            Subscribe();
+
+            //NotifyPropertyChanged("LeagueAssociations");
+            Instance = this;
+        }
+
+        public void Subscribe()
+        {
             Season.CurrentSeason.OnSeasonProgress += HandleProgress;
             Season.OnSeasonChange += HandleSeasonSwitch;
-            //NotifyPropertyChanged("LeagueAssociations");
         }
 
         public void HandleSeasonSwitch(object o, EventArgs e)
@@ -48,7 +54,13 @@ namespace FM.ViewModels
             //NotifyPropertyChanged("SelectedMatchDay.ObservableMatches");
         }
 
-        public ObservableCollection<LeagueAssociation> LeagueAssociations { get; set; }
+        public ObservableCollection<LeagueAssociation> LeagueAssociations
+        {
+            get
+            {
+                return new ObservableCollection<LeagueAssociation>(Game.Instance.FootballUniverse.LeagueAssociations);
+            }
+        }
 
         private LeagueAssociation selectedLeagueAssociation;
 

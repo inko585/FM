@@ -28,5 +28,42 @@ namespace FM.Views
             DataContext = new PlayerViewModel(player);
             InitializeComponent();
         }
+
+        private void Contract_Click(object sender, RoutedEventArgs e)
+        {
+            var pvm = (sender as Button).DataContext as PlayerViewModel;
+
+            if (pvm.Player.Club == Game.Instance.PlayerClub && !pvm.Player.WantsToLeavePlayerClub.HasValue)
+            {
+                pvm.Player.WantsToLeavePlayerClub = pvm.Player.CheckIfPlayerWantsToLeavePlayerClub();
+                if (pvm.Player.WantsToLeavePlayerClub.Value)
+                {
+                    AEGraphics.ShowMessage(pvm.Player.FullName + " teilt ihnen mit dass er den Club verlassen will. Er will sich eine neue Herausforderung suchen.");
+                    pvm.NotifyPropertyChanged("Player");
+                    pvm.NotifyPropertyChanged("ContractEnabled");
+                    pvm.NotifyPropertyChanged("BuyEnabled");
+                    return;
+                }
+            }
+
+            var dia = new ContractWindow(pvm.Player, Game.Instance.PlayerClub, false);
+
+            dia.ShowDialog();
+            pvm.NotifyPropertyChanged("Player");
+            pvm.NotifyPropertyChanged("ContractEnabled");
+            pvm.NotifyPropertyChanged("BuyEnabled");
+        }
+
+        private void Buy_Click(object sender, RoutedEventArgs e)
+        {
+            var pvm = (sender as Button).DataContext as PlayerViewModel;
+
+            var dia = new ContractWindow(pvm.Player, Game.Instance.PlayerClub, true);
+
+            dia.ShowDialog();
+            pvm.NotifyPropertyChanged("Player");
+            pvm.NotifyPropertyChanged("ContractEnabled");
+            pvm.NotifyPropertyChanged("BuyEnabled");
+        }
     }
 }

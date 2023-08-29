@@ -36,11 +36,17 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Messaging" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -58,8 +64,14 @@
     <Compile Include="Models\NavItem.cs" />
     <Compile Include="Models\Season.cs" />
     <Compile Include="RichList.cs" />
+    <Compile Include="Save\UniverseObject.cs" />
     <Compile Include="ViewModels\ClubViewModel.cs" />
+    <Compile Include="ViewModels\ContractViewModel.cs" />
+    <Compile Include="ViewModels\FoundingViewModel.cs" />
+    <Compile Include="ViewModels\LineUpViewModel.cs" />
     <Compile Include="ViewModels\LiveViewModel.cs" />
+    <Compile Include="ViewModels\PriceViewModel.cs" />
+    <Compile Include="ViewModels\RoosterViewModel.cs" />
     <Compile Include="ViewModels\TransferViewModel.cs" />
     <Compile Include="ViewModels\MatchDayViewModel.cs" />
     <Compile Include="ViewModels\LeagueViewModel.cs" />
@@ -67,6 +79,18 @@
     <Compile Include="ViewModels\PlayerViewModel.cs" />
     <Compile Include="Views\ClubWindow.xaml.cs">
       <DependentUpon>ClubWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\LineUpControl.xaml.cs">
+      <DependentUpon>LineUpControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PriceWindow.xaml.cs">
+      <DependentUpon>PriceWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ContractWindow.xaml.cs">
+      <DependentUpon>ContractWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\FoundingWindow.xaml.cs">
+      <DependentUpon>FoundingWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\GameForm.cs">
       <SubType>Form</SubType>
@@ -77,6 +101,9 @@
     <Compile Include="Generator.cs" />
     <Compile Include="Views\LiveWindow_Text.xaml.cs">
       <DependentUpon>LiveWindow_Text.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\RoosterControl.xaml.cs">
+      <DependentUpon>RoosterControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ScorerControl.xaml.cs">
       <DependentUpon>ScorerControl.xaml</DependentUpon>
@@ -116,6 +143,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -156,7 +184,27 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\LineUpControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PriceWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ContractWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\FoundingWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\LiveWindow_Text.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\RoosterControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

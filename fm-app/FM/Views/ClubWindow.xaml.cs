@@ -44,6 +44,9 @@ namespace FM.Views
 
             var pView = new PlayerWindow(p);
             pView.ShowDialog();
+            var cvm = DataContext as ClubViewModel;
+            cvm.NotifyPropertyChanged("Club");
+            cvm.NotifyPropertyChanged("LeavingHistory");
         }
 
         private void From_PreviewMouseDown(object sender, MouseButtonEventArgs e)

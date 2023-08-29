@@ -24,37 +24,29 @@ namespace FootballPit
     public class Match
     {
 
-        public Match()
-        {
-            IsPlayed = false;
-        }
 
-        public LeagueCompetitor HomeCompetitor { get; set; }
-        public LeagueCompetitor AwayCompetitor { get; set; }
-        public Club HomeClub
-        {
-            get
-            {
-                return HomeCompetitor.Club;
-            }
-        }
-        public Club AwayClub
-        {
-            get
-            {
-                return AwayCompetitor.Club;
-            }
-        }
+        public LeagueCompetitor HomeCompetitor { get => homeCompetitor; set { homeCompetitor = value; HomeClub = value.Club; } }
+        public LeagueCompetitor AwayCompetitor { get => awayCompetitor; set { awayCompetitor = value; AwayClub = value.Club; } }
+        public Club HomeClub { get; set; }
+
+        public Club AwayClub { get; set; }
 
         public bool AwayDressSwitch
         {
             get
             {
-                return HomeClub.ClubColors.MainColorString == AwayClub.ClubColors.MainColorString /*|| HomeClub.ClubColors.MainColorString == AwayClub.ClubColors.SecondColorString*/;
+                
+                return HomeClub.ClubColors.MainColorString == AwayClub.ClubColors.MainColorString || HomeClub.ClubColors.ComparableString == AwayClub.ClubColors.ComparableString /*|| HomeClub.ClubColors.MainColorString == AwayClub.ClubColors.SecondColorString*/;
             }
         }
 
-        public bool IsPlayed { get; set; }
+        public bool IsPlayed
+        {
+            get
+            {
+                return MatchResult != null;
+            }
+        }
 
 
         public MatchResult MatchResult { get; set; }
@@ -75,9 +67,9 @@ namespace FootballPit
         public static double FITNESS_DECAY_PASSIVE_TACTIC_BONUS = 2d;
         public static double ATTK_FACTOR_OFFENSIVE = 1.2;
         public static double ATTK_FACTOR_NORMAL = 1;
-        public static double DEF_FACTOR_HARD_TACKLING = 1.07;
+        public static double DEF_FACTOR_HARD_TACKLING = 1.065;
         public static double DEF_FACTOR_NORMAL_TACKLING = 1d;
-        public static double DEF_FACTOR_LOW_TACKING = 0.93;
+        public static double DEF_FACTOR_LOW_TACKING = 0.935;
         //public static double DEF_FACTOR_OFFENSIVE = 0.8;
         //public static double DEF_FACTOR_NORMAL = 1;
         public static double GAME_LENGTH = 60;
@@ -237,7 +229,7 @@ namespace FootballPit
 
             ResetFitness();
             MatchResult = res;
-            IsPlayed = true;
+
 
             HomeClub.ResetLineup();
             AwayClub.ResetLineup();
@@ -274,7 +266,7 @@ namespace FootballPit
                 }
             }
 
-            var r = new Run(Match.GAME_LENGTH+": Das Spiel ist aus!");
+            var r = new Run(Match.GAME_LENGTH + ": Das Spiel ist aus!");
             r.FontWeight = FontWeights.Bold;
             var tb = new TextBlock();
             tb.Inlines.Add(r);
@@ -361,6 +353,8 @@ namespace FootballPit
         }
 
         public static Random Random = new Random(DateTime.Now.Millisecond);
+        private LeagueCompetitor homeCompetitor;
+        private LeagueCompetitor awayCompetitor;
 
         public bool IsGoalShotFired(LineUp lu, int area)
         {
@@ -744,7 +738,7 @@ namespace FootballPit
             var posessions = GetPlayerPosession(posession);
             posessions = posessions.Skip(Math.Max(0, posessions.Count() - 2)).ToList();
             var diceAction = Util.GetRandomInt(0, 4);
-            var diceShot = Util.GetRandomInt(0, 6);
+            var diceShot = Util.GetRandomInt(0, 4);
             var diceResult = Util.GetRandomInt(0, 4);
             var diceHigh = Util.GetRandomInt(0, 2);
 
@@ -895,32 +889,28 @@ namespace FootballPit
         {
             "Gehalten!",
             "Pfosten!",
-            "Weit vorbei...",
+            "Doch der geht vorbei...",
             "Glanztat von @0!",
             "Doch den kann @0 irgendwie halten!"
         };
 
         private List<string> ShotLow = new List<string>
         {
-            "Den will er sich nicht nehmen lassen...",
-            "Er schießt...",
-            "Schuss!",
+            "Er setzt zum Heber an...",
+            "Er schießt!",
+            "Er sucht den Abschluss!",
             "Er versucht den Ball am Tormann vorbei zu schieben...",
             "Er zieht ab!",
-            "Er versucht den Ball irgendwie am Tormann vorbei zu legen...",
-            "Er setzt zum Heber an...",
 
         };
 
 
         private List<string> ShotHigh = new List<string>
         {
-            "Er versucht den Ball per Kopf direkt ins Tor zu verlängern...",
+            "Er versucht den Ball per Kopf ins Tor zu verlängern...",
             "Er nimmt den Ball Volley!",
             "Kopfball aufs Tor!",
             "Schöner Dropkick!",
-            "Er versucht den Ball Volley am Tormann vorbei zu legen...",
-            "Er bringt den Ball per Kopf Richtung Tor...",
             "Seitfallzieher!"
 
         };
@@ -948,33 +938,33 @@ namespace FootballPit
             "@0 setzt sich gekonnt durch...;Jetzt mit einem Steilpass auf @1!",
             "@0 kann den Ball behaupten und geht mit Tempo Richtung Tor!;Er legt quer auf @1!",
             "@0 kann den Ball unter Druck irgendwie behaupten...;Steckt durch zu @1...",
-            "@0 dribbelt mit Tempo über Außen;Bringt den Ball nach innen auf @1... ",
-            "@0 mit einem gutem Dribbling;Er steckt durch zu @1..."
+            "@0 dribbelt mit Tempo nach vorne!;Legt den Ball zurück auf @1... ",
+            "@0 mit einem gutem Dribbling...;Er steckt durch zu @1..."
         };
 
         private List<string> DribblingAndPassHigh = new List<string>
         {
             "@0 setzt sich gekonnt durch;Jetzt mit der Flanke auf @1...",
-            "@0 kann den Ball behaupten und geht mit Tempo nach vorne!;Er flankt den Ball nach innen auf @1!",
+            "@0 kann den Ball gekonnt behaupten!;Spielt einen hohen Ball auf @1...",
             "@0 kann den Ball unter Druck irgendwie behaupten...;Chipt den Ball auf @1...",
-            "@0 dribbelt mit Tempo über Außen;Er flankt auf @1... ",
-            "@0 mit einem gutem Dribbling.;Er packt einen Lupfer auf @1 aus..."
+            "@0 dribbelt mit Tempo nach vorne!;Er flankt auf @1... ",
+            "@0 mit einem gutem Dribbling...;Er packt einen Lupfer auf @1 aus..."
         };
 
         private List<string> PassLow = new List<string>
         {
             "Wunderschöner Pass von @0 in die Spitze!;@1 hat nur noch den Tormann vor sich...",
-            "@0 steckt den Ball durch zu @1;Der hat freie Schussbahn!",
-            "@0 mit einer gefühlvollen Ablage auf @1;Der könnte jetzt schießen...",
-            "@0 spielt den Ball gekonnt zu @1;Der ist jetzt in aussichtsreicher Position... ",
+            "@0 steckt den Ball durch zu @1...;Der könnte jetzt schießen...",
+            "@0 mit einem gefühlvollen Pass auf @1...;Der hat jetzt freie Schussbahn!",
+            "@0 spielt den Ball gekonnt zu @1...;Der setzt sich vor dem Tor durch...",
             "@0 spielt den Ball Steil vors Tor!;@1 kommt an den Ball..."
         };
 
         private List<string> PassHigh = new List<string>
         {
             "Wunderschöner Chip von @0 über die Abwehr hinweg!;Der Ball kommt genau auf @1...",
-            "@0 verlängert einen hohen Ball per Kopf auf @1!;Der steht völlig frei!",
-            "@0 mit einer Volley Ablage hoch auf @1...",
+            "@0 verlängert einen hohen Ball per Kopf auf @1!",
+            "@0 chipt den Ball aus dem Stand hoch auf @1...",
             "@0 mit einem hohen Ball vors Tor...;@1 kommt an den Ball!",
             "@0 kann den Ball unter Druck hoch vors Tor bringen...;Dort lauert bereits @1!",
             //"@0 kommt irgendwie noch an den Ball und verlängert diesen hoch vors Tor! Der Ball kommt auf @1!"
@@ -1018,6 +1008,8 @@ namespace FootballPit
             Out = outP;
             Minute = minute;
         }
+
+        public Substitution() { }
     }
 
     public class ScoreEvent

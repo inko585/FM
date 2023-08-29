@@ -18,10 +18,12 @@ namespace FM
 {
     public class Test
     {
-        World w = World.ReadWorld(@"C:\Users\Jens\Documents\gendata12_8.xml");
+        World w = World.ReadWorld(@"C:\Users\Jens\Documents\gendata12_11.xml");
         public void Run()
         {
             new Application();
+
+
             var logger = Logger.GetLogger("Results");
             logger.AddAppender(new RollingFileAppender("RFA", Logger.LOG_ALL, "results.log"));
             //var c = new Club();
@@ -35,18 +37,21 @@ namespace FM
             //c2.StartingLineUp = lu2;
 
             //w.Associations.First().Depth = 2;
-            var c = WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.AssociationLooks.First(), w.Nations.First(), w.Associations.First().Power);
-            var c2 = WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.AssociationLooks.First(), w.Nations.First(), w.Associations.First().Power);
+            //var c = WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.AssociationLooks.First(), w.Nations.First(), w.Associations.First().Power);
+            //var c2 = WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.AssociationLooks.First(), w.Nations.First(), w.Associations.First().Power);
             //WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.Nations.First(), w.Associations.First().Power);
-            var m = new Match();
-            m.HomeCompetitor = new LeagueCompetitor() { Club = c, Points = 0 };
-            m.AwayCompetitor = new LeagueCompetitor() { Club = c2, Points = 0 };
-            var mr = m.Simulate(true);
+            //var m = new Match();
+            //m.HomeCompetitor = new LeagueCompetitor() { Club = c, Points = 0 };
+            //m.AwayCompetitor = new LeagueCompetitor() { Club = c2, Points = 0 };
+            //var mr = m.Simulate(true);
             //var lw = new LiveWindow_Text(mr);
             //lw.ShowDialog();
-            
-            Game.InitNewGame(w, 12);
+
             var mw = new FM.Views.MainWindow();
+
+            Game.InitNewGame(w, 12);
+
+            mw.Init();
 
             PrintLeagueResults();
 
@@ -54,9 +59,9 @@ namespace FM
 
 
 
-            Season.InitSeasons();
+            //Season.InitSeasons();
 
-            10.Times(() => { Season.CurrentSeason.Simulate(); });
+            //10.Times(() => { Season.CurrentSeason.Simulate(); });
 
 
             //foreach (var l in Game.Instance.PlayerLeagueAssociation.Leagues)
@@ -113,88 +118,88 @@ namespace FM
             //c2.Coach.Philospophie = new OffensivePhilopshie();
             //c.Coach.Philospophie = new DefensivePhilosophie();
 
-            //50.Times(() =>
-            //{
-            //    var c = WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.AssociationLooks.First(), w.Nations.First(), w.Associations.First().Power);
-            //    var c2 = WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.AssociationLooks.First(), w.Nations.First(), w.Associations.First().Power);
-            //    //WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.Nations.First(), w.Associations.First().Power);
-            //    var m = new Match();
-            //    m.HomeCompetitor = new LeagueCompetitor() { Club = c, Points = 0 };
-            //    m.AwayCompetitor = new LeagueCompetitor() { Club = c2, Points = 0 };
-            //    var mr = m.Simulate(true);
-            //    var p1 = c.Coach.Philospophie.GetType().Name;
-            //    var p2 = c2.Coach.Philospophie.GetType().Name;
+            500.Times(() =>
+            {
+                var c = WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.AssociationLooks.First(), w.Nations.First(), w.Associations.First().Power);
+                var c2 = WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.AssociationLooks.First(), w.Nations.First(), w.Associations.First().Power);
+                //WorldGenerator.GenerateRandomClub(w, w.Associations.First(), w.Nations.First(), w.Associations.First().Power);
+                var m = new Match();
+                m.HomeCompetitor = new LeagueCompetitor() { Club = c, Points = 0 };
+                m.AwayCompetitor = new LeagueCompetitor() { Club = c2, Points = 0 };
+                var mr = m.Simulate(true);
+                var p1 = c.Coach.Philospophie.GetType().Name;
+                var p2 = c2.Coach.Philospophie.GetType().Name;
 
-            //    if (!totalCount.ContainsKey(p1))
-            //    {
-            //        totalCount[p1] = 1;
-            //    }
-            //    else
-            //    {
-            //        totalCount[p1]++;
-            //    }
+                if (!totalCount.ContainsKey(p1))
+                {
+                    totalCount[p1] = 1;
+                }
+                else
+                {
+                    totalCount[p1]++;
+                }
 
-            //    if (!totalCount.ContainsKey(p2))
-            //    {
-            //        totalCount[p2] = 1;
-            //    }
-            //    else
-            //    {
-            //        totalCount[p2]++;
-            //    }
+                if (!totalCount.ContainsKey(p2))
+                {
+                    totalCount[p2] = 1;
+                }
+                else
+                {
+                    totalCount[p2]++;
+                }
 
-            //    var winP = m.MatchResult.HomeGoals > m.MatchResult.AwayGoals ? p1 : m.MatchResult.AwayGoals > m.MatchResult.HomeGoals ? p2 : "";
-            //    if (winP != "")
-            //    {
-            //        if (!winCount.ContainsKey(winP))
-            //        {
-            //            winCount[winP] = 1;
-            //        }
-            //        else
-            //        {
-            //            winCount[winP]++;
-            //        }
-            //    }
+                var winP = m.MatchResult.HomeGoals > m.MatchResult.AwayGoals ? p1 : m.MatchResult.AwayGoals > m.MatchResult.HomeGoals ? p2 : "";
+                if (winP != "")
+                {
+                    if (!winCount.ContainsKey(winP))
+                    {
+                        winCount[winP] = 1;
+                    }
+                    else
+                    {
+                        winCount[winP]++;
+                    }
+                }
 
-            //    if (m.MatchResult.HomeGoals != m.MatchResult.AwayGoals)
-            //    {
-            //        winGoals.Add(m.MatchResult.HomeGoals > m.MatchResult.AwayGoals ? m.MatchResult.HomeGoals : m.MatchResult.AwayGoals);
-            //        setPlaySkillWinner.Add(m.MatchResult.HomeGoals > m.MatchResult.AwayGoals ? m.HomeClub.StartingLineUp.Players.Max(x => (int)x.SetPlaySkill) : m.AwayClub.StartingLineUp.Players.Max(x => (int)x.SetPlaySkill));
-            //        loseGoals.Add(m.MatchResult.HomeGoals < m.MatchResult.AwayGoals ? m.MatchResult.HomeGoals : m.MatchResult.AwayGoals);
-            //        setPlaySkillLoser.Add(m.MatchResult.HomeGoals < m.MatchResult.AwayGoals ? m.HomeClub.StartingLineUp.Players.Max(x => (int)x.SetPlaySkill) : m.AwayClub.StartingLineUp.Players.Max(x => (int)x.SetPlaySkill));
+                //    if (m.MatchResult.HomeGoals != m.MatchResult.AwayGoals)
+                //    {
+                //        winGoals.Add(m.MatchResult.HomeGoals > m.MatchResult.AwayGoals ? m.MatchResult.HomeGoals : m.MatchResult.AwayGoals);
+                //        setPlaySkillWinner.Add(m.MatchResult.HomeGoals > m.MatchResult.AwayGoals ? m.HomeClub.StartingLineUp.Players.Max(x => (int)x.SetPlaySkill) : m.AwayClub.StartingLineUp.Players.Max(x => (int)x.SetPlaySkill));
+                //        loseGoals.Add(m.MatchResult.HomeGoals < m.MatchResult.AwayGoals ? m.MatchResult.HomeGoals : m.MatchResult.AwayGoals);
+                //        setPlaySkillLoser.Add(m.MatchResult.HomeGoals < m.MatchResult.AwayGoals ? m.HomeClub.StartingLineUp.Players.Max(x => (int)x.SetPlaySkill) : m.AwayClub.StartingLineUp.Players.Max(x => (int)x.SetPlaySkill));
 
-            //        if (m.HomeClub.StartingLineUp.Players.Average(x => x.ValueBase) > m.AwayClub.StartingLineUp.Players.Average(x => x.ValueBase))
-            //        {
-            //            if (m.MatchResult.HomeGoals > m.MatchResult.AwayGoals)
-            //            {
-            //                strongerTeamWinCount++;
-            //            }
-            //            else
-            //            {
-            //                strongerTeamLoseCount++;
-            //            }
-            //        }
-            //        else
-            //        {
-            //            if (m.MatchResult.AwayGoals > m.MatchResult.HomeGoals)
-            //            {
-            //                strongerTeamWinCount++;
-            //            }
-            //            else
-            //            {
-            //                strongerTeamLoseCount++;
-            //            }
-            //        }
-            //    }
-            //    //Console.WriteLine(mr);
-            //});
-            ////}
-            ////}
-
-            //foreach (var k in totalCount.Keys)
-            //{
-            //    Console.WriteLine(k + ": " + ((double)((double)winCount[k] / (double)totalCount[k])));
+                //        if (m.HomeClub.StartingLineUp.Players.Average(x => x.ValueBase) > m.AwayClub.StartingLineUp.Players.Average(x => x.ValueBase))
+                //        {
+                //            if (m.MatchResult.HomeGoals > m.MatchResult.AwayGoals)
+                //            {
+                //                strongerTeamWinCount++;
+                //            }
+                //            else
+                //            {
+                //                strongerTeamLoseCount++;
+                //            }
+                //        }
+                //        else
+                //        {
+                //            if (m.MatchResult.AwayGoals > m.MatchResult.HomeGoals)
+                //            {
+                //                strongerTeamWinCount++;
+                //            }
+                //            else
+                //            {
+                //                strongerTeamLoseCount++;
+                //            }
+                //        }
+                //}
+                //    //Console.WriteLine(mr);
+            });
             //}
+            ////}
+
+            foreach (var k in totalCount.Keys)
+            {
+                Console.WriteLine(k + ": " + ((double)((double)winCount[k] / (double)totalCount[k])));
+            }
 
             //Console.WriteLine("AverageWinGoals: " + winGoals.Average());
             //Console.WriteLine("AverageLoseGoals: " + loseGoals.Average());

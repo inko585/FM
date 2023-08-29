@@ -50,7 +50,7 @@ namespace FM
 
             sellingClub.Account += p.Price;
             c.Account -= p.Price;
-
+            p.PlayerPriceAdjustment = 1;
             sellingClub.TransferIncomeCurrentSeason += p.Price;
             c.TransferExpensesCurrentSeason += p.Price;
 

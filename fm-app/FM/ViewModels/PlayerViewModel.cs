@@ -1,4 +1,5 @@
 ﻿using FM.Common.Generic;
+using FM.Common.Season;
 using FM.Views;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,10 @@ namespace FM.ViewModels
         }
 
         public Player Player { get; set; }
+
+        public bool ContractEnabled => Player.WillSignContractWithPlayerClub && ((Season.CurrentSeason.CurrentWeek.Number == Game.CONTRACT_BORDER_WEEK && Player.Club == Game.Instance.PlayerClub) || Season.CurrentSeason.CurrentWeek.Number > Game.CONTRACT_BORDER_WEEK);
+
+        public bool BuyEnabled => !Game.Instance.PlayerClub.Rooster.Contains(Player) && Player.IsForSale && Player.WillSignContract && Season.CurrentSeason.CurrentWeek.Number <= 4;
 
 
 

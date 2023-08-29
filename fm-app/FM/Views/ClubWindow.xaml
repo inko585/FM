@@ -143,13 +143,15 @@
                         </Grid.RowDefinitions>
                         <Grid Background="LightGray" Grid.ColumnSpan="2">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="80"></ColumnDefinition>
+                                <ColumnDefinition Width="70"></ColumnDefinition>
                                 <ColumnDefinition Width="*"></ColumnDefinition>
-                                <ColumnDefinition Width="80"></ColumnDefinition>
-                                <ColumnDefinition Width="80"></ColumnDefinition>
+                                <ColumnDefinition Width="70"></ColumnDefinition>
+                                <ColumnDefinition Width="70"></ColumnDefinition>
 
-                                <ColumnDefinition Width="80"></ColumnDefinition>
-                                <ColumnDefinition Width="120"></ColumnDefinition>
+                                <ColumnDefinition Width="70"></ColumnDefinition>
+                                <ColumnDefinition Width="90"></ColumnDefinition>
+                                <ColumnDefinition Width="100"></ColumnDefinition>
+                                <ColumnDefinition Width="100"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
                             <Border BorderThickness="1,1,1,1" BorderBrush="Gray">
                                 <Label  HorizontalAlignment="Center" Content="Position" />
@@ -167,7 +169,13 @@
                                 <Label HorizontalAlignment="Center" Content="Stärke"/>
                             </Border>
                             <Border BorderThickness="0,1,1,1"   BorderBrush="Gray"  Grid.Column="5">
+                                <Label HorizontalAlignment="Center" Content="Vertrag"/>
+                            </Border>
+                            <Border BorderThickness="0,1,1,1"   BorderBrush="Gray"  Grid.Column="6">
                                 <Label HorizontalAlignment="Center" Content="Marktwert"/>
+                            </Border>
+                            <Border BorderThickness="0,1,1,1"   BorderBrush="Gray"  Grid.Column="7">
+                                <Label HorizontalAlignment="Center" Content="Ablöse"/>
                             </Border>
                         </Grid>
 
@@ -176,12 +184,14 @@
                                 <DataTemplate>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="80"></ColumnDefinition>
+                                            <ColumnDefinition Width="70"></ColumnDefinition>
                                             <ColumnDefinition Width="*"></ColumnDefinition>
-                                            <ColumnDefinition Width="80"></ColumnDefinition>
-                                            <ColumnDefinition Width="80"></ColumnDefinition>
-                                            <ColumnDefinition Width="80"></ColumnDefinition>
-                                            <ColumnDefinition Width="120"></ColumnDefinition>
+                                            <ColumnDefinition Width="70"></ColumnDefinition>
+                                            <ColumnDefinition Width="70"></ColumnDefinition>
+                                            <ColumnDefinition Width="70"></ColumnDefinition>
+                                            <ColumnDefinition Width="90"></ColumnDefinition>
+                                            <ColumnDefinition Width="100"></ColumnDefinition>
+                                            <ColumnDefinition Width="100"></ColumnDefinition>
 
                                         </Grid.ColumnDefinitions>
                                         <Border BorderThickness="1,0,1,1" BorderBrush="Gray">
@@ -202,7 +212,13 @@
                                             <Label HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding SkillMax}"/>
                                         </Border>
                                         <Border BorderThickness="0,0,1,1"   BorderBrush="Gray"  Grid.Column="5">
+                                            <Label HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding ContractString}"/>
+                                        </Border>
+                                        <Border BorderThickness="0,0,1,1"   BorderBrush="Gray"  Grid.Column="6">
                                             <Label HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding MarketValueStandardString}"/>
+                                        </Border>
+                                        <Border BorderThickness="0,0,1,1"   BorderBrush="Gray"  Grid.Column="7">
+                                            <Label HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding PriceString}"/>
                                         </Border>
                                     </Grid>
 
@@ -212,35 +228,6 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
-                        <!--<ListBox Name="playerListBox" Margin="5,5,5,5" ItemsSource="{Binding Club.ObservableRooster}" Style="{StaticResource DefaultAEList}" ItemContainerStyle="{StaticResource UnselectableAEItemBox}" Grid.Row="2">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition/>
-                                        <ColumnDefinition/>
-                                        <ColumnDefinition/>
-                                        <ColumnDefinition/>
-                                        <ColumnDefinition/>
-                                        <ColumnDefinition/>
-                                        <ColumnDefinition/>
-                                        <ColumnDefinition/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <Label Name="posLabel" Content="{Binding Position}"/>
-                                    <Label Name="nameLabel" PreviewMouseLeftButtonDown="NameLabel_PreviewMouseLeftButtonDown"  Content="{Binding FullName}" Grid.Column="1" Style="{StaticResource LinkLabelStyle}"/>
-                                    <Label Name="nationLabel" Content="{Binding Nation.Short}" Grid.Column="2"/>
-                                    <Label Name="ageLabel" Content="{Binding Age}" Grid.Column="3"/>
-                                    <Label Name="skillLabel" Content="{Binding SkillMax}" Grid.Column="4"/>
-                                    <Label Content="{Binding SalaryStandard}" Grid.Column="5"/>
-                                    <Label Content="{Binding ExampleContractP}" Grid.Column="6"/>
-                                    <Label Content="{Binding Price}" Grid.Column="7"/>
-
-                                </Grid>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-
-                    </ListBox>-->
                     </Grid>
                 </ScrollViewer>
             </TabItem>
