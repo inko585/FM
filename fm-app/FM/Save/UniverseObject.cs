@@ -4,13 +4,16 @@ using FM.Common.Pixels;
 using FM.Common.Season;
 using FM.Entities.Base;
 using FM.Generator;
+using FM.ViewModels;
 using FootballPit;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.Policy;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
@@ -44,6 +47,7 @@ namespace FM.Save
         }
 
         public string PlayerClub;
+        public FM_LineUpSettings LineUpSettings { get; set; }
         public List<FM_Player> RetiredPlayers { get; set; }
         public List<FM_Coach> Coaches { get; set; }
         public List<FM_Club> Clubs { get; set; }
@@ -65,6 +69,26 @@ namespace FM.Save
         public List<FM_Transfer> Transfers { get; set; }
     }
 
+    public class FM_LineUpSettings
+    {
+
+        public FM_LineUpSettings()
+        {
+            StartingPlayers = new List<string>();
+            Bench = new List<string>();
+            Rest = new List<string>();
+        }
+
+        public List<string> StartingPlayers { get; set; }
+        public List<string> Bench { get; set; }
+        public List<string> Rest { get; set; }
+        public int Formation { get; set; }
+
+        public int Tackling { get; set; }
+        public int ShotFrequency { get; set; }
+        public int Tactic { get; set; }
+
+    }
     public class FM_Season
     {
         public FM_Season()
@@ -123,6 +147,8 @@ namespace FM.Save
         public int Viewer { get; set; }
         public string HomeClub { get; set; }
         public string AwayClub { get; set; }
+        public int HomeGoals { get; set; }
+        public int AwayGoals { get; set; }
         public List<string> ScoreEvents { get; set; }
         public List<string> Substitutions { get; set; }
     }
@@ -263,7 +289,7 @@ namespace FM.Save
         public string ContractComing { get; set; }
         public int Age { get; set; }
         public float SkillBase { get; set; }
-        public float XPLevel { get; set; }
+        public int XPLevel { get; set; }
         public int XP { get; set; }
         public double TalentFactor { get; set; }
         public float Fitness { get; set; }
@@ -276,6 +302,7 @@ namespace FM.Save
         public float Charisma { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public int InjuryTime { get; set; }
 
         public bool? WantsToLeaveClub { get; set; }
     }
@@ -410,7 +437,7 @@ namespace FM.Save
 
 
 
-        public static FootballUniverse Load(World w, out Club playerClub)
+        public static FootballUniverse Load(World w, out PlayerClub playerClub)
         {
 
             FootballUniverse ret = null;
@@ -454,24 +481,25 @@ namespace FM.Save
 
                 foreach (var club in load.Clubs)
                 {
-                    var actualClub = new Club()
-                    {
-                        Account = club.Account,
-                        Elo = club.Elo,
-                        IsClimber = club.IsClimber,
-                        Name = club.Name,
-                        Savings = club.Savings,
-                        SponsorMoneyCurrentSeason = club.SponsorMoneyCurrentSeason,
-                        TransferExpensesCurrentSeason = club.TransferExpensesCurrentSeason,
-                        TransferIncomeCurrentSeason = club.TransferIncomeCurrentSeason,
-                        ViewerAttractionEstimation = club.ViewerAttractionEstimation,
-                        Crest = club.Crest,
-                        Dress = club.Dress,
-                        Nation = w.GetNationByName(club.Nation),
-                        Coach = CoachLoadCache[club.Coach],
-                        CurrentSponsor = SponsorLoadCache[club.CurrentSponsor],
-                        PlayersSoldFromStartingLineUp = club.PlayersSoldFromStartingLineUp
-                    };
+                    var actualClub = load.PlayerClub == club.Id ? new PlayerClub() : new Club();
+
+                    actualClub.Account = club.Account;
+                    actualClub.Elo = club.Elo;
+                    actualClub.IsClimber = club.IsClimber;
+                    actualClub.Name = club.Name;
+                    actualClub.Savings = club.Savings;
+                    actualClub.SponsorMoneyCurrentSeason = club.SponsorMoneyCurrentSeason;
+                    actualClub.TransferExpensesCurrentSeason = club.TransferExpensesCurrentSeason;
+                    actualClub.TransferIncomeCurrentSeason = club.TransferIncomeCurrentSeason;
+                    actualClub.ViewerAttractionEstimation = club.ViewerAttractionEstimation;
+                    actualClub.Crest = club.Crest;
+                    actualClub.Dress = club.Dress;
+                    actualClub.Nation = w.GetNationByName(club.Nation);
+                    actualClub.Coach = CoachLoadCache[club.Coach];
+                    actualClub.CurrentSponsor = SponsorLoadCache[club.CurrentSponsor];
+                    actualClub.PlayersSoldFromTeam = club.PlayersSoldFromStartingLineUp;
+
+
 
                     actualClub.JoiningPlayers = new List<Player>();
 
@@ -495,12 +523,12 @@ namespace FM.Save
                     actualClub.ClubAssetLevel[ClubAsset.YouthWork] = club.YoutWorkLevel;
                     actualClub.ClubAssetLevel[ClubAsset.Stadium] = club.StadiumLevel;
                     actualClub.ClubAssetLevel[ClubAsset.Office] = club.OfficeLevel;
-                    actualClub.Rooster = new List<Player>();
+                    actualClub.Rooster = new System.Collections.ObjectModel.ObservableCollection<Player>();
                     ClubLoadCache[club.Id] = actualClub;
 
                 }
 
-                
+
 
                 foreach (var league in load.Leagues)
                 {
@@ -605,15 +633,16 @@ namespace FM.Save
                         Charisma = pl.Charisma,
                         FirstName = pl.FirstName,
                         LastName = pl.LastName,
+                        InjuryTime = pl.InjuryTime,
                         ConstitutionBase = pl.ConstitutionBase,
                         PlayerPriceAdjustment = pl.PlayerPriceAdjustment,
                         WantsToLeavePlayerClub = pl.WantsToLeaveClub
 
                     };
 
-                    if (pl.IsRetired != null && pl.IsRetired)
+                    if (pl.IsRetired)
                     {
-                        ret.RetiredPlayers.Add(actualPlayer);
+                        ret.InactivePlayers.Add(actualPlayer);
                     }
 
                     CurrentContractIds.Add(pl.ContractCurrent);
@@ -623,6 +652,15 @@ namespace FM.Save
                     PlayerLoadCache[pl.Id] = actualPlayer;
 
                 }
+
+                LineUpViewModel.Instance.SelectedFormation = LineUpViewModel.Instance.Formations.ElementAt(load.LineUpSettings.Formation);
+                LineUpViewModel.Instance.SelectedShotFrequency = LineUpViewModel.Instance.ShotFrequencies.ElementAt(load.LineUpSettings.ShotFrequency);
+                LineUpViewModel.Instance.SelectedTacklingIntensity = LineUpViewModel.Instance.TacklingIntensities.ElementAt(load.LineUpSettings.Tackling);
+                LineUpViewModel.Instance.SelectedTactic = LineUpViewModel.Instance.Tactics.ElementAt(load.LineUpSettings.Tactic);
+
+                LineUpViewModel.Instance.AddStartingPlayers(load.LineUpSettings.StartingPlayers.Select(p => PlayerLoadCache[p]));
+                LineUpViewModel.Instance.AddBenchPlayers(load.LineUpSettings.Bench.Select(p => PlayerLoadCache[p]));
+                LineUpViewModel.Instance.AddRestPlayers(load.LineUpSettings.Rest.Select(p => PlayerLoadCache[p]));
 
 
                 foreach (var se in load.ScoreEvents)
@@ -658,8 +696,9 @@ namespace FM.Save
                     {
                         AwayClub = ClubLoadCache[mr.AwayClub],
                         HomeClub = ClubLoadCache[mr.HomeClub],
-                        Viewer = mr.Viewer
-
+                        Viewer = mr.Viewer,
+                        HomeGoals = mr.HomeGoals,
+                        AwayGoals = mr.AwayGoals
                     };
 
                     foreach (var se in mr.ScoreEvents)
@@ -677,34 +716,38 @@ namespace FM.Save
 
                 foreach (var m in load.Matches)
                 {
-                    var actualMatch = new Match()
+                    if (m.HomeCompetitor != null && m.AwayCompetitor != null)
                     {
-                        HomeClub = ClubLoadCache[m.HomeClub],
-                        AwayClub = ClubLoadCache[m.AwayClub]
-                    };
+                        var actualMatch = new Match()
+                        {
+                            HomeClub = ClubLoadCache[m.HomeClub],
+                            AwayClub = ClubLoadCache[m.AwayClub]
+                        };
 
-                    if (m.HomeCompetitor != null)
-                    {
-                        actualMatch.AwayCompetitor = CompetitorLoadCache[m.AwayCompetitor];
-                        actualMatch.HomeCompetitor = CompetitorLoadCache[m.HomeCompetitor];
+                        if (m.HomeCompetitor != null)
+                        {
+                            actualMatch.AwayCompetitor = CompetitorLoadCache[m.AwayCompetitor];
+                            actualMatch.HomeCompetitor = CompetitorLoadCache[m.HomeCompetitor];
+                        }
+
+                        if (MatchResultLoadCache.TryGetValue(m.MatchResult ?? "", out MatchResult actualMR))
+                        {
+                            actualMatch.MatchResult = actualMR;
+                        }
+
+                        MatchLoadCache[m.Id] = actualMatch;
                     }
-
-                    if (MatchResultLoadCache.TryGetValue(m.MatchResult ?? "", out MatchResult actualMR))
-                    {
-                        actualMatch.MatchResult = actualMR;
-                    }
-
-                    MatchLoadCache[m.Id] = actualMatch;
                 }
 
                 foreach (var md in load.MatchDays)
                 {
+
                     var actualMD = new MatchDay(md.Number)
                     {
                         League = LeagueLoadCache[md.League]
                     };
 
-                    actualMD.Matches = md.Matches.Select(m => MatchLoadCache[m]).ToList();
+                    actualMD.Matches = md.Matches.Select(m => MatchLoadCache.ContainsKey(m) ? MatchLoadCache[m] : null).ToList();
 
                     MatchDayLoadCache[md.Id] = actualMD;
                 }
@@ -786,7 +829,7 @@ namespace FM.Save
                 {
                     var actualTransfer = new Transfer()
                     {
-                        From = ClubLoadCache[transfer.From],
+                        From = transfer.From == null ? null : ClubLoadCache[transfer.From],
                         To = transfer.To == null ? null : ClubLoadCache[transfer.To],
                         MarketValue = transfer.MarketValue,
                         Player = PlayerLoadCache[transfer.Player],
@@ -807,7 +850,7 @@ namespace FM.Save
                     }
                 }
 
-                playerClub = ClubLoadCache[load.PlayerClub];
+                playerClub = ClubLoadCache[load.PlayerClub] as PlayerClub;
                 ClearLoadCache();
                 ret.ResetCache();
                 return ret;
@@ -820,7 +863,7 @@ namespace FM.Save
         }
 
 
-        public static void Save(FootballUniverse u)
+        public static void Save(FootballUniverse u, string path = "")
         {
             var save = new FM_Universe();
 
@@ -849,7 +892,7 @@ namespace FM.Save
                     ViewerAttractionEstimation = club.ViewerAttractionEstimation,
                     Crest = club.Crest,
                     Dress = club.Dress,
-                    PlayersSoldFromStartingLineUp = club.PlayersSoldFromStartingLineUp
+                    PlayersSoldFromStartingLineUp = club.PlayersSoldFromTeam
 
                 };
 
@@ -925,97 +968,103 @@ namespace FM.Save
 
                 save.Seasons.Add(season_);
                 SeasonCache[season] = season_;
-
-                foreach (var fw in season.FootballWeeks)
+                if (season == Season.CurrentSeason)
                 {
-                    var fw_ = new FM_FootballWeek()
+                    foreach (var fw in season.FootballWeeks)
                     {
-                        Number = fw.Number
-                    };
-
-                    season_.FootballWeeks.Add(fw_.Id);
-                    save.FootballWeeks.Add(fw_);
-
-                    foreach (var md in fw.MatchDays)
-                    {
-                        var md_ = new FM_MatchDay()
+                        var fw_ = new FM_FootballWeek()
                         {
-                            League = LeagueCache[md.League].Id,
-                            Number = md.Number
+                            Number = fw.Number
                         };
 
-                        fw_.MatchDays.Add(md_.Id);
-                        save.MatchDays.Add(md_);
+                        season_.FootballWeeks.Add(fw_.Id);
+                        save.FootballWeeks.Add(fw_);
 
-                        foreach (var m in md.Matches)
+
+                        foreach (var md in fw.MatchDays)
                         {
-                            var match_ = new FM_Match()
+                            var md_ = new FM_MatchDay()
                             {
-                                HomeClub = ClubCache[m.HomeClub].Id,
-                                AwayClub = ClubCache[m.AwayClub].Id
+                                League = LeagueCache[md.League].Id,
+                                Number = md.Number
                             };
 
-                            if (!m.IsPlayed)
+                            fw_.MatchDays.Add(md_.Id);
+                            save.MatchDays.Add(md_);
+
+                            foreach (var m in md.Matches)
                             {
-                                match_.HomeCompetitor = LeagueCompetitorCache[m.HomeCompetitor].Id;
-                                match_.AwayCompetitor = LeagueCompetitorCache[m.AwayCompetitor].Id;
-                            }
 
-
-                            md_.Matches.Add(match_.Id);
-                            save.Matches.Add(match_);
-
-                            if (m.MatchResult != null)
-                            {
-                                var mr_ = new FM_MatchResult()
+                                var match_ = new FM_Match()
                                 {
-                                    HomeClub = ClubCache[m.MatchResult.HomeClub].Id,
-                                    AwayClub = ClubCache[m.MatchResult.AwayClub].Id,
-                                    Viewer = m.MatchResult.Viewer
+                                    HomeClub = ClubCache[m.HomeClub].Id,
+                                    AwayClub = ClubCache[m.AwayClub].Id
                                 };
 
 
-                                save.MatchesResults.Add(mr_);
-                                match_.MatchResult = mr_.Id;
+                                //if (!m.IsPlayed)
+                                //{
+                                match_.HomeCompetitor = LeagueCompetitorCache[m.HomeCompetitor].Id;
+                                match_.AwayCompetitor = LeagueCompetitorCache[m.AwayCompetitor].Id;
+                                //}
 
 
-                                foreach (var se in m.MatchResult.Scorers)
+                                md_.Matches.Add(match_.Id);
+                                save.Matches.Add(match_);
+
+                                if (m.MatchResult != null)
                                 {
-                                    var se_ = new FM_ScoreEvent()
+                                    var mr_ = new FM_MatchResult()
                                     {
-                                        Club = ClubCache[se.Club].Id,
-                                        Minute = se.Minute,
-                                        CurrentScore = se.CurrentScore,
-                                        CurrentAwayGoals = se.CurrentAwayGoals,
-                                        CurrentHomeGoals = se.CurrentHomeGoals
+                                        HomeClub = ClubCache[m.MatchResult.HomeClub].Id,
+                                        AwayClub = ClubCache[m.MatchResult.AwayClub].Id,
+                                        Viewer = m.MatchResult.Viewer,
+                                        HomeGoals = m.MatchResult.HomeGoals,
+                                        AwayGoals = m.MatchResult.AwayGoals
                                     };
 
-                                    ScoreEventCache[se] = se_;
-                                    save.ScoreEvents.Add(se_);
-                                    mr_.ScoreEvents.Add(se_.Id);
-                                }
 
-                                foreach (var su in m.MatchResult.Substitutions)
-                                {
-                                    var su_ = new FM_Substitution()
+                                    save.MatchesResults.Add(mr_);
+                                    match_.MatchResult = mr_.Id;
+
+
+                                    foreach (var se in m.MatchResult.Scorers)
                                     {
-                                        Club = ClubCache[su.Club].Id,
-                                        Minute = su.Minute,
-                                    };
+                                        var se_ = new FM_ScoreEvent()
+                                        {
+                                            Club = ClubCache[se.Club].Id,
+                                            Minute = se.Minute,
+                                            CurrentScore = se.CurrentScore,
+                                            CurrentAwayGoals = se.CurrentAwayGoals,
+                                            CurrentHomeGoals = se.CurrentHomeGoals
+                                        };
 
-                                    SubstitutionCache[su] = su_;
-                                    save.Substitutions.Add(su_);
-                                    mr_.Substitutions.Add(su_.Id);
+                                        ScoreEventCache[se] = se_;
+                                        save.ScoreEvents.Add(se_);
+                                        mr_.ScoreEvents.Add(se_.Id);
+                                    }
+
+                                    foreach (var su in m.MatchResult.Substitutions)
+                                    {
+                                        var su_ = new FM_Substitution()
+                                        {
+                                            Club = ClubCache[su.Club].Id,
+                                            Minute = su.Minute,
+                                        };
+
+                                        SubstitutionCache[su] = su_;
+                                        save.Substitutions.Add(su_);
+                                        mr_.Substitutions.Add(su_.Id);
+                                    }
                                 }
                             }
 
                         }
-
                     }
                 }
             }
 
-            foreach (var pl in u.Players.Concat(u.RetiredPlayers))
+            foreach (var pl in u.Players)
             {
                 var player_ = new FM_Player()
                 {
@@ -1033,9 +1082,10 @@ namespace FM.Save
                     Nation = pl.Nation.Name,
                     Charisma = pl.Charisma,
                     FirstName = pl.FirstName,
+                    InjuryTime = pl.InjuryTime,
                     LastName = pl.LastName,
                     ConstitutionBase = pl.ConstitutionBase,
-                    IsRetired = u.RetiredPlayers.Contains(pl),
+                    IsRetired = u.InactivePlayers.Contains(pl),
                     PlayerPriceAdjustment = pl.PlayerPriceAdjustment,
                     WantsToLeaveClub = pl.WantsToLeavePlayerClub
 
@@ -1098,8 +1148,29 @@ namespace FM.Save
 
             }
 
+            var lu = new FM_LineUpSettings();
+            foreach (var container in LineUpViewModel.Instance.StartingPlayers)
+            {
+                if (container.Player != null)
+                {
+                    lu.StartingPlayers.Add(PlayerCache[container.Player].Id);
+                }
+            }
+            foreach (var container in LineUpViewModel.Instance.Bench.Where(r => r.Player != null))
+            {
+                lu.Bench.Add(PlayerCache[container.Player].Id);
+            }
+            foreach (var container in LineUpViewModel.Instance.Rest.Where(r => r.Player != null))
+            {
+                lu.Rest.Add(PlayerCache[container.Player].Id);
+            }
 
+            lu.ShotFrequency = LineUpViewModel.Instance.ShotFrequencies.IndexOf(LineUpViewModel.Instance.SelectedShotFrequency);
+            lu.Tackling = LineUpViewModel.Instance.TacklingIntensities.IndexOf(LineUpViewModel.Instance.SelectedTacklingIntensity);
+            lu.Tactic = LineUpViewModel.Instance.Tactics.IndexOf(LineUpViewModel.Instance.SelectedTactic);
+            lu.Formation = LineUpViewModel.Instance.Formations.IndexOf(LineUpViewModel.Instance.SelectedFormation);
 
+            save.LineUpSettings = lu;
 
             foreach (var keyValuePlayer in PlayerCache)
             {
@@ -1139,8 +1210,8 @@ namespace FM.Save
             {
                 var t_ = new FM_Transfer()
                 {
-                    From = ClubCache[t.From].Id,
-                    To = t.To == null? null : ClubCache[t.To].Id,
+                    From = t.From == null ? null : ClubCache[t.From].Id,
+                    To = t.To == null ? null : ClubCache[t.To].Id,
                     MarketValue = t.MarketValue,
                     Price = t.Price,
                     Week = t.Week,
@@ -1152,9 +1223,9 @@ namespace FM.Save
             }
 
             var xs = new XmlSerializer(typeof(FM_Universe));
-            string path;
 
-            if (Util.TryGetXMLSavePath("fm_save.xml", out path))
+
+            if (path != "" || Util.TryGetXMLSavePath("fm_save.xml", out path))
             {
                 using (var tw = new StreamWriter(path))
                 {

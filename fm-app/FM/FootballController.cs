@@ -15,10 +15,7 @@ namespace FM
 
         public static void SignContract(Player p, Club c, int contractRunTime, int salary, bool currentSeason)
         {
-            if (p.Club != c)
-            {
-                p.ClubHistory.Add(c);
-            }
+
             var contract = new Contract()
             {
                 Club = c,
@@ -27,12 +24,18 @@ namespace FM
                 Salary = salary
             };
 
-            if (currentSeason)
+            if (currentSeason && p.Club == null)
             {
+                
                 p.ContractCurrent = contract;
                 c.Rooster.Add(p);
+                p.DressNumber = c.GetFreeNumber(p.Position);
+                p.PlayerStatistics.Add(new PlayerStatistics(p, (int)p.SkillMax, Season.CurrentSeason.Year, c.Leagues.First().Depth));
+                p.ClubHistory.Add(c);
                 p.ResetDress();
+                Game.Instance.FootballUniverse.InactivePlayers.Remove(p);
             }
+
             else
             {
                 p.ContractComing = contract;
@@ -40,7 +43,7 @@ namespace FM
             }
 
 
-            Console.WriteLine("New Contract " + p.FullName + ": " + p.Club.Name + " => " + c.Name);
+            Console.WriteLine("New Contract " + p.FullName + ": " + (p.Club?.Name ?? "-") + " => " + c.Name);
 
         }
 
@@ -55,9 +58,9 @@ namespace FM
             c.TransferExpensesCurrentSeason += p.Price;
 
             //Console.WriteLine("Transfer " + p.FullName + ": " + sellingClub.Name + " => " + c.Name + " (" + p.Price + ")");
-            if (c.StartingLineUp.Players.Contains(p))
+            if (c.StartingLineUp.Players.Contains(p) || c.Bench.Contains(p))
             {
-                c.PlayersSoldFromStartingLineUp++;
+                c.PlayersSoldFromTeam++;
             }
 
             Game.Instance.FootballUniverse.TransferList.Add(new Transfer(p, sellingClub, c, s.Year, s.CurrentWeek.Number, p.Price, p.MarketValueStandard));

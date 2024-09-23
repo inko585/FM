@@ -196,6 +196,16 @@ namespace FM.Entities.Base
 
     public class Occurrence
     {
+        public Occurrence()
+        {
+        }
+
+        public Occurrence(string text, int scaleValue)
+        {
+            Text = text;
+            ScaleValue = scaleValue;
+        }
+
         public string Text { get; set; }
 
         public int ScaleValue { get; set; }
@@ -203,16 +213,39 @@ namespace FM.Entities.Base
 
     public class ColorPairOccurrence : Occurrence
     {
+        public ColorPairOccurrence()
+        {
+        }
+
+        public ColorPairOccurrence(string text, int scaleValue) : base(text, scaleValue)
+        {
+        }
+
         public string Text2 { get; set; }
     }
 
     public class SponsorOccurrence : Occurrence
     {
+        public SponsorOccurrence()
+        {
+        }
+
+        public SponsorOccurrence(string text, int scaleValue) : base(text, scaleValue)
+        {
+        }
+
         public int Size { get; set; }
     }
 
     public class SubEthnieOccurrence : Occurrence
     {
+        public SubEthnieOccurrence()
+        {
+        }
+
+        public SubEthnieOccurrence(string text, int scaleValue) : base(text, scaleValue)
+        {
+        }
 
         public int FirstAndLastNamesRate { get; set; }
         public int FirstNameRate { get; set; }

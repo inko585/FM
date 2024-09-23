@@ -49,5 +49,11 @@ namespace FM.ViewModels
                 return Game.Instance.PlayerClub;
             }
         }
+
+        public void SubscribeToPlayerClub()
+        {
+            PlayerClub.Rooster.CollectionChanged += (o, e) => Update();
+            Update();
+        }
     }
 }

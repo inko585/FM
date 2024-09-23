@@ -1,4 +1,5 @@
 ﻿using FM.Common.Generic;
+using FM.Generator;
 using FM.Save;
 using FM.ViewModels;
 using FM.Views;
@@ -7,8 +8,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace FM.Common.Season
 {
@@ -39,9 +42,20 @@ namespace FM.Common.Season
             {
                 c.Account += c.SponsorMoneyCurrentSeason;
                 c.Account += c.Leagues.Sum(l => l.ClubSupport);
-                c.TalentPromotion();
-            }
 
+
+                c.TalentPromotion();
+
+                while (c.BudgetCurrentSeason <= 0)
+                {
+                    var candidates = c.Rooster.Where(p => p.Age > 17);
+                    var p1 = candidates.ElementAt(Util.GetRandomInt(0, candidates.Count() - 1));
+                    p1.SkillBase = (int)Math.Round(p1.SkillBase * 0.95);
+                    p1.ContractCurrent.Salary = p1.SalaryStandard;
+                    //Game.Instance.FootballUniverse.InactivePlayers.Add(p1);
+                }
+
+            }
 
 
             AllSeasons = new List<Season>();
@@ -60,7 +74,7 @@ namespace FM.Common.Season
                     {
                         ver[c.GetAverageValueForStartingLineUp()] = c.Elo;
                     }
-                    
+
                 }
 
                 return ver;
@@ -83,8 +97,6 @@ namespace FM.Common.Season
         public static void NextSeason()
         {
 
-            Game.Instance.FootballUniverse.PlayersWithoutContract.Clear();
-
             foreach (var l in Game.Instance.FootballUniverse.LeagueAssociations.SelectMany(la => la.Leagues))
             {
                 l.AverageAttractions.Add(l.Clubs.Average(c => c.Attraction));
@@ -94,6 +106,8 @@ namespace FM.Common.Season
 
             Test.PrintLeagueResults();
             Test.PrintLeaguesTransfers();
+            //Test.PrintNewPlayers();
+            Test.PrintLeavingPlayers();
 
             foreach (var c in Game.Instance.FootballUniverse.Clubs)
             {
@@ -102,9 +116,13 @@ namespace FM.Common.Season
                 c.NewPlayersWithoutFee.Clear();
                 c.NewPlayersWithFee.Clear();
                 c.NewPlayersFromYouth.Clear();
-                c.PlayersSoldFromStartingLineUp = 0;
-
+                c.PlayersSoldFromTeam = 0;
+                c.Account -= c.Rooster.Sum(pl => pl.ContractCurrent.Salary);
+                c.Savings = c.Account;
             }
+
+            MainViewModel.Instance.Update();
+
             foreach (var la in Game.Instance.FootballUniverse.LeagueAssociations)
             {
                 //la.Leagues.First().RankedClubs.First().Club.Elo += 200;   
@@ -174,7 +192,7 @@ namespace FM.Common.Season
                 c.UpgradeAssets();
                 c.Account += c.SponsorMoneyCurrentSeason;
                 c.Account += c.Leagues.Sum(l => l.ClubSupport);
-                c.Account -= c.Rooster.Sum(pl => pl.ContractCurrent.Salary);
+
                 c.LookForSponsor();
                 c.SponsorMoneyCurrentSeason = Util.GetNiceValue((int)(c.SponsorMoneyPotential * c.CurrentSponsor.ActualSponsoringRate));
                 c.ViewerAttractionEstimation = c.ViewerAttraction;
@@ -183,7 +201,7 @@ namespace FM.Common.Season
 
 
             var leavingPlayers = new List<Player>();
-            foreach (var p in Game.Instance.FootballUniverse.Players.Where(x => !Game.Instance.FootballUniverse.RetiredPlayers.Contains(x)))
+            foreach (var p in Game.Instance.FootballUniverse.ActivePlayers)
             {
                 p.Age++;
                 if (p.Age > 30)
@@ -191,33 +209,44 @@ namespace FM.Common.Season
                     p.Constitution -= p.ConstitutionBase * 0.03f * (p.Age - 30);
                 }
 
-                p.ContractCurrent.RunTime--;
-                if (p.ContractCurrent.RunTime == 0)
+                if (p.ContractCurrent != null)
+                {
+                    p.ContractCurrent.RunTime--;
+                }
+
+                if (p.ContractCurrent == null || p.ContractCurrent.RunTime == 0)
                 {
                     var clubCurrent = p.Club;
-                    p.Club.Rooster.Remove(p);
-
                     if (p.ContractComing != null)
                     {
+                        Game.Instance.FootballUniverse.InactivePlayers.Remove(p);
                         p.ContractCurrent = p.ContractComing;
                         p.ContractComing = null;
                         p.ContractCurrent.SignedOn = next;
-                        p.ResetDress();
+
                         if (p.Club != clubCurrent)
                         {
+                            if (clubCurrent != null)
+                            {
+                                clubCurrent.Rooster.Remove(p);
+                            }
                             p.Club.NewPlayersWithoutFee.Add(p);
                             p.PlayerPriceAdjustment = 1;
+                            p.DressNumber = p.Club.GetFreeNumber(p.Position);
+                            p.ResetDress();
                         }
-                        p.DressNumber = p.Club.GetFreeNumber(p.Position);
                         p.PlayerStatistics.Add(new PlayerStatistics(p, (int)p.SkillMax, next.Year, p.Club.Leagues.First().Depth));
                     }
-                    else
+                    else if (p.ContractCurrent != null)
                     {
+                        clubCurrent.Rooster.Remove(p);
                         var bm = p.PlayerImage;
-                        Game.Instance.FootballUniverse.RetiredPlayers.Add(p);
-                        Game.Instance.FootballUniverse.TransferList.Add(new Transfer(p, p.Club, null, CurrentSeason.Year, 0, 0, p.MarketValueStandard));
+                        Game.Instance.FootballUniverse.InactivePlayers.Add(p);
+                        if (!p.WillSignContract)
+                        {
+                            Game.Instance.FootballUniverse.TransferList.Add(new Transfer(p, p.Club, null, CurrentSeason.Year, 0, 0, p.MarketValueStandard));
+                        }
                         p.ContractCurrent = null;
-
                     }
                 }
                 else
@@ -229,7 +258,18 @@ namespace FM.Common.Season
 
             foreach (var c in Game.Instance.FootballUniverse.Clubs)
             {
-                c.Rooster.AddRange(c.JoiningPlayers);
+                foreach (var p in c.JoiningPlayers)
+                {
+                    if (!c.Rooster.Contains(p))
+                    {
+                        c.Rooster.Add(p);
+                        if (p.ClubHistory.Last() != c)
+                        {
+                            p.ClubHistory.Add(c);
+                        }
+                        p.ResetDress();
+                    }
+                }
                 c.JoiningPlayers.Clear();
                 c.TransferIncomeCurrentSeason = 0;
                 c.TransferExpensesCurrentSeason = 0;
@@ -265,11 +305,12 @@ namespace FM.Common.Season
             {
                 foreach (var l in la.Leagues)
                 {
-                    var joker = new KeyValuePair<LeagueCompetitor, int>(l.Standings.Last(), l.Standings.Count);
-                    var dict = l.Standings.Where(c => c != joker.Key).ToDictionary(x => x, x => l.Standings.IndexOf(x) + 1);
+                    var standings = l.Standings.Shuffle().ToList(); ;
+                    var joker = new KeyValuePair<LeagueCompetitor, int>(standings.Last(), standings.Count());
+                    var dict = standings.Where(c => c != joker.Key).ToDictionary(x => x, x => standings.IndexOf(x) + 1);
                     var firstHalfMatchDays = new List<MatchDay>();
 
-                    for (var i = 1; i < l.Standings.Count; i++)
+                    for (var i = 1; i < standings.Count(); i++)
                     {
                         var md = new MatchDay(i);
                         md.League = l;
@@ -286,7 +327,7 @@ namespace FM.Common.Season
                                 {
                                     if (!pairings.Any(p => p.HomeCompetitor == t2.Key || p.AwayCompetitor == t2.Key))
                                     {
-                                        if (i == l.Standings.Count - 1)
+                                        if (i == standings.Count() - 1)
                                         {
                                             if (t1.Value + t2.Value == i)
                                             {
@@ -359,18 +400,28 @@ namespace FM.Common.Season
 
         public void Progress()
         {
+            Game.Instance.FootballUniverse.ResetStrongestPlayerNotInStartingLineup();
+
+            if (CurrentWeek.Number == 1)
+            {
+                IO.Save(Game.Instance.FootballUniverse, Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/autosave_" + Season.CurrentSeason.Year + ".xml");
+            }
+            else if (CurrentWeek.Number == 12)
+            {
+                IO.Save(Game.Instance.FootballUniverse, Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/autosave_" + Season.CurrentSeason.Year + "_2.xml");
+            }
 
             if (CurrentWeek.Number <= 3)
             {
-                foreach (var club in Game.Instance.FootballUniverse.Clubs.Where(c => c != Game.Instance.PlayerClub))
+                foreach (var club in Game.Instance.FootballUniverse.Clubs.Where(c => c != Game.Instance.PlayerClub).OrderByDescending(c => c.Attraction))
                 {
                     club.LookForImprovement(1.1);
                 }
             }
-            
+
             else if (CurrentWeek.Number >= Game.CONTRACT_BORDER_WEEK)
             {
-                foreach (var club in Game.Instance.FootballUniverse.Clubs.Where(c => c != Game.Instance.PlayerClub))
+                foreach (var club in Game.Instance.FootballUniverse.Clubs.Where(c => c != Game.Instance.PlayerClub).OrderByDescending(c => c.Attraction))
                 {
                     club.PlanNextYearRooster();
                 }
@@ -393,15 +444,7 @@ namespace FM.Common.Season
                 //    }
                 //}
 
-                foreach (var p in Game.Instance.FootballUniverse.Players)
-                {
-                    p.Train();
-                }
 
-                foreach (var c in Game.Instance.FootballUniverse.Clubs)
-                {
-                    c.ResetLineup();
-                }
 
                 foreach (var md in CurrentWeek.MatchDays)
                 {
@@ -437,7 +480,22 @@ namespace FM.Common.Season
                         m.HomeCompetitor.CounterGoals += m.MatchResult.AwayGoals;
 
                         m.HomeClub.Account += Game.ENTREE_FEE * m.MatchResult.Viewer;
+
                     }
+                }
+
+                foreach (var p in Game.Instance.FootballUniverse.ActivePlayers)
+                {
+                    p.Train();
+                    if (p.InjuryTime > 0)
+                    {
+                        p.InjuryTime--;
+                    }
+                }
+
+                foreach (var c in Game.Instance.FootballUniverse.Clubs)
+                {
+                    c.ResetLineup();
                 }
 
 
@@ -536,7 +594,7 @@ namespace FM.Common.Season
         {
             get
             {
-                return Matches.Any(m => m.MatchResult != null);
+                return Matches.Any(m => m == null || m.MatchResult != null);
             }
         }
         public List<Match> Matches { get; set; }

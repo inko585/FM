@@ -20,12 +20,13 @@ namespace FM.ViewModels
 
         public bool IsTransfer { get; set; }
 
-        public ContractViewModel(Player player, Club club, bool isTransfer)
+        public ContractViewModel(Player player, Club club, bool isTransfer, bool isWitihngTransferWindow)
         {
             Player = player;
             Club = club;
             IsTransfer = isTransfer;
             SelectedRunTimeIndex = 0;
+            IsWitihngTransferWindow = isWitihngTransferWindow;
         }
 
         private int selectedRunTimeIndex;
@@ -46,7 +47,7 @@ namespace FM.ViewModels
         public Brush RestBudgetColor => RestBudget > 0 ? new SolidColorBrush(Colors.Green) : new SolidColorBrush(Colors.Red);
         public bool OkButtonEnabled => RestBudget > 0;
         public bool RunTimeSelectionEnabled => Player.Age < 30;
-
+        public bool IsWitihngTransferWindow { get; set; }
         public ObservableCollection<string> RunTimeSelection => new ObservableCollection<string> { "2 Jahre", "3 Jahre", "4 Jahre", "5 Jahre" };
 
 
@@ -61,7 +62,7 @@ namespace FM.ViewModels
         {
             get
             {
-                return Format(Price, true);
+                return Price == 0 ? "-" : Format(Price, true);
             }
         }
 
@@ -87,7 +88,7 @@ namespace FM.ViewModels
             }
         }
 
-        private int RestBudget => (IsTransfer ? Club.BudgetCurrentSeason : Club.BudgetNextSeason) - (Price + Salary);
+        private int RestBudget => (IsWitihngTransferWindow ? Club.BudgetCurrentSeason : Club.BudgetNextSeason) - (Price + Salary);
         
 
         

@@ -41,6 +41,6 @@ namespace FM.Views
             Result = Tuple.Create(vm.FoundingClub, vm.SelectedAssociation, vm.SelectedDepth);
         }
 
-        public Tuple<Club, Association, int> Result { get; private set; }
+        public Tuple<PlayerClub, Association, int> Result { get; private set; }
     }
 }

@@ -63,13 +63,16 @@
     <Compile Include="Models\FootballUniverse.cs" />
     <Compile Include="Models\NavItem.cs" />
     <Compile Include="Models\Season.cs" />
+    <Compile Include="PredefinedClubs.cs" />
     <Compile Include="RichList.cs" />
     <Compile Include="Save\UniverseObject.cs" />
     <Compile Include="ViewModels\ClubViewModel.cs" />
     <Compile Include="ViewModels\ContractViewModel.cs" />
     <Compile Include="ViewModels\FoundingViewModel.cs" />
+    <Compile Include="ViewModels\InfrastructureViewModel.cs" />
     <Compile Include="ViewModels\LineUpViewModel.cs" />
     <Compile Include="ViewModels\LiveViewModel.cs" />
+    <Compile Include="ViewModels\PlayerSearchViewModel.cs" />
     <Compile Include="ViewModels\PriceViewModel.cs" />
     <Compile Include="ViewModels\RoosterViewModel.cs" />
     <Compile Include="ViewModels\TransferViewModel.cs" />
@@ -80,8 +83,14 @@
     <Compile Include="Views\ClubWindow.xaml.cs">
       <DependentUpon>ClubWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\InfrastructureControl.xaml.cs">
+      <DependentUpon>InfrastructureControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\LineUpControl.xaml.cs">
       <DependentUpon>LineUpControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PlayerSearchControl.xaml.cs">
+      <DependentUpon>PlayerSearchControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\PriceWindow.xaml.cs">
       <DependentUpon>PriceWindow.xaml</DependentUpon>
@@ -184,7 +193,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\InfrastructureControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\LineUpControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PlayerSearchControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

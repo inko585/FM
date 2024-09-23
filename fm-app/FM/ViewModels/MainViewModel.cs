@@ -19,18 +19,30 @@ namespace FM.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
-        public static MainViewModel Instance { get; set; }
+        public static bool IsInitialized => instance != null;
+        private static MainViewModel instance;
+        public static MainViewModel Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new MainViewModel();
+                }
+                return instance;
+            }
+        }
 
         private void Subscribe()
         {
-            Season.CurrentSeason.OnSeasonProgress += (s, e) => NotifyPropertyChanged(nameof(NextOpponent));
+            Season.CurrentSeason.OnSeasonProgress += (s, e) => Update();
             NotifyPropertyChanged(nameof(PlayerClub));
-            NotifyPropertyChanged(nameof(NextOpponent));
+            Update();
         }
 
-        public MainViewModel()
+        private MainViewModel()
         {
-            Instance = this;
+            
             NavItems = new ObservableCollection<NavItem>();
             CollectionView = CollectionViewSource.GetDefaultView(NavItems);
             CollectionView.GroupDescriptions.Add(new PropertyGroupDescription("Category"));
@@ -41,9 +53,24 @@ namespace FM.ViewModels
             NavItems.Add(new NavItem()
             {
                 Category = "VEREIN",
+                Name = "Aufstellung",
+                UserControl = new LineUpControl()
+            });
+
+            NavItems.Add(new NavItem()
+            {
+                Category = "VEREIN",
                 Name = "Kader",
                 UserControl = new RoosterControl()
             });
+
+            NavItems.Add(new NavItem()
+            {
+                Category = "VEREIN",
+                Name = "Infrastruktur",
+                UserControl = new InfrastructureControl()
+            });
+
             NavItems.Add(new NavItem()
             {
                 Category = "STATISTIKEN",
@@ -65,6 +92,13 @@ namespace FM.ViewModels
                 UserControl = new TransferControl()
             });
 
+            NavItems.Add(new NavItem()
+            {
+                Category = "SONSTIGES",
+                Name = "Spieler Suche",
+                UserControl = new PlayerSearchControl()
+            });
+
             NotifyPropertyChanged("NavItems");
 
             CollectionView.Refresh();
@@ -73,7 +107,7 @@ namespace FM.ViewModels
             SaveCommand = new RelayCommand(o => IO.Save(Game.Instance.FootballUniverse));
             LoadCommand = new RelayCommand(o =>
             {
-                var universe = IO.Load(Game.Instance.FootballUniverse.World, out Club playerClub);
+                var universe = IO.Load(Game.Instance.FootballUniverse.World, out PlayerClub playerClub);
                 if (universe != null)
                 {
                     Game.Instance.FootballUniverse = universe;
@@ -88,10 +122,15 @@ namespace FM.ViewModels
                     MatchDayViewModel.Instance.SelectedLeague = MatchDayViewModel.Instance.SelectedLeagueAssociation.Leagues.FirstOrDefault();
                     MatchDayViewModel.Instance.Subscribe();
                     TransferViewModel.Instance.NotifyPropertyChanged(nameof(TransferViewModel.Instance.LeagueAssociations));
+                    TransferViewModel.Instance.NotifyPropertyChanged(nameof(TransferViewModel.Instance.Seasons));
                     TransferViewModel.Instance.SelectedLeagueAssociation = TransferViewModel.Instance.LeagueAssociations.FirstOrDefault();
                     TransferViewModel.Instance.SelectedLeague = TransferViewModel.Instance.SelectedLeagueAssociation.Leagues.FirstOrDefault();
                     TransferViewModel.Instance.Subscribe();
                     RoosterViewModel.Instance.Subscribe();
+                    RoosterViewModel.Instance.SubscribeToPlayerClub();
+                    LineUpViewModel.Instance.Subscribe();
+                    LineUpViewModel.Instance.SubscribeToPlayerClub();
+                    InfrastructureViewModel.Instance.Update();
                     Subscribe();
                     AdjustColor();
                 }
@@ -113,18 +152,20 @@ namespace FM.ViewModels
 
         public Club PlayerClub => Game.Instance.PlayerClub;
 
-        public Club NextOpponent
-        {
-            get
-            {
-                if (Game.Instance.PlayerLeague.NextMatchDay == null)
-                {
-                    return null;
-                }
-                var pm = Game.Instance.PlayerLeague.NextMatchDay.Matches.First(m => m.HomeClub == PlayerClub || m.AwayClub == PlayerClub);
-                return pm.HomeClub == PlayerClub ? pm.AwayClub : pm.HomeClub;
+        public Club NextOpponent => Game.Instance.NextPlayerOpponent;
 
-            }
+
+        public string AccountString => string.Format("{0:#,0}", PlayerClub.Account) + " €";
+        public string BudgetString => string.Format("{0:#,0}", PlayerClub.BudgetCurrentSeason) + " €";
+        public string SavingsString => string.Format("{0:#,0}", PlayerClub.Savings) + " €";
+
+
+        public void Update()
+        {
+            NotifyPropertyChanged(nameof(AccountString));
+            NotifyPropertyChanged(nameof(BudgetString));
+            NotifyPropertyChanged(nameof(SavingsString));
+            NotifyPropertyChanged(nameof(NextOpponent));
         }
 
         public FootballUniverse Universe

@@ -4,21 +4,24 @@ using FM.Common.Pixels;
 using FM.Common.Season;
 using FM.Entities.Base;
 using FM.Generator;
+using FM.ViewModels;
 using FM.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 
 namespace FM.Common.Generic
 {
     public class Game
     {
-        public static readonly int ENTREE_FEE = 30;
-        public static readonly int XP_MATCH = 14;
-        public static readonly int XP_MATCH_SUB = 9;
+        public static readonly int ENTREE_FEE = 40;
+        public static readonly int XP_MATCH = 16;
+        public static readonly int XP_MATCH_SUB = 8;
         public static readonly int CONTRACT_BORDER_WEEK = 11;
 
         public static Game Instance { get; private set; }
@@ -28,34 +31,77 @@ namespace FM.Common.Generic
             FootballUniverse = new FootballUniverse(w);
         }
 
-        public Club PlayerClub { get; set; }
+        public PlayerClub PlayerClub { get; set; }
+
+        public Club NextPlayerOpponent
+        {
+            get
+            {
+                if (Game.Instance.PlayerLeague.NextMatchDay == null)
+                {
+                    return null;
+                }
+                var pm = Game.Instance.PlayerLeague.NextMatchDay.Matches.First(m => m.HomeClub == PlayerClub || m.AwayClub == PlayerClub);
+                return pm.HomeClub == PlayerClub ? pm.AwayClub : pm.HomeClub;
+
+            }
+        }
 
         public static void InitNewGame(World w, int leagueSize)
         {
             Instance = new Game(w, leagueSize);
             Instance.FootballUniverse.LeagueAssociations = new List<LeagueAssociation>();
             //TODO use the correct looks here
-            var fw = new FoundingWindow(w);
-            if (fw.ShowDialog() == true)
-            {
-                Instance.PlayerClub = fw.Result.Item1;
-                var al = w.AssociationLooks.First();
-                WorldGenerator.TakenNames.Add(fw.Result.Item1.Name);
-                foreach (var a in w.Associations)
-                {
-                    Club pc = null;
-                    int depth = -1;
+            //var fw = new FoundingWindow(w);
+            //if (fw.ShowDialog() == true)
+            //{
+            //    Instance.PlayerClub = fw.Result.Item1;
+            //    WorldGenerator.TakenNames.Add(fw.Result.Item1.Name);
+            //}
+            var al = w.AssociationLooks.First();
 
-                    if (fw.Result.Item2 == a)
-                    {
-                        pc = fw.Result.Item1;
-                        depth = fw.Result.Item3;
-                    }
-                    Instance.FootballUniverse.LeagueAssociations.Add(WorldGenerator.GenerateRandomLeagueAssociation(w, a, al, pc, depth));
+            foreach (var a in w.Associations)
+            {
+                //Club pc = null;
+                //int depth = -1;
+
+                //if (Instance.PlayerClub != null && fw.Result.Item2 == a)
+                //{
+                //    pc = fw.Result.Item1;
+                //    depth = fw.Result.Item3;
+                //}
+                LeagueAssociation la;
+                if (a.Nations.Any(n => n.Text == "Deutschland"))
+                {
+                    la = PredefinedClubs.GenerateGermanLeagueAssociation(w, a);
+                    var random = Util.GetRandomInt(24, 59);
+                    var club = la.Leagues.SelectMany(l => l.Clubs).ElementAt(random);
+                    var playerClub = PredefinedClubs.BuildClub(w, club.Nation, club.Name, club.ClubColors.MainColorString, club.ClubColors.SecondColorString, club.SecondClubColors.MainColorString, club.SecondClubColors.SecondColorString, club.Dress, club.Crest, club.StartingPowerLevel, true) as PlayerClub;
+                    
+
+                    
+                    var playerLeague = club.Leagues.First();
+                    playerLeague.Clubs.Remove(club);
+                    playerLeague.Clubs.Add(playerClub);
+                    playerClub.Leagues.Add(playerLeague);
+                    Instance.PlayerClub = playerClub;
+
+                    la.Leagues.ForEach(l => l.ResetStandings());
+                } else
+                {
+                   la = WorldGenerator.GenerateRandomLeagueAssociation(w, a, al);
                 }
 
-                Season.Season.InitSeasons();
+                
+                Instance.FootballUniverse.LeagueAssociations.Add(la);
+                
+                
             }
+
+            //init player club lineup
+            var x = LeagueViewModel.Instance;
+            Season.Season.InitSeasons();
+
 
         }
 
@@ -75,17 +121,34 @@ namespace FM.Common.Generic
         {
             World = w;
             TransferList = new List<Transfer>();
-            PlayersWithoutContract = new List<Player>();
-            RetiredPlayers = new List<Player>();
+            InactivePlayers = new List<Player>();
         }
         public World World { get; set; }
         public List<LeagueAssociation> LeagueAssociations { get; set; }
         private List<Club> clubs;
         public List<Transfer> TransferList { get; set; }
 
-        public List<Player> PlayersWithoutContract { get; set; }
+        public void ResetStrongestPlayerNotInStartingLineup()
+        {
+            strongestPlayerNotInStartingLineUp = null;
+        }
 
-        public List<Player> RetiredPlayers { get; set; }
+        private Player strongestPlayerNotInStartingLineUp;
+        public Player StrongestPlayerNotInStartingLineUp
+        {
+            get
+            {
+                if (strongestPlayerNotInStartingLineUp == null)
+                {
+                    var affectedPlayers = ActivePlayers.Where(p => p.Club == null || !p.Club.StartingLineUp.Players.Contains(p));
+                    strongestPlayerNotInStartingLineUp = affectedPlayers.OrderByDescending(p => p.ValueWithPotential).FirstOrDefault();
+                }
+                return strongestPlayerNotInStartingLineUp;
+            }
+        }
+        public List<Player> InactivePlayers { get; set; }
+
+        public List<Player> PlayersLookingForClub => InactivePlayers.Where(p => p.WillSignContract).ToList();
 
         public void ResetCache()
         {
@@ -108,13 +171,23 @@ namespace FM.Common.Generic
         {
             get
             {
-                return Clubs.SelectMany(c => c.Rooster).Concat(PlayersWithoutContract).ToList();
+                return Clubs.SelectMany(c => c.Rooster).Concat(InactivePlayers).ToList();
+            }
+        }
+
+        public List<Player> ActivePlayers
+        {
+            get
+            {
+                return Clubs.SelectMany(c => c.Rooster).Concat(PlayersLookingForClub).Where(p => p != null).ToList();
             }
         }
     }
 
     public class LeagueAssociation
     {
+
+        public double AverageAttractionTop3 => Leagues.Take(3).SelectMany(l => l.Clubs).Average(c => c.Attraction);
         public LeagueAssociation()
         {
             Leagues = new List<League>();
@@ -200,7 +273,7 @@ namespace FM.Common.Generic
         {
             get
             {
-                return (int)Math.Pow(2, Power) * 75000;
+                return Util.GetNiceValue((int)Math.Pow(2.2, Power) * 40000);
             }
         }
         public MatchDay LatestMatchDay
@@ -315,9 +388,42 @@ namespace FM.Common.Generic
 
     }
 
+    public class PlayerClub : Club
+    {
+        public override LineUp StartingLineUp => LineUpViewModel.Instance.LineUp;
+
+        public override int Account
+        {
+            get => base.Account;
+            set
+            {
+                base.Account = value;
+                if (MainViewModel.IsInitialized)
+                {
+                    InfrastructureViewModel.Instance.Update();
+                    MainViewModel.Instance.Update();
+                }
+            }
+        }
+
+        public override void ResetLineup()
+        {
+            //do nothing
+        }
+
+        public override void UpgradeAssets()
+        {
+            // do nothing
+        }
+
+        public override List<Player> Bench => LineUpViewModel.Instance.Bench.Select(b => b.Player).ToList();
+    }
 
     public class Club
     {
+
+        //for predefined clubs
+        public double StartingPowerLevel { get; set; }
 
         public override string ToString()
         {
@@ -325,7 +431,7 @@ namespace FM.Common.Generic
         }
         public Club()
         {
-            Rooster = new List<Player>();
+            Rooster = new ObservableCollection<Player>();
             JoiningPlayers = new List<Player>();
             Leagues = new List<League>();
             TransferExpensesCurrentSeason = 0;
@@ -335,7 +441,7 @@ namespace FM.Common.Generic
             LastYearLineUp = new List<Player>();
             NewPlayersWithFee = new List<Player>();
             NewPlayersWithoutFee = new List<Player>();
-            PlayersSoldFromStartingLineUp = 0;
+            PlayersSoldFromTeam = 0;
             ClubAssetLevel = new Dictionary<ClubAsset, int>();
             NewPlayersFromYouth = new List<Player>();
         }
@@ -376,6 +482,7 @@ namespace FM.Common.Generic
             }
         }
 
+        public string LeagueString => LeagueDepthString + ", Tabellenplatz " + GetRank(Leagues.First());
         public int GetRank(League l)
         {
             var rank = l.RankedClubs.FirstOrDefault(rc => rc.Club == this);
@@ -435,7 +542,16 @@ namespace FM.Common.Generic
         public int AssetCost(ClubAsset ca)
         {
             var lvl = ClubAssetLevel[ca];
-            return 50000 * (int)Math.Pow(1.6, lvl);
+
+            switch (lvl)
+            {
+                case 1: return 1000000;
+                case 2: return 3000000;
+                case 3: return 10000000;
+                case 4: return 35000000;
+                default: return 125000000;
+            }
+
         }
 
         public Dictionary<ClubAsset, int> ClubAssetLevel { get; set; }
@@ -459,6 +575,7 @@ namespace FM.Common.Generic
 
         public List<Player> NewPlayersFromYouth { get; set; }
 
+
         public List<Player> NewPlayersFromYouth_LU
         {
             get
@@ -477,12 +594,12 @@ namespace FM.Common.Generic
 
         public List<Player> LastYearLineUp { get; set; }
 
-        public int PlayersSoldFromStartingLineUp { get; set; }
+        public int PlayersSoldFromTeam { get; set; }
         public String Name { get; set; }
 
         public Nation Nation { get; set; }
 
-        public void ResetLineup()
+        public virtual void ResetLineup()
         {
             lineup = null;
             bench = null;
@@ -490,20 +607,20 @@ namespace FM.Common.Generic
         }
         private LineUp lineup;
 
-        public LineUp StartingLineUp
+        public virtual LineUp StartingLineUp
         {
             get
             {
                 if (lineup == null)
                 {
-                    lineup = Coach.CreateLineUp(Rooster, p => p.ValueForCoach);
+                    lineup = Coach.CreateLineUp(Rooster, p => p.ValueForCoachCurrent);
                 }
                 return lineup;
             }
         }
 
         private List<Player> bench;
-        public List<Player> Bench
+        public virtual List<Player> Bench
         {
             get
             {
@@ -512,7 +629,7 @@ namespace FM.Common.Generic
                     bench = new List<Player>();
                     foreach (var pos in GetPositions())
                     {
-                        bench.AddRange(Rooster.Where(pl => !StartingLineUp.Players.Contains(pl) && pl.Position == pos).OrderByDescending(pl => pl.ValueForCoach).Take(pos == Position.Goalie ? 1 : Coach.Philospophie.GetPreferredFormation()[((int)pos) - 1]));
+                        bench.AddRange(Rooster.Where(pl => !StartingLineUp.Players.Contains(pl) && pl.Position == pos).OrderByDescending(pl => pl.ValueForCoachCurrent).Take(pos == Position.Goalie ? 1 : Coach.Philospophie.GetPreferredFormation()[((int)pos) - 1]));
                     }
                 }
                 return bench;
@@ -545,7 +662,7 @@ namespace FM.Common.Generic
         //        return res;
         //    }
         //}
-        public List<Player> Rooster { get; set; }
+        public ObservableCollection<Player> Rooster { get; set; }
         public List<Player> JoiningPlayers { get; set; }
 
         public List<Player> RoosterNextYear
@@ -572,20 +689,6 @@ namespace FM.Common.Generic
         public bool IsClimber { get; set; }
 
         public Sponsor CurrentSponsor { get; set; }
-
-        public void ClearDepth()
-        {
-            var lineupCountPos = GetLineUpCountForPosition();
-            while ((Account + StadiumIncomeEstimation - SalaryExpenseEstimationCurrentSeason) < 0)
-            {
-                var top = Rooster.Where(o => lineupCountPos[o.Position] < Rooster.Where(pl => pl.Position == o.Position).Count()).OrderByDescending(pl => pl.ContractCurrent.Salary).First();
-                var x = top.PlayerImage;
-                top.ContractCurrent = null;
-                Rooster.Remove(top);
-                Game.Instance.FootballUniverse.PlayersWithoutContract.Add(top);
-            }
-
-        }
 
         public bool PositionSufficient(Position p)
         {
@@ -648,14 +751,22 @@ namespace FM.Common.Generic
             get; set;
         }
 
-        public int Account { get; set; }
+        protected int account;
+        public virtual int Account
+        {
+            get => account;
+            set
+            {
+                account = value;
+            }
+        }
         public int Savings { get; set; }
 
         public double TalentGenerationLevel
         {
             get
             {
-                return 1 + ClubAssetLevel[ClubAsset.YouthWork] * 0.5;
+                return ClubAssetLevel[ClubAsset.YouthWork];
             }
         }
 
@@ -663,7 +774,15 @@ namespace FM.Common.Generic
         {
             get
             {
-                return ClubAssetLevel[ClubAsset.Stadium] * 1500;
+                switch(ClubAssetLevel[ClubAsset.Stadium])
+                {
+                    case 1: return 2000;
+                    case 2: return 5000;
+                    case 3: return 10000;
+                    case 4: return 16000;
+                    case 5: return 24000;
+                    default: return 36000;
+                }
             }
         }
 
@@ -679,7 +798,15 @@ namespace FM.Common.Generic
         {
             get
             {
-                return 2 + ClubAssetLevel[ClubAsset.TrainingGrounds];
+                switch(ClubAssetLevel[ClubAsset.TrainingGrounds])
+                {
+                    case 1: return 6;
+                    case 2: return 10;
+                    case 3: return 16;
+                    case 4: return 24;
+                    case 5: return 34;
+                    default: return 46;
+                }
             }
         }
 
@@ -700,7 +827,7 @@ namespace FM.Common.Generic
         {
             get
             {
-                return (int)(Math.Round(Math.Pow(1.5, (Attraction / 160))) * 3200);
+                return (int)(Math.Round(Math.Pow(1.44, (Attraction / 170))) * 4000);
             }
         }
 
@@ -711,7 +838,7 @@ namespace FM.Common.Generic
         {
             get
             {
-                return (int)(Math.Round(Math.Pow(Attraction, 1.8) / 115));
+                return (int)(Math.Round(Math.Pow(1.12, Attraction/100))) * 200;
             }
         }
 
@@ -748,16 +875,26 @@ namespace FM.Common.Generic
         {
             get
             {
-                return (int)(IncomeEstimationCurrentSeason * (IsClimber ? 1 : 0.75) - ExpenseEstimationCurrentSeason);
+                var b = (int)(IncomeEstimationCurrentSeason * (IsAllMaxedOut ? 1 : 0.75) - ExpenseEstimationCurrentSeason) + (IsAllMaxedOut ? Savings : 0);
+                if (b < 0)
+                {
+                    return Math.Max(0, (int)(IncomeEstimationCurrentSeason - ExpenseEstimationCurrentSeason));
+                }
+                else
+                {
+                    return b;
+                }
             }
         }
 
         public int budgetNextSeason = -1;
+
+
         public int BudgetNextSeason
         {
             get
             {
-                return (int)((IncomeEstimationNextSeason * 0.6 - ExpenseEstimationNextSeason));
+                return (int)(IncomeEstimationNextSeason * (IsAllMaxedOut ? 1 : 0.6) - ExpenseEstimationNextSeason + (IsAllMaxedOut ? Savings : 0));
             }
         }
 
@@ -781,7 +918,7 @@ namespace FM.Common.Generic
         {
             get
             {
-                return 75 * ClubAssetLevel[ClubAsset.Office];
+                return 300 * ClubAssetLevel[ClubAsset.Office];
             }
         }
 
@@ -824,18 +961,25 @@ namespace FM.Common.Generic
             return ret;
         }
 
-        public void UpgradeAssets()
+        public bool IsAllMaxedOut => ClubAssetLevel.All(cal => cal.Value == 6);
+        public virtual void UpgradeAssets()
         {
+            if (IsAllMaxedOut)
+            {
+                return;
+            }
+
             while (true)
             {
-                var assetCosts = ClubAssetLevel.Select(cal => Tuple.Create(cal.Key, AssetCost(cal.Key))).OrderBy(t => t.Item2).ToList();
+                var assetCosts = ClubAssetLevel.Where(cal => cal.Value < 6).Select(cal => Tuple.Create(cal.Key, AssetCost(cal.Key))).OrderBy(t => t.Item2).ToList();
                 if (ViewerAttraction < StadiumCapacity)
                 {
                     assetCosts = assetCosts.Where(ac => ac.Item1 != ClubAsset.Stadium).ToList();
                 }
-                if (Account > assetCosts.First().Item2)
+                if (assetCosts.Any() && Savings > assetCosts.First().Item2)
                 {
                     var asset = assetCosts.First().Item1;
+                    Savings -= assetCosts.First().Item2;
                     Account -= assetCosts.First().Item2;
                     ClubAssetLevel[asset]++;
 
@@ -858,20 +1002,31 @@ namespace FM.Common.Generic
             var newPlayers = new List<Player>();
             var neededPlayers = new List<Player>();
 
-            foreach (var pos in nPlayersNeededPos.Where(np => np.Value > 0))
+            if (this != Game.Instance.PlayerClub)
             {
-                pos.Value.Times(() =>
+                foreach (var pos in nPlayersNeededPos.Where(np => np.Value > 0))
                 {
-                    neededPlayers.Add(Generator.WorldGenerator.GenerateRandomPlayer(Game.Instance.FootballUniverse.World, Nation, pos.Key, Util.GetGaussianRandom(TalentGenerationLevel, 0.5), 17, 17));
-                });
+                    pos.Value.Times(() =>
+                    {
+                        var lvl = Util.GetGaussianRandom(3.5 + TalentGenerationLevel, 0.75).Clamp(1, 9);
+                        neededPlayers.Add(Generator.WorldGenerator.GenerateRandomPlayer(Game.Instance.FootballUniverse.World, Nation, pos.Key, lvl, 17, 17));
+                    });
+                }
             }
 
-            if (neededPlayers.Count < 3)
+            var talentCount = TalentGenerationLevel > 4 ? 3 : TalentGenerationLevel > 2 ? 2 : 1;
+            var posOcc = new List<Occurrence>() { new Occurrence("TOR", 4), new Occurrence("VER", 6), new Occurrence("MID", 8), new Occurrence("ST", 6) };
+
+            if (neededPlayers.Count < talentCount)
             {
-                (5 - neededPlayers.Count).Times(() =>
+                (talentCount - neededPlayers.Count).Times(() =>
                 {
-                    var pos = Util.GetRandomInt(0, 3);
-                    newPlayers.Add(Generator.WorldGenerator.GenerateRandomPlayer(Game.Instance.FootballUniverse.World, Nation, positions.ElementAt(pos), Util.GetGaussianRandom(TalentGenerationLevel, 0.5), 17, 17));
+                    var dice = Util.GetRandomDouble();
+                    if (dice < 0.34)
+                    {
+                        var pos = posOcc.IndexOf(WorldGenerator.GetRandomOccurrence(posOcc, WorldGenerator.STANDARD_DEV));
+                        newPlayers.Add(GenerateYouthPlayer(positions.ElementAt(pos)));
+                    }
                 });
                 //foreach (var p in positions)
                 //{
@@ -883,28 +1038,39 @@ namespace FM.Common.Generic
 
                 //newPlayers.AddRange(youthPlayers.OrderByDescending(pl => pl.ValueWithPotential).Take(Math.Max(0, 3 - newPlayers.Count)));
 
-                newPlayers = newPlayers.OrderByDescending(p => p.ValueWithPotential).Take(3 - neededPlayers.Count).ToList();
+                newPlayers = newPlayers.OrderByDescending(p => p.ValueWithPotential).Take(talentCount - neededPlayers.Count).ToList();
             }
 
             newPlayers.AddRange(neededPlayers);
 
             foreach (var pl in newPlayers)
             {
-                pl.ContractCurrent = new Contract()
-                {
-                    Club = this,
-                    Player = pl,
-                    RunTime = 2,
-                    Salary = (int)(pl.GetSalaryExpectationForClub(this, true) * 0.7)
-                };
-                this.Rooster.Add(pl);
-                pl.DressNumber = GetFreeNumber(pl.Position);
-                this.NewPlayersFromYouth.Add(pl);
-                pl.PlayerStatistics.Add(new PlayerStatistics(pl, (int)pl.SkillMax, Season.Season.CurrentSeason.Year, Leagues.First().Depth));
+                GiveConractToYouthPlayer(pl);
             }
 
         }
 
+        public Player GenerateYouthPlayer(Position position)
+        {
+            var lvl = Util.GetGaussianRandom(3.5 + TalentGenerationLevel, 0.75).Clamp(1, 9);
+            return Generator.WorldGenerator.GenerateRandomPlayer(Game.Instance.FootballUniverse.World, Nation, position, lvl, 17, 17);
+        }
+
+        public void GiveConractToYouthPlayer(Player pl)
+        {
+            pl.ContractCurrent = new Contract()
+            {
+                Club = this,
+                Player = pl,
+                RunTime = 2,
+                Salary = Math.Min(250000, Util.GetNiceValue((int)(pl.GetSalaryExpectationForClub(this, true) * 0.5)))
+            };
+            this.Rooster.Add(pl);
+            pl.DressNumber = GetFreeNumber(pl.Position);
+            this.NewPlayersFromYouth.Add(pl);
+            pl.PlayerStatistics.Add(new PlayerStatistics(pl, (int)pl.SkillMax, Season.Season.CurrentSeason.Year, Leagues.First().Depth));
+            pl.ClubHistory.Add(this);
+        }
 
         public void PlanNextYearRooster()
         {
@@ -934,7 +1100,7 @@ namespace FM.Common.Generic
                     {
                         var budget1 = (int)(BudgetNextSeason * 0.8);
                         var budgetPlayer = budget1 / nPlayersNeeded;
-                        var interestingPlayers_base = Game.Instance.FootballUniverse.Players.Where(p => p.WillSignContract && (p.WillSignContractWithoutFee && ((p.Club == this && Season.Season.CurrentSeason.CurrentWeek.Number == Game.CONTRACT_BORDER_WEEK) || Season.Season.CurrentSeason.CurrentWeek.Number > Game.CONTRACT_BORDER_WEEK)) && p.GetSalaryExpectationForClub(this, false) <= budgetPlayer && avValueOnField < (1.2 * p.GetValueAndPreferenceForClub(this, false))).OrderByDescending(p => p.GetValueAndPreferenceForClub(this, false));
+                        var interestingPlayers_base = Game.Instance.FootballUniverse.ActivePlayers.Where(p => p.WillSignContract && (p.WillSignContractWithoutFee && ((p.Club == this && Season.Season.CurrentSeason.CurrentWeek.Number == Game.CONTRACT_BORDER_WEEK) || Season.Season.CurrentSeason.CurrentWeek.Number > Game.CONTRACT_BORDER_WEEK)) && p.GetSalaryExpectationForClub(this, false) <= budgetPlayer && avValueOnField < (1.3 * p.GetValueAndPreferenceForClub(this, false))).OrderByDescending(p => p.GetValueAndPreferenceForClub(this, false));
 
                         RoosterFillHillClimping(interestingPlayers_base, budget1, nPlayersNeededPos, priceCache, valueCache, out Dictionary<Player, int> candidates, out Dictionary<Player, int> alternatives);
 
@@ -958,7 +1124,7 @@ namespace FM.Common.Generic
 
                             var riskScore = budgetPowerFactor * 0.2 + loyaltyFactor * 0.2 + nFactor * 0.2 + timeFactor * 0.4;
 
-                            if (riskScore > 0.55)
+                            if (riskScore > 0.6 || Season.Season.CurrentSeason.CurrentWeek.Number == Season.Season.CurrentSeason.FootballWeeks.Count)
                             {
                                 nPlayersNeeded--;
                                 FootballHelper.SignContract(c.Key, this, c.Key.Age > 30 ? 2 : Util.GetRandomInt(2, 5), c.Key.GetSalaryExpectationForClub(this, false), false);
@@ -1044,7 +1210,7 @@ namespace FM.Common.Generic
             }
             else
             {
-                return player.Average(pl => pl.GetValueForClub(0.97f));
+                return player.Average(pl => pl.GetValueForClub());
             }
         }
 
@@ -1061,7 +1227,7 @@ namespace FM.Common.Generic
         {
             var players = currentSeason ? StartingLineUp.PlayersForPosition[p] : StartingLineUpNextSeason.PlayersForPosition[p];
 
-            return players.OrderBy(pl => pl.GetValueForClub(0.97f)).FirstOrDefault()?.GetValueForClub(0.97f) ?? 0;
+            return players.OrderBy(pl => pl.GetValueForClub()).FirstOrDefault()?.GetValueForClub() ?? 0;
         }
 
         public void LookForSponsor()
@@ -1127,16 +1293,16 @@ namespace FM.Common.Generic
         public void LookForImprovementWithoutFee(double valueMargin)
         {
 
-            var playerPool = Game.Instance.FootballUniverse.Players.Where(p => p.WillSignContract && p.WillJoinClub(this)).ToList();
+            var playerPool = Game.Instance.FootballUniverse.ActivePlayers.Where(p => p.WillSignContract && p.WillJoinClub(this)).ToList();
 
             Dictionary<Player, int> priceCache = new Dictionary<Player, int>();
             Dictionary<Player, float> valueCache = new Dictionary<Player, float>();
 
-            playerPool = playerPool.Where(p => p.ContractComing == null && p.ContractCurrent.RunTime == 1 && ((p.Club == this && Season.Season.CurrentSeason.CurrentWeek.Number == Game.CONTRACT_BORDER_WEEK) || (Season.Season.CurrentSeason.CurrentWeek.Number > Game.CONTRACT_BORDER_WEEK)) && Price(p, false, priceCache) < BudgetNextSeason).ToList();
+            playerPool = playerPool.Where(p => p.ContractComing == null && (p.Club == null || p.ContractCurrent.RunTime == 1) && ((p.Club == this && Season.Season.CurrentSeason.CurrentWeek.Number == Game.CONTRACT_BORDER_WEEK) || (Season.Season.CurrentSeason.CurrentWeek.Number > Game.CONTRACT_BORDER_WEEK)) && Price(p, false, priceCache) < BudgetNextSeason).ToList();
             var nextYearTeam = Coach.CreateLineUp(Rooster, p => InvestInterest(p, false, valueCache));
             var oldTeam = nextYearTeam.Players.ToList();
             var currentTeam = nextYearTeam.Players.ToDictionary(p => p, p => 0);
-            var minValue = oldTeam.Min(p => p.GetValueForClub(0.97f));
+            var minValue = oldTeam.Min(p => p.GetValueForClub());
             playerPool = playerPool.Where(p => p.GetSalaryExpectationForClub(this, false) < (p.SalaryStandard * 1.5) && InvestInterest(p, false, valueCache) > minValue * valueMargin).ToList();
 
             ImprovementHillClimping(playerPool, BudgetNextSeason, oldTeam, false, priceCache, valueCache, out Dictionary<Player, int> improvedTeam, out Dictionary<Player, int> alternatives);
@@ -1144,7 +1310,7 @@ namespace FM.Common.Generic
             var bestFit = improvedTeam.Where(t => t.Value != 0).Select(t => t.Key);
             foreach (var bf in bestFit)
             {
-                var oldValue = oldTeam.Where(p => p.Position == bf.Position).Min(p => InvestInterest(p,false, valueCache));
+                var oldValue = oldTeam.Where(p => p.Position == bf.Position).Min(p => InvestInterest(p, false, valueCache));
                 //var improvementFactor = InvestInterest(bf, valueCache)/oldValue;
 
                 var loyaltyFactor = bf.Club == this ? 1 : 0;
@@ -1155,15 +1321,15 @@ namespace FM.Common.Generic
                 var posAlternatives = alternatives.Where(a => a.Key.Position == bf.Position);
                 if (posAlternatives.Any())
                 {
-                    nextBestValue = posAlternatives.Select(a => InvestInterest(a.Key, false,valueCache)).Max();
+                    nextBestValue = posAlternatives.Select(a => InvestInterest(a.Key, false, valueCache)).Max();
                 }
                 var valueDropFactor = (InvestInterest(bf, false, valueCache) / nextBestValue) - 1;
                 //var costFactor = Leagues.First().AverageBudgetNextSeason / bf.GetSalaryExpectationForClub(this, false);
                 var timeFactor = (float)Season.Season.CurrentSeason.CurrentWeek.Number / Season.Season.CurrentSeason.FootballWeeks.Count;
 
-                var riskScore = budgetPowerFactor * 0.25 + loyaltyFactor * 0.2 + valueDropFactor * 0.2 + timeFactor * 0.35;
+                var riskScore = budgetPowerFactor * 0.2 + loyaltyFactor * 0.2 + valueDropFactor * 0.2 + timeFactor * 0.4;
 
-                if (riskScore > 0.55)
+                if (riskScore > 0.6 || Season.Season.CurrentSeason.CurrentWeek.Number == Season.Season.CurrentSeason.FootballWeeks.Count)
                 {
                     var sal = bf.GetSalaryExpectationForClub(this, false);
 
@@ -1199,16 +1365,16 @@ namespace FM.Common.Generic
         public void LookForImprovement(double valueMargin)
         {
 
-            var playerPool = Game.Instance.FootballUniverse.Players.Where(p => p.WillSignContract && p.WillJoinClub(this)).ToList();
+            var playerPool = Game.Instance.FootballUniverse.ActivePlayers.Where(p => p.WillSignContract && p.WillJoinClub(this)).ToList();
 
             Dictionary<Player, int> priceCache = new Dictionary<Player, int>();
             Dictionary<Player, float> valueCache = new Dictionary<Player, float>();
 
-            playerPool = playerPool.Where(p => p.IsForSale && p.Club != this && Price(p, false, priceCache) < BudgetCurrentSeason).ToList();
+            playerPool = playerPool.Where(p => p.IsForSale && p.Club != this && Price(p, true, priceCache) < BudgetCurrentSeason).ToList();
 
             var thisYearTeam = Coach.CreateLineUp(Rooster, p => InvestInterest(p, true, valueCache));
             var oldTeam = thisYearTeam.Players.ToList();
-            var minValue = oldTeam.Min(p => p.GetValueForClub(0.97f));
+            var minValue = oldTeam.Min(p => p.GetValueForClub());
             playerPool = playerPool.Where(p => InvestInterest(p, true, valueCache) > minValue * valueMargin).ToList();
 
             ImprovementHillClimping(playerPool, BudgetCurrentSeason, oldTeam, true, priceCache, valueCache, out Dictionary<Player, int> improvedTeam, out Dictionary<Player, int> alternatives);
@@ -1220,9 +1386,9 @@ namespace FM.Common.Generic
                 var sal = bf.GetSalaryExpectationForClub(this, true);
                 if ((sal + bf.Price) < BudgetCurrentSeason)
                 {
-                    if (Game.Instance.FootballUniverse.PlayersWithoutContract.Contains(bf))
+                    if (Game.Instance.FootballUniverse.PlayersLookingForClub.Contains(bf))
                     {
-                        Game.Instance.FootballUniverse.PlayersWithoutContract.Remove(bf);
+                        //Game.Instance.FootballUniverse.PlayersWithoutContract.Remove(bf);
                         Game.Instance.FootballUniverse.TransferList.Add(new Transfer(bf, bf.Club ?? bf.ClubHistory.Last(), this, Season.Season.CurrentSeason.Year, Season.Season.CurrentSeason.CurrentWeek.Number, 0, bf.MarketValueStandard));
                         FootballHelper.SignContract(bf, this, bf.Age > 30 ? 2 : Util.GetRandomInt(2, 5), sal, true);
 
@@ -1271,7 +1437,7 @@ namespace FM.Common.Generic
                     }
                     else
                     {
-                        foreach (var c in candidates_.Where(c => c.Key.Position == n.Key).OrderBy(c => InvestInterest(c.Key,false, valueCache)))
+                        foreach (var c in candidates_.Where(c => c.Key.Position == n.Key).OrderBy(c => InvestInterest(c.Key, false, valueCache)))
                         {
                             var nextCand = availablePlayers.Where(ap => !candidates_.Any(x => ap == x.Key) && ap.Position == n.Key && InvestInterest(ap, false, valueCache) > InvestInterest(c.Key, false, valueCache)).ToList();
                             if (nextCand.Any())
@@ -1313,7 +1479,7 @@ namespace FM.Common.Generic
 
         private void ImprovementHillClimping(List<Player> availablePlayers, int budget, List<Player> playerInput, bool includeTransferFee, Dictionary<Player, int> priceCache, Dictionary<Player, float> valueCache, out Dictionary<Player, int> improvedTeam, out Dictionary<Player, int> alternatives)
         {
-            improvedTeam = playerInput.ToDictionary(p => p, p => 0);
+            improvedTeam = playerInput.Shuffle().ToDictionary(p => p, p => 0);
 
 
             availablePlayers = availablePlayers.OrderBy(p => Price(p, includeTransferFee, priceCache)).ToList();
@@ -1384,6 +1550,8 @@ namespace FM.Common.Generic
 
         //public ObservableCollection<Player> ObservableStartingPlayers { get; set; }
         public List<Player> Players { get; set; }
+
+        private List<Player> NonNullPlayers => Players.Where(p => p != null).ToList();
         public Player CentralPlayer { get; set; }
 
         public Player Sweeper { get; set; }
@@ -1394,7 +1562,7 @@ namespace FM.Common.Generic
         {
             get
             {
-                return Players.Where(p => p.Position == Position.Striker).ToList();
+                return NonNullPlayers.Where(p => p.Position == Position.Striker).ToList();
             }
         }
 
@@ -1402,14 +1570,14 @@ namespace FM.Common.Generic
         {
             get
             {
-                return Players.Where(p => p.Position == Position.Midfielder).ToList();
+                return NonNullPlayers.Where(p => p.Position == Position.Midfielder).ToList();
             }
         }
         public List<Player> Defenders
         {
             get
             {
-                return Players.Where(p => p.Position == Position.Defender).ToList();
+                return NonNullPlayers.Where(p => p.Position == Position.Defender).ToList();
             }
         }
         public Tactic Tactic { get; set; }
@@ -1428,7 +1596,7 @@ namespace FM.Common.Generic
         {
             get
             {
-                return Players.Where(p => p.Position != Position.Goalie).ToList();
+                return NonNullPlayers.Where(p => p.Position != Position.Goalie).ToList();
             }
         }
 
@@ -1436,7 +1604,7 @@ namespace FM.Common.Generic
         {
             get
             {
-                return Players.FirstOrDefault(p => p.Position == Position.Goalie);
+                return NonNullPlayers.FirstOrDefault(p => p.Position == Position.Goalie);
             }
         }
 
@@ -1567,6 +1735,13 @@ namespace FM.Common.Generic
         public LineUp CreateLineUp(IEnumerable<Player> rooster, Func<Player, float> evalFunc)
         {
             var formation = Philospophie.GetPreferredFormation();
+            List<Player> players = GetLineUpPlayers(rooster, evalFunc, formation);
+
+            return new LineUp(players, null, null, Philospophie.GetPreferredTactic(), Philospophie.GetPreferredTackling(), Philospophie.GetPreferredShotFrequency()) { Club = this.Club };
+        }
+
+        public static List<Player> GetLineUpPlayers(IEnumerable<Player> rooster, Func<Player, float> evalFunc, int[] formation)
+        {
             var players = new List<Player>();
             if (rooster.Goalies().Any())
             {
@@ -1575,8 +1750,7 @@ namespace FM.Common.Generic
             players.AddRange(rooster.Defenders().OrderByDescending(d => evalFunc(d)).Take(Math.Min(rooster.Defenders().Count(), formation[0])));
             players.AddRange(rooster.Midfielders().OrderByDescending(m => evalFunc(m)).Take(Math.Min(rooster.Midfielders().Count(), formation[1])));
             players.AddRange(rooster.Strikers().OrderByDescending(m => evalFunc(m)).Take(Math.Min(rooster.Strikers().Count(), formation[2])));
-
-            return new LineUp(players, null, null, Philospophie.GetPreferredTactic(), Philospophie.GetPreferredTackling(), Philospophie.GetPreferredShotFrequency()) { Club = this.Club };
+            return players;
         }
 
         public Club Club { get; set; }
@@ -1674,7 +1848,7 @@ namespace FM.Common.Generic
         public BitmapImage MatchPlayerImage { get; set; }
     }
 
-    public class Player : Human
+    public class Player : Human, INotifyPropertyChanged
     {
         public static int MIN_STARTING_CONSITUTION = 15;
         public static int MIN_AGE = 17;
@@ -1705,6 +1879,9 @@ namespace FM.Common.Generic
         }
 
         public int DressNumber { get; set; }
+        public int InjuryTime { get; set; } = 0;
+        public string InjuryLabel => InjuryTime > 0 ? "\uf462" : "";
+        public string InjuryTimeString => InjuryTime > 0 ? "(" + InjuryTime + ")" : "";
         public string DressNumberString
         {
             get
@@ -1713,13 +1890,13 @@ namespace FM.Common.Generic
             }
         }
 
-        //public string FieldNameString
-        //{
-        //    get
-        //    {
-        //        return DressNumberString + " " + LastName; 
-        //    }
-        //}
+        public string LineUpString
+        {
+            get
+            {
+                return PositionStringShort + " " + DressNumberString + " " + FullName;
+            }
+        }
 
         public bool? WantsToLeavePlayerClub { get; set; }
 
@@ -1753,7 +1930,7 @@ namespace FM.Common.Generic
         {
             get
             {
-                return (Age < 30 || Constitution > 10) && !ContractCurrent.IsSignedThisYear;
+                return (Age < 30 || Constitution > 10) && !(ContractCurrent?.IsSignedThisYear ?? false);
             }
         }
 
@@ -1765,6 +1942,8 @@ namespace FM.Common.Generic
                     (Season.Season.CurrentSeason.Year + ContractCurrent.RunTime - 1).ToString() + (ContractComing != null ? " (T)" : "");
             }
         }
+
+        public string SalaryString => string.Format("{0:#,0}", ContractCurrent.Salary);
 
         public bool WillSignContractWithoutFee
         {
@@ -1778,13 +1957,13 @@ namespace FM.Common.Generic
         {
             get
             {
-                return Club == null || Club.PositionSufficient(Position) || (Club.PositionSomeWhatSufficient(Position) && ValueForCoach < Club.GetAverageValueForTeam() * 0.5);
+                return Club == null || ((!Club.StartingLineUp.Players.Contains(this) || Club.StartingLineUp.Players.Any(p => p.ValueWithPotential*1.15 < Game.Instance.FootballUniverse.StrongestPlayerNotInStartingLineUp.ValueWithPotential)) && (Club.PositionSufficient(Position) || (Club.PositionSomeWhatSufficient(Position) && ValueForCoach < Club.GetAverageValueForTeam() * 0.5)));
             }
         }
 
         public bool WillJoinClub(Club c)
         {
-            return !this.Club.StartingLineUp.Players.Contains(this) || Club.Elo <= (c.Elo * 1.1);
+            return this.Club == null || !this.Club.StartingLineUp.Players.Contains(this) || Club.Elo <= (c.Elo * 1.1);
         }
 
         public List<Club> ClubHistory { get; set; }
@@ -1804,15 +1983,16 @@ namespace FM.Common.Generic
 
         public int Age { get; set; }
         public float SkillBase { get; set; }
-        public float XPLevel { get; set; }
+        public int XPLevel { get; set; }
         public int XP { get; set; }
 
         public bool IsLeftFoot { get; set; }
 
         public void ResetDress()
         {
-            this.playerImage = null;
-            this.playerImage_away = null;
+            this.playerImage = PixelArt.GetPlayerImage(this.Face, this.ClubHistory.Last().ClubColors, this.ClubHistory.Last().Dress);
+            this.playerImage_away = PixelArt.GetPlayerImage(this.Face, this.ClubHistory.Last().SecondClubColors, this.ClubHistory.Last().Dress);
+            this.profileImage = PixelArt.GetProfileImage(this.Face, this.ClubHistory.Last().ClubColors, this.ClubHistory.Last().Dress, this.ClubHistory.Last().StadiumCapacity);
         }
 
         public double PlayerPriceAdjustment { get; set; }
@@ -1838,9 +2018,10 @@ namespace FM.Common.Generic
 
         public float GetValueAndPreferenceForClub(Club c, bool currentSeason)
         {
-            var nfac = c.Nation == Nation ? 1 : 0.97f;
-            var lfac = Club == c || currentSeason ? 1 : 0.85f;
-            return ValueWithPotential * nfac * lfac;
+            var nationfac = c.Nation == Nation ? 1 : 0.98f;
+            var loyalityfac = Club == c || currentSeason ? 1 : 0.85f;
+            var scountingfac = c.Nation == Club?.Nation ? 1 : 0.98f;
+            return GetValueForClub() * nationfac * loyalityfac * scountingfac;
         }
 
         //public float GetInvestInterestForClub(Club c, Dictionary<Player, float> cache = null)
@@ -1865,7 +2046,19 @@ namespace FM.Common.Generic
             }
         }
 
-        public float GetValueForClub(float ageDecline)
+        public float GetValueForClub()
+        {
+            var overAge = Age - 30;
+            var ageDeclineFactor = 1d;
+            if (overAge > 0)
+            {
+                ageDeclineFactor = Math.Pow(0.97, overAge);
+            }
+
+            return ValueWithPotential * (float)ageDeclineFactor;
+        }
+
+        public float GetValueForSalary(float ageDecline)
         {
             var overAge = Age - 30;
             var ageDeclineFactor = 1d;
@@ -1874,9 +2067,8 @@ namespace FM.Common.Generic
                 ageDeclineFactor = Math.Pow(ageDecline, overAge);
             }
 
-            return ValueWithPotential * (float)ageDeclineFactor;
+            return ((SkillMax / 100) * 0.88f  + (SkillMax / 100) * (Position == Position.Goalie ? 1 : ((Constitution + 10) / Player.MAX_CONSTITUTION)) * 0.12f) * (float)ageDeclineFactor;
         }
-
 
         public float ValueAbsolute
         {
@@ -1954,7 +2146,7 @@ namespace FM.Common.Generic
                 {
                     if (PlayerStatistics.Any())
                     {
-                        playerImage = PixelArt.GetPlayerImage(this.Face, this.PlayerStatistics.Last().Club.ClubColors, this.PlayerStatistics.Last().Club.Dress);
+                        playerImage = PixelArt.GetPlayerImage(this.Face, this.ClubHistory.Last().ClubColors, this.ClubHistory.Last().Dress);
                     }
                 }
                 return playerImage;
@@ -1970,7 +2162,7 @@ namespace FM.Common.Generic
                 {
                     if (PlayerStatistics.Any())
                     {
-                        playerImage_away = PixelArt.GetPlayerImage(this.Face, this.PlayerStatistics.Last().Club.SecondClubColors, this.PlayerStatistics.Last().Club.Dress);
+                        playerImage_away = PixelArt.GetPlayerImage(this.Face, this.ClubHistory.Last().SecondClubColors, this.ClubHistory.Last().Dress);
                     }
                 }
                 return playerImage_away;
@@ -1978,20 +2170,29 @@ namespace FM.Common.Generic
         }
 
         private BitmapImage profileImage;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void NotifyPropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+
         public BitmapImage ProfileImage
         {
             get
             {
                 if (profileImage == null)
                 {
-                    profileImage = PixelArt.GetProfileImage(this.Face, this.PlayerStatistics.Last().Club.ClubColors, this.PlayerStatistics.Last().Club.Dress, this.PlayerStatistics.Last().Club.StadiumCapacity);
+                    profileImage = PixelArt.GetProfileImage(this.Face, this.ClubHistory.Last().ClubColors, this.ClubHistory.Last().Dress, this.ClubHistory.Last().StadiumCapacity);
                 }
                 return profileImage;
             }
 
 
         }
-
+            
         public string PositionString
         {
             get
@@ -2019,10 +2220,10 @@ namespace FM.Common.Generic
             }
         }
 
-        public int LevelCap()
+        public int LevelCap(int? i = null)
         {
 
-            return (int)Math.Pow(XPLevel + 1, TalentFactor) * 100;
+            return i == 1 ? 0 : (int)(Math.Pow(((double)(i ?? (XPLevel + 1))), TalentFactor) * 80);
         }
 
         public void AccountXP(int xp)
@@ -2035,13 +2236,20 @@ namespace FM.Common.Generic
                     XPLevel++;
                 }
             }
+            NotifyPropertyChanged(nameof(XPString));
+            NotifyPropertyChanged(nameof(SkillMax));
+
         }
+
+        public string XPString => Age <= 30 ? (XP - LevelCap(XPLevel)) + "/" + (LevelCap() - LevelCap(XPLevel)) : "-";
 
 
         public void Train()
         {
             AccountXP(Club?.TrainingXP ?? 0);
         }
+
+
 
         public float GoalThreat
         {
@@ -2081,12 +2289,13 @@ namespace FM.Common.Generic
             }
         }
 
+        public float SkillMaxCurrent => InjuryTime > 0 ? (float)Math.Round(SkillMax / 2) : SkillMax;
 
         public float SkillCurrent
         {
             get
             {
-                return SkillMax - (SkillMax * (1 - (Fitness / MAX_FITNESS)) * 0.3f);
+                return SkillMaxCurrent - (SkillMaxCurrent * (1 - (Fitness / MAX_FITNESS)) * 0.23f);
             }
         }
 
@@ -2094,15 +2303,17 @@ namespace FM.Common.Generic
         {
             get
             {
-                return (float)Math.Round(0.7f * (XPLevel + SkillBase) + 0.3f * (XPLevel + SkillBase) * (Constitution / MAX_CONSTITUTION), 0);
+                return (float)Math.Min(99, Math.Ceiling(0.7f * (XPLevel + SkillBase) + 0.3f * (XPLevel + SkillBase) * (Constitution / MAX_CONSTITUTION)));
             }
         }
+
+        public string MatchValues => SkillMaxCurrent + " (" + ConstitutionDisplayed + ")";
 
         public int SalaryStandard
         {
             get
             {
-                return Util.GetNiceValue((int)Math.Round(Math.Pow(2.75, GetValueForClub(0.96f) * 10), 1) * 500);
+                return Util.GetNiceValue((int)Math.Round(Math.Pow(2.74, GetValueForSalary(0.96f) * 10), 1) * 750);
             }
         }
 
@@ -2110,7 +2321,7 @@ namespace FM.Common.Generic
         {
             get
             {
-                return Util.GetNiceValue((int)Math.Round(Math.Pow(2.75, GetValueForClub(0.96f) * 10), 1) * 1000);
+                return Util.GetNiceValue((int)Math.Round(Math.Pow(2.74, GetValueForClub() * 10), 1) * 1000);
             }
         }
 
@@ -2142,41 +2353,34 @@ namespace FM.Common.Generic
                     return 0;
                 }
 
+                var isInTeam = Club.StartingLineUp.Players.Contains(this) || Club.Bench.Contains(this);
+
                 var startingLineupFactor = 1d;
-                var eloFactor = 1d;
-                var budgetFactor = 1d;
-                var contractFactor = 1d;
+                var eloFactor = Math.Pow((double)Club.Attraction / Club.Leagues.First().Association.AverageAttractionTop3, 2);
+                var contractFactor = Math.Pow(1.2, ContractCurrent.RunTime - 1);
+                var budgedFactor = Club.BudgetCurrentSeason < 0 ? 0.75 : 1;
 
-                if (Club.BudgetCurrentSeason > 0)
+                if (isInTeam && Club.PlayersSoldFromTeam > 0)
                 {
-                    if (Club.PlayersSoldFromStartingLineUp > 0)
-                    {
-                        startingLineupFactor = 1d + 0.45 * Club.PlayersSoldFromStartingLineUp;
-                    }
-
-                    if (Club.StartingLineUp.Players.Contains(this) && Season.Season.CurrentSeason.CurrentWeek.Number == 3)
-                    {
-                        startingLineupFactor *= 2;
-                    }
-                    contractFactor = Club.StartingLineUp.Players.Contains(this) ? (Math.Pow(1.2, ContractCurrent.RunTime)) : 0.85;
-                    eloFactor = eloFactor + (Club.StartingLineUp.Players.Contains(this) ? ((double)Club.Attraction / 10000) : 0);
+                    startingLineupFactor = 1d + (Club.StartingLineUp.Players.Contains(this) ? 0.45 : 0.3) * Club.PlayersSoldFromTeam;
                 }
-                else
+
+                if (isInTeam && Season.Season.CurrentSeason.CurrentWeek.Number == 3)
                 {
-                    budgetFactor = 0d;
+                    startingLineupFactor *= (Club.StartingLineUp.Players.Contains(this) ? 2 : 1.5);
                 }
 
                 if (!Club.StartingLineUp.Players.Contains(this))
                 {
                     if (!Club.Bench.Contains(this))
                     {
-                        startingLineupFactor = 0d;
+                        startingLineupFactor = 0;
                     }
                 }
 
 
 
-                return Util.GetNiceValue((int)Math.Round((MarketValueStandard * (0.2 * budgetFactor + 0.2 * eloFactor + 0.3 * contractFactor + 0.3 * startingLineupFactor) / 1000), 0) * 1000);
+                return Util.GetNiceValue((int)Math.Round(budgedFactor * (MarketValueStandard * (0.4 * eloFactor + 0.3 * contractFactor + 0.3 * startingLineupFactor) / 1000), 0) * 1000);
             }
         }
 
@@ -2185,7 +2389,7 @@ namespace FM.Common.Generic
         {
             get
             {
-                return IsForSale && WillSignContract ? string.Format("{0:#,0}", Util.GetNiceValue(Price)) : "-";
+                return (Club != null && IsForSale && WillSignContract) ? string.Format("{0:#,0}", Util.GetNiceValue(Price)) : "-";
             }
         }
         public double ExampleContractP
@@ -2195,6 +2399,9 @@ namespace FM.Common.Generic
                 return GetSalaryExpectationForClub(this.Club, false);
             }
         }
+
+        public int ExpectedMinSalary => GetSalaryExpectationForClub(Game.Instance.PlayerClub, ContractCurrent != null && (ContractCurrent.RunTime > 1 || (ContractCurrent.RunTime == 1 && Season.Season.CurrentSeason.CurrentWeek.Number < 4)), 2);
+        public string ExpectedSalaryString => WillSignContract ? string.Format("{0:#,0}", Util.GetNiceValue(ExpectedMinSalary)) : "-";
 
         //public double GetContractP(Club c, double salaryOffer)
         //{
@@ -2216,7 +2423,7 @@ namespace FM.Common.Generic
         //        }
         //        timeFactor = timeFactor * (Math.Pow(0.97, Season.Season.CurrentSeason.CurrentWeek.Number / Season.Season.CurrentSeason.FootballWeeks.Count()));
         //    }
-
+        
 
         //    return teamPowerFactor * posCompetitionFactor * moralFactor * timeFactor;
         //}
@@ -2226,6 +2433,8 @@ namespace FM.Common.Generic
             {
                 return -1;
             }
+
+
             //var teamPowerFactor = Math.Pow(ValueWithPotential / (c.StartingLineUp.Players.Any() ? (c.StartingLineUp.Players.Average(p => p.ValueWithPotential)) : 0.01), 3);
 
             //var playersForPos = c.StartingLineUp.Players.Where(p => p.Position == Position);
@@ -2234,15 +2443,15 @@ namespace FM.Common.Generic
             var moralFactor = 1d;
             if (c == this.Club)
             {
-                moralFactor = (Age == 18 ? 0.8 : 0.9) + (1 - (Moral / MAX_MORAL));
+                moralFactor = (Age == 18 ? 0.7 : 0.8) + (1 - (Moral / MAX_MORAL));
             }
 
-            var timeFactor = 0.3;
+            var timeFactor = 0.8;
             if (ContractCurrent != null && !isTransfer)
             {
-                timeFactor = timeFactor * Math.Pow(1.12, (Season.Season.CurrentSeason.FootballWeeks.Count() - Math.Max(Game.CONTRACT_BORDER_WEEK + 1, Season.Season.CurrentSeason.CurrentWeek.Number)));
+                timeFactor = timeFactor * Math.Pow(1.07, (Season.Season.CurrentSeason.FootballWeeks.Count() - Math.Max(Game.CONTRACT_BORDER_WEEK + 1, Season.Season.CurrentSeason.CurrentWeek.Number)));
             }
-            else
+            else if (ContractCurrent != null)
             {
                 timeFactor = 1;
             }
@@ -2254,7 +2463,8 @@ namespace FM.Common.Generic
                 salaryRaw *= 0.8;
                 if (Age <= 27 && years > 2)
                 {
-                    salaryRaw = salaryRaw * (1 + ((Math.Min(30 - Age, years.Value) - 2) * (Age <= 21 ? 0.3 : 0.2)));
+                    var yearBonus = Math.Max((0.1 * salaryRaw), Util.GetMinMargin((int)Math.Round(salaryRaw, 0)));
+                    salaryRaw = salaryRaw + ((Math.Min(30 - Age, years.Value) - 2) * yearBonus);
                 }
             }
 

@@ -32,7 +32,7 @@ namespace FM.Views
 
         public void Init()
         {
-            ViewModel = new MainViewModel();
+            ViewModel = MainViewModel.Instance;
             DataContext = ViewModel;
             ViewModel.View = this;
             InitializeComponent();

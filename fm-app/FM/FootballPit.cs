@@ -35,7 +35,7 @@ namespace FootballPit
         {
             get
             {
-                
+
                 return HomeClub.ClubColors.MainColorString == AwayClub.ClubColors.MainColorString || HomeClub.ClubColors.ComparableString == AwayClub.ClubColors.ComparableString /*|| HomeClub.ClubColors.MainColorString == AwayClub.ClubColors.SecondColorString*/;
             }
         }
@@ -129,7 +129,7 @@ namespace FootballPit
                     gform.SetArea(area, offClub);
                 }
 
-                if (i > 15)
+                if (i > 35)
                 {
                     if (offClub != HomeClub)
                     {
@@ -218,8 +218,6 @@ namespace FootballPit
                                 continue;
                             }
                         }
-
-
                     }
                 }
                 PosessionBackLog.Clear();
@@ -236,6 +234,7 @@ namespace FootballPit
             var xpPlayers = new List<Player>();
             foreach (var p in HomeClub.StartingLineUp.Players)
             {
+                CheckForInjuries(p, 0.04);
                 p.AccountXP(Game.XP_MATCH);
                 xpPlayers.Add(p);
                 if (p.PlayerStatistics.Any())
@@ -245,6 +244,7 @@ namespace FootballPit
             }
             foreach (var p in AwayClub.StartingLineUp.Players)
             {
+                CheckForInjuries(p, 0.04);
                 p.AccountXP(Game.XP_MATCH);
                 xpPlayers.Add(p);
                 if (p.PlayerStatistics.Any())
@@ -257,6 +257,7 @@ namespace FootballPit
             {
                 if (!xpPlayers.Contains(sub.In.Player))
                 {
+                    CheckForInjuries(sub.In.Player, 0.02);
                     sub.In.Player.AccountXP(Game.XP_MATCH_SUB);
                     xpPlayers.Add(sub.In.Player);
                     if (sub.In.Player.PlayerStatistics.Any())
@@ -274,7 +275,16 @@ namespace FootballPit
             return res;
         }
 
-
+        private static void CheckForInjuries(Player player, double p)
+        {
+            var injuryDice = Util.GetRandomDouble();
+            if (injuryDice <= p)
+            {
+                //minimum 2, since players heal one injur counter shortly after
+                var injuryTime = (int)Math.Max(2, Math.Round(Util.GetGaussianRandom(3, 2)));
+                player.InjuryTime += injuryTime;
+            }
+        }
 
         private Dictionary<Player, int> MinuteIn = new Dictionary<Player, int>();
         public void MakeSubstitutions(MatchResult mr, int min, Club c, LineUp lineUp, List<Player> bench)
@@ -292,14 +302,14 @@ namespace FootballPit
 
             foreach (var po in playersOrdered)
             {
-                var newPlayer = bench.FirstOrDefault(bp => bp.Position == po.Position && bp.ValueForCoachCurrent > (po.ValueForCoachCurrent * 1.15));
+                var newPlayer = bench.FirstOrDefault(bp => bp.Position == po.Position && bp.ValueForCoachCurrent > (po.ValueForCoachCurrent * 1.23));
                 if (newPlayer != null)
                 {
                     MinuteIn[newPlayer] = min;
                     lineUp.Players.Remove(po);
                     lineUp.Players.Add(newPlayer);
                     bench.Remove(newPlayer);
-                    bench.Add(po);
+                    //bench.Add(po);
                     var substitution = new Substitution(c, MatchPlayer(newPlayer), MatchPlayer(po), min);
                     mr.MatchEvents.Add(new MatchEvent(mr.CreateSubstitutionCommentary(substitution, c == HomeClub), substitution, null, min, false));
                     mr.Substitutions.Add(new Substitution(c, MatchPlayer(newPlayer), MatchPlayer(po), min));
@@ -329,8 +339,10 @@ namespace FootballPit
 
         private void ResetFitness()
         {
-            HomeClub.Rooster.ForEach(p => p.Fitness = 100);
-            AwayClub.Rooster.ForEach(p => p.Fitness = 100);
+            foreach (var p in HomeClub.Rooster.Concat(AwayClub.Rooster))
+            {
+                p.Fitness = 100;
+            }
         }
 
         private void SwitchPossession(LineUp currentHomeLU, LineUp currentAwayLU, out Club offClub, out Club defClub, ref LineUp offLineUp, out LineUp defLineUp, ref int area)

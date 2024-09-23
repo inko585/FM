@@ -50,6 +50,15 @@ namespace FM.Common.Pixels
 
         public string MainColorString { get; set; }
         public string SecondColorString { get; set; }
+
+        public ClubColors() { }
+        public ClubColors(string color1, string color2)
+        {
+            MainColor = Util.GetColorFromText(color1);
+            MainColorString = color1;
+            SecondColor = Util.GetColorFromText(color2);
+            SecondColorString = color2;
+        }
     }
 
     public static class PixelArt
@@ -334,11 +343,11 @@ namespace FM.Common.Pixels
 
         public static LockBitmap GetStadium(int capacity)
         {
-            if (capacity >= 15000)
+            if (capacity >= 16000)
             {
                 return new LockBitmap(Util.GetBitmapFromText(BitmapType.Stadium, "Big"));
             }
-            else if (capacity >= 10000)
+            else if (capacity >= 12000)
             {
                 return new LockBitmap(Util.GetBitmapFromText(BitmapType.Stadium, "Medium"));
             }

@@ -1,5 +1,6 @@
 ﻿using AE.Graphics.Wpf;
 using FM.Common.Generic;
+using FM.Common.Season;
 using FM.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -46,7 +47,7 @@ namespace FM.Views
                 }
             }
 
-            var dia = new ContractWindow(pvm.Player, Game.Instance.PlayerClub, false);
+            var dia = new ContractWindow(pvm.Player, Game.Instance.PlayerClub, false, Season.CurrentSeason.CurrentWeek.Number <= 4);
 
             dia.ShowDialog();
             pvm.NotifyPropertyChanged("Player");
@@ -58,7 +59,7 @@ namespace FM.Views
         {
             var pvm = (sender as Button).DataContext as PlayerViewModel;
 
-            var dia = new ContractWindow(pvm.Player, Game.Instance.PlayerClub, true);
+            var dia = new ContractWindow(pvm.Player, Game.Instance.PlayerClub, true, true);
 
             dia.ShowDialog();
             pvm.NotifyPropertyChanged("Player");

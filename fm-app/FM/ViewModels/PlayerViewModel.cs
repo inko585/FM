@@ -27,9 +27,9 @@ namespace FM.ViewModels
 
         public Player Player { get; set; }
 
-        public bool ContractEnabled => Player.WillSignContractWithPlayerClub && ((Season.CurrentSeason.CurrentWeek.Number == Game.CONTRACT_BORDER_WEEK && Player.Club == Game.Instance.PlayerClub) || Season.CurrentSeason.CurrentWeek.Number > Game.CONTRACT_BORDER_WEEK);
+        public bool ContractEnabled => Player.WillSignContractWithPlayerClub && ((Season.CurrentSeason.CurrentWeek.Number <= 4 && Game.Instance.FootballUniverse.PlayersLookingForClub.Contains(Player)) || ((Season.CurrentSeason.CurrentWeek.Number == Game.CONTRACT_BORDER_WEEK && Player.Club == Game.Instance.PlayerClub) || Season.CurrentSeason.CurrentWeek.Number > Game.CONTRACT_BORDER_WEEK));
 
-        public bool BuyEnabled => !Game.Instance.PlayerClub.Rooster.Contains(Player) && Player.IsForSale && Player.WillSignContract && Season.CurrentSeason.CurrentWeek.Number <= 4;
+        public bool BuyEnabled => Player.ContractCurrent != null && (!Game.Instance.PlayerClub.Rooster.Contains(Player) && Player.IsForSale && Player.WillSignContract && Season.CurrentSeason.CurrentWeek.Number <= 4);
 
 
 

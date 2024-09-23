@@ -63,7 +63,7 @@ namespace FM.ViewModels
             {
                 filter = value;
                 NotifyPropertyChanged("Filter");
-                NotifyPropertyChanged("TransferHistory");
+                NotifyPropertyChanged(nameof(TransferHistory));
             }
         }
 
@@ -87,7 +87,7 @@ namespace FM.ViewModels
         {
             get
             {
-                return new ObservableCollection<Transfer>(Game.Instance.FootballUniverse.TransferList.Where(t => t.Year == SelectedSeason.Year && (t.From.Leagues.Contains(SelectedLeague) || (t.To?.Leagues?.Contains(SelectedLeague) ?? false)) && (Filter == "" || (t.From.Name + " " + t.Player.FullName + " " + t.To?.Name ?? "").Contains(Filter))));
+                return new ObservableCollection<Transfer>(Game.Instance.FootballUniverse.TransferList.Where(t => t.Year == SelectedSeason.Year && ((t.From?.Leagues?.Contains(SelectedLeague) ?? false) || (t.To?.Leagues?.Contains(SelectedLeague) ?? false)) && (Filter == "" || (t.From.Name + " " + t.Player.FullName + " " + t.To?.Name ?? "").Contains(Filter))));
             }
         }
 
@@ -107,6 +107,7 @@ namespace FM.ViewModels
                     SelectedLeague = selectedLeagueAssociation.Leagues.First();
                 }
                 NotifyPropertyChanged("SelectedLeagueAssociation");
+                NotifyPropertyChanged(nameof(TransferHistory));
             }
         }
 
@@ -119,7 +120,7 @@ namespace FM.ViewModels
             {
                 selectedSeason = value;
                 NotifyPropertyChanged("SelectedSeason");
-                NotifyPropertyChanged("TranferHistory");
+                NotifyPropertyChanged(nameof(TransferHistory));
             }
         }
 
@@ -133,7 +134,7 @@ namespace FM.ViewModels
             {
                 league = value;
                 NotifyPropertyChanged("SelectedLeague");
-                NotifyPropertyChanged("TransferHistory");
+                NotifyPropertyChanged(nameof(TransferHistory));
             }
         }
 

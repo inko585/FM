@@ -69,10 +69,11 @@
 
                     </Grid.RowDefinitions>
                     <Border BorderThickness="1,1,1,0"  BorderBrush="Gray" Grid.Row="0" Grid.Column="0" Background="LightGray">
-                        <Label Content="Position"  VerticalAlignment="Center"/>
+                        <Label Content="Marktwert"  VerticalAlignment="Center"/>
                     </Border>
                     <Border BorderThickness="0,1,1,0"  BorderBrush="Gray" Grid.Row="0" Grid.Column="1">
-                        <Label Content="{Binding Player.PositionString}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                        <Label Content="{Binding Player.MarketValueStandardString}" FontWeight="Bold"  VerticalAlignment="Center" HorizontalAlignment="Left" />
+
                     </Border>
 
                     <Border BorderThickness="1,1,1,0"  BorderBrush="Gray" Grid.Row="1" Grid.Column="0" Background="LightGray">
@@ -86,10 +87,13 @@
                     </Border>
 
                     <Border BorderThickness="1,1,1,0"  BorderBrush="Gray" Grid.Row="2" Grid.Column="0" Background="LightGray">
-                        <Label Content="Marktwert"  VerticalAlignment="Center" />
+                        <Label Content="Status"  VerticalAlignment="Center" />
                     </Border>
                     <Border BorderThickness="0,1,1,0"  BorderBrush="Gray" Grid.Row="2" Grid.Column="1">
-                        <Label Content="{Binding Player.MarketValueStandardString}" FontWeight="Bold"  VerticalAlignment="Center" HorizontalAlignment="Left" />
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="{Binding Player.InjuryLabel}" Foreground="Red" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" Margin="2,0,0,0" FontFamily="{StaticResource FontAwesome6}"></Label>
+                            <Label Content="{Binding Player.InjuryTimeString}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left"  />
+                        </StackPanel>
                     </Border>
 
                     <Border BorderThickness="1,1,1,0"  BorderBrush="Gray" Grid.Row="3" Grid.Column="0" Background="LightGray">
@@ -148,17 +152,17 @@
                         </Border>
 
                         <Border BorderThickness="1,1,1,0"  BorderBrush="Gray" Grid.Row="1" Grid.Column="0" Background="LightGray">
-                            <Label Content="Alter" Grid.Row="1" VerticalAlignment="Center"/>
+                            <Label Content="Position" Grid.Row="1" VerticalAlignment="Center"/>
                         </Border>
                         <Border BorderThickness="0,1,0,0"  BorderBrush="Gray" Grid.Row="1" Grid.Column="1" >
-                            <Label Content="{Binding Player.Age}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1"/>
+                            <Label Content="{Binding Player.PositionStringShort}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1"/>
                         </Border>
 
                         <Border BorderThickness="1,1,1,1"  BorderBrush="Gray" Grid.Row="2" Grid.Column="0" Background="LightGray">
-                            <Label Content="Konstitution" VerticalAlignment="Center" Grid.Row="2"/>
+                            <Label Content="Alter" VerticalAlignment="Center" Grid.Row="2"/>
                         </Border>
                         <Border BorderThickness="0,1,0,1"  BorderBrush="Gray" Grid.Row="2" Grid.Column="1" >
-                            <Label Content="{Binding Player.ConstitutionDisplayed}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="2" Grid.Column="1"/>
+                            <Label Content="{Binding Player.Age}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1"/>
                         </Border>
 
                         <Border BorderThickness="1,1,1,0"  BorderBrush="Gray" Grid.Row="0" Grid.Column="2" Background="LightGray">
@@ -169,17 +173,17 @@
                         </Border>
 
                         <Border BorderThickness="1,1,1,0"  BorderBrush="Gray" Grid.Row="1" Grid.Column="2" Background="LightGray">
-                            <Label Content="Charisma" VerticalAlignment="Center"/>
+                            <Label Content="Konstitution" VerticalAlignment="Center"/>
                         </Border>
                         <Border BorderThickness="0,1,1,0"  BorderBrush="Gray" Grid.Row="1" Grid.Column="3" >
-                            <Label Content="{Binding Player.Charisma}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                            <Label Content="{Binding Player.ConstitutionDisplayed}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="2" Grid.Column="1"/>
                         </Border>
 
                         <Border BorderThickness="1,1,1,1"  BorderBrush="Gray" Grid.Row="2" Grid.Column="2" Background="LightGray">
-                            <Label Content="Moral:" VerticalAlignment="Center" />
+                            <Label Content="XP" VerticalAlignment="Center" />
                         </Border>
                         <Border BorderThickness="0,1,1,1"  BorderBrush="Gray" Grid.Row="2" Grid.Column="3" >
-                            <Label Content="100" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                            <Label Content="{Binding Player.XPString}" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                         </Border>
                     </Grid>
                 </TabItem>

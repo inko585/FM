@@ -17,7 +17,7 @@ namespace FM.ViewModels
 {
     public class FoundingViewModel : BaseViewModel
     {
-        public Club FoundingClub { get; set; }
+        public PlayerClub FoundingClub { get; set; }
 
         public AssociationLook AssociationLook { get; set; }
         public FoundingViewModel(IEnumerable<Association> associations, AssociationLook al)
@@ -26,7 +26,7 @@ namespace FM.ViewModels
             SelectedCrestId = 0;
 
             AssociationLook = al;
-            FoundingClub = new Club();
+            FoundingClub = new PlayerClub();
             ColorOptions = new ObservableCollection<ColorOption>(al.ColorPairs.Select(cp => cp.Text).Concat(al.ColorPairs.Select(cp => cp.Text2)).Distinct().Select(t => new ColorOption(t)));
 
 

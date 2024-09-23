@@ -62,7 +62,7 @@ namespace FM.Views
                     return;
                 }
             }
-            var dia = new ContractWindow(p, Game.Instance.PlayerClub, false);
+            var dia = new ContractWindow(p, Game.Instance.PlayerClub, false, false);
             dia.ShowDialog();
             RoosterViewModel.Instance.Update();
         }

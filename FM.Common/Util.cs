@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 using System.Xml.Serialization;
+using static System.Resources.ResXFileRef;
 
 namespace FM.Common
 {
@@ -15,6 +17,12 @@ namespace FM.Common
 
     public static class RichInt
     {
+        public static T Clamp<T>(this T val, T min, T max) where T : IComparable<T>
+        {
+            if (val.CompareTo(min) < 0) return min;
+            else if (val.CompareTo(max) > 0) return max;
+            else return val;
+        }
 
         public static IEnumerable<T> Times<T>(this int times, Func<int, T> function)
         {
@@ -78,22 +86,70 @@ namespace FM.Common
 
     public class Util
     {
-
-
-
-        public static Random rnd = new Random();
+        private static long seed = DateTime.Now.Ticks;
         public static double GetGaussianRandom(double mean, double stdDev)
         {
 
-            double u1 = rnd.NextDouble();
-            double u2 = rnd.NextDouble();
+            double u1 = GetRandomDouble();
+            double u2 = GetRandomDouble();
             double rndStdNorm = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2);
             return mean + stdDev * rndStdNorm;
         }
 
         public static int GetRandomInt(int from, int to)
         {
-            return rnd.Next(from, to + 1);
+            if (from == to)
+            {
+                return from;
+            }
+            if (from > to)
+            {
+                throw new ArgumentException("The 'min' value must be less than or equal to the 'max' value.");
+            }
+
+           
+            using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+            {
+                
+                byte[] seedBytes = BitConverter.GetBytes(seed);
+                rng.GetBytes(seedBytes);
+
+                int randomNumber = Math.Abs(BitConverter.ToInt32(seedBytes, 0));
+                return (int)((randomNumber / (double)int.MaxValue) * (to - from) + from);
+            }
+        }
+
+        public static double GetRandomDouble()
+        {
+            using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+            {
+                byte[] seedBytes = BitConverter.GetBytes(seed);
+                rng.GetBytes(seedBytes);
+
+                var longValue = BitConverter.ToInt64(seedBytes, 0);
+                return (double)(longValue & long.MaxValue) / long.MaxValue;
+            }
+        }
+
+
+        public static int GetMinMargin(int raw)
+        {
+            if (raw <= 10000)
+            {
+                return 1000;
+            }
+            else if (raw <= 100000)
+            {
+                return 25000;
+            }
+            else if (raw <= 1000000)
+            {
+                return 50000;
+            }
+            else
+            {
+                return 250000;
+            }
         }
 
         public static int GetNiceValue(int raw)
@@ -115,6 +171,21 @@ namespace FM.Common
             }
         }
 
+        public static void RandomizeList<T>(List<T> list)
+        {
+            Random rand = new Random();
+
+            int n = list.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = rand.Next(n + 1);
+                T value = list[k];
+                list[k] = list[n];
+                list[n] = value;
+            }
+        }
+
         public static BitmapImage BitmapToImageSource(Bitmap bitmap)
         {
             using (MemoryStream memory = new MemoryStream())
@@ -128,6 +199,18 @@ namespace FM.Common
                 bitmapimage.EndInit();
 
                 return bitmapimage;
+            }
+        }
+        public static Color GetColorFromText(string name)
+        {
+            try
+            {
+                var converter = new ColorConverter();
+                return (Color)converter.ConvertFromString(name);
+            }
+            catch (Exception e)
+            {
+                return Color.Pink;
             }
         }
 

@@ -26,11 +26,14 @@ namespace FM.Views
     /// </summary>
     public partial class ContractWindow : AEWindow
     {
-        public ContractWindow(Player player, Club club, bool isTransfer)
+
+        private bool IsWithinTransferWindow;
+        public ContractWindow(Player player, Club club, bool isTransfer, bool isWithinTransferWindow)
         {
-            ViewModel = new ContractViewModel(player, club, isTransfer);
+            ViewModel = new ContractViewModel(player, club, isTransfer, isWithinTransferWindow);
             DataContext = ViewModel;
             InitializeComponent();
+            IsWithinTransferWindow = isWithinTransferWindow;
         }
 
 
@@ -44,8 +47,16 @@ namespace FM.Views
             }
             else
             {
-                FootballHelper.SignContract(contractVM.Player, contractVM.Club, contractVM.SelectedRunTimeIndex + 2, contractVM.Salary, false);
+                
+                if (contractVM.Club != contractVM.Player.Club)
+                {
+                    Game.Instance.FootballUniverse.TransferList.Add(new Transfer(contractVM.Player, contractVM.Player.Club ?? contractVM.Player.ClubHistory.Last(), contractVM.Club, Season.CurrentSeason.Year + (IsWithinTransferWindow ? 0 : 1), 1, 0, contractVM.Player.MarketValueStandard));
+                }
+                FootballHelper.SignContract(contractVM.Player, contractVM.Club, contractVM.SelectedRunTimeIndex + 2, contractVM.Salary, contractVM.Club != contractVM.Player.Club && IsWithinTransferWindow);
+
             }
+
+            MainViewModel.Instance.Update();
             this.Close();
         }
     }
